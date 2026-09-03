@@ -14,6 +14,11 @@ export function JsonLd() {
       "@type": "AdministrativeArea",
       name: ENTITY.areaServed,
     },
+    address: {
+      "@type": "PostalAddress",
+      addressRegion: "CA",
+      addressCountry: "US",
+    },
     knowsAbout: [
       "Website building for small businesses",
       "Owner-approved quoting",
