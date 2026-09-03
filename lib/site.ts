@@ -47,7 +47,7 @@ export const comparisonNav: NavLink[] = [
   { href: "/servicetitan-alternative", label: "ServiceTitan alternative" },
   {
     href: "/jobber-housecall-site-builder",
-    label: "Site builder vs custom",
+    label: "Site builder vs a site you own",
   },
 ];
 

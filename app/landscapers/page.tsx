@@ -26,7 +26,7 @@ export default function LandscapersPage() {
       <Section tone="white">
         <div className="grid gap-4 md:grid-cols-2">
           <PeachCard>
-            <h2 className="text-2xl font-semibold">Built for the yard, not a template</h2>
+            <h2 className="text-2xl font-semibold">A site you own, written for the yard</h2>
             <p className="text-ink-soft mt-3 leading-7">
               Real services. Real service area. Phone-first pages. Previews you
               approve before anything goes live. The site is yours — canceling
@@ -72,7 +72,7 @@ export default function LandscapersPage() {
                   <>
                     Those builders are a brochure on someone else’s host. See{" "}
                     <Link href="/jobber-housecall-site-builder" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-                      site builder vs a custom contractor site
+                      site builder vs a site you own
                     </Link>
                     .
                   </>

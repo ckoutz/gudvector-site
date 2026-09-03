@@ -114,7 +114,7 @@ export default function DontWantSoftwarePage() {
           },
           {
             href: "/jobber-housecall-site-builder",
-            title: "Site builder vs custom",
+            title: "Site builder vs a site you own",
             text: "If the bundled site was the homework.",
           },
           {

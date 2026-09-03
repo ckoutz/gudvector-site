@@ -20,7 +20,7 @@ export default function JobberAlternativePage() {
   return (
     <main id="main">
       <PageHero
-        eyebrow="Comparison · facts dated 2 Sep 2026"
+        eyebrow="Comparison · prices re-checked 3 Sep 2026"
         title="A Jobber alternative when the shop needs its own site and quote rules."
         lede="Güd Vector is not a Jobber clone. It is a custom website plus quoting, a customer portal, and booking requests built around this shop — so the owner does not migrate a whole company onto a login."
       />
@@ -32,9 +32,9 @@ export default function JobberAlternativePage() {
             className="text-brand-deep font-semibold underline-offset-4 hover:underline"
           >
             getjobber.com/pricing
-          </a>{" "}
-          as fetched 2 September 2026. Re-check that page before you treat a
-          dollar as current.
+          </a>
+          , re-checked 3 September 2026. One cadence: billed annually. Re-check
+          that page before you treat a dollar as current.
         </p>
         <div className="mt-8">
           <ComparisonTable
@@ -49,9 +49,9 @@ export default function JobberAlternativePage() {
                 ],
               },
               {
-                label: "Public price (2 Sep 2026)",
+                label: "Public price (3 Sep 2026)",
                 values: [
-                  "Core from $29/mo billed annually ($49/mo no commitment). Connect from $139/mo no commitment. Grow from $199/mo. Plus from $499/mo (5 users) to $699/mo (15 users). Card 2.9% + 30¢. Add-ons on that page: Receptionist $29, Pipeline $49, Marketing Suite $99. 14-day Grow trial, no card.",
+                  "Core from $29/mo billed annually. Connect from $99/mo billed annually. Grow from $149/mo billed annually. Plus from $399/mo billed annually (5 users) to $529/mo billed annually (15 users). Card 2.9% + 30¢. Add-ons on that page: Receptionist $29, Pipeline $49, Marketing Suite $99. 14-day Grow trial, no card.",
                   "Quoted as a project. No public rate card on this site.",
                 ],
               },
@@ -85,7 +85,8 @@ export default function JobberAlternativePage() {
           <h2 className="text-2xl font-semibold">When Jobber is the right answer</h2>
           <p className="text-ink-soft mt-3 leading-7">
             If you need drag-and-drop dispatch this week, a Client Hub, and a
-            price you can start at $29–$49 a month, Jobber is built for that.
+            price you can start at $29 a month billed annually, Jobber is built
+            for that.
             Ease of use and that community are not things we pretend to beat.
             Go to the official page and run the trial.
           </p>
@@ -103,7 +104,7 @@ export default function JobberAlternativePage() {
                     Yes, on every plan as of 2 Sep 2026. That is a different
                     product from a site you own. See{" "}
                     <Link href="/jobber-housecall-site-builder" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-                      site builder vs custom
+                      site builder vs a site you own
                     </Link>
                     .
                   </>
@@ -133,7 +134,7 @@ export default function JobberAlternativePage() {
           },
           {
             href: "/jobber-housecall-site-builder",
-            title: "Site builder vs custom",
+            title: "Site builder vs a site you own",
             text: "The “we already have a site in Jobber” page.",
           },
           {

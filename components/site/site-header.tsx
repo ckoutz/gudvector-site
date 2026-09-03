@@ -28,7 +28,7 @@ export function SiteHeader() {
             href={LIVE_PORTAL}
             className="text-ink-soft hover:text-ink min-h-11 rounded-full px-3 py-2 text-[0.95rem] font-semibold"
           >
-            Customer portal
+            Client portal login
           </a>
           <Link
             href="/#contact"

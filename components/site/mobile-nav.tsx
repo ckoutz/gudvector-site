@@ -50,7 +50,7 @@ export function MobileNav() {
             render={<a href={LIVE_PORTAL} />}
             className="min-h-11 rounded-xl px-3 py-2.5 text-base font-semibold"
           >
-            Customer portal
+            Client portal login
           </SheetClose>
         </nav>
       </SheetContent>

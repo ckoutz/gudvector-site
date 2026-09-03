@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/site/brand-logo";
-import { ENTITY, footerNav, LIVE_PORTAL } from "@/lib/site";
+import { comparisonNav, ENTITY, footerNav, LIVE_PORTAL } from "@/lib/site";
 
 export function SiteFooter() {
   const workLinks = footerNav.filter(
@@ -30,11 +30,26 @@ export function SiteFooter() {
             {ENTITY.motto}
           </p>
         </div>
-        <div className="grid gap-8 sm:grid-cols-2">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <p className="font-heading text-lg">Pages</p>
             <ul className="mt-3 space-y-2">
               {workLinks.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-ink-soft hover:text-ink min-h-11 inline-flex items-center text-sm font-semibold"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="font-heading text-lg">Comparisons</p>
+            <ul className="mt-3 space-y-2">
+              {comparisonNav.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
@@ -54,7 +69,7 @@ export function SiteFooter() {
                   href={LIVE_PORTAL}
                   className="text-ink-soft hover:text-ink min-h-11 inline-flex items-center text-sm font-semibold"
                 >
-                  Customer portal
+                  Client portal login
                 </a>
               </li>
               {legalLinks.map((item) => (

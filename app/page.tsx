@@ -39,7 +39,7 @@ const steps = [
   {
     n: "05",
     title: "Go live",
-    text: "Launch a site and systems your team can actually run day to day.",
+    text: "A site and quotes you can run from your phone.",
   },
 ];
 
@@ -81,12 +81,14 @@ export default function HomePage() {
             <h1 className="mt-4 max-w-3xl text-4xl font-semibold sm:text-5xl lg:text-6xl">
               {ENTITY.h1}
             </h1>
-            <p className="text-ink-soft mt-6 max-w-2xl text-lg leading-8">
-              We build a custom website and a custom system around how a Bay
-              Area service shop already works. The owner approves every quote.
-              The customer pays, pauses, or cancels in a branded portal. The
-              site is yours — not a template you adapt to, and not another
-              dashboard you learn.
+            <p className="text-ink-soft mt-5 max-w-2xl text-lg leading-8">
+              After a good review they still look you up on Google — and a lot
+              of them now ask ChatGPT who to call.
+            </p>
+            <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
+              You get a phone-ready page you own, live fast. Then quoting and
+              pay are wired to how you already work — not another dashboard you
+              learn.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -109,7 +111,7 @@ export default function HomePage() {
 
       <Section tone="white">
         <p className="bg-peach text-brand-deep inline-flex rounded-full px-3 py-1 text-sm font-semibold">
-          Preview pattern
+          What a customer opens on their phone
         </p>
         <h2 className="mt-4 max-w-3xl text-3xl font-semibold sm:text-4xl">
           Their shop vs a page a homeowner can use.

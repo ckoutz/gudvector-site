@@ -94,7 +94,7 @@ export default function HousecallAlternativePage() {
                   <>
                     No. It is an add-on on their platform. Details on{" "}
                     <Link href="/jobber-housecall-site-builder" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-                      site builder vs custom
+                      site builder vs a site you own
                     </Link>
                     .
                   </>
@@ -115,7 +115,7 @@ export default function HousecallAlternativePage() {
           {
             href: "/jobber-alternative",
             title: "Jobber alternative",
-            text: "Official Core $29 / $49 from 2 Sep 2026.",
+            text: "Official Core from $29/mo billed annually, re-checked 3 Sep 2026.",
           },
           {
             href: "/servicetitan-alternative",
