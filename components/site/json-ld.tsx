@@ -14,6 +14,7 @@ export function JsonLd() {
       "@type": "AdministrativeArea",
       name: ENTITY.areaServed,
     },
+    // SEO-confirmed: CA + US only. No locality, street, postalCode, geo, or telephone.
     address: {
       "@type": "PostalAddress",
       addressRegion: "CA",
