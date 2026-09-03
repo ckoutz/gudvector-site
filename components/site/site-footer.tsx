@@ -1,21 +1,28 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { BrandLogo } from "@/components/site/brand-logo";
-import { comparisonNav, ENTITY, footerNav, LIVE_PORTAL } from "@/lib/site";
+import { PortalLoginLink } from "@/components/site/portal-login-link";
+import { comparisonNav, ENTITY, footerNav } from "@/lib/site";
 
-export function SiteFooter() {
+export async function SiteFooter() {
   const workLinks = footerNav.filter(
     (item) => item.href !== "/privacy" && item.href !== "/terms",
   );
   const legalLinks = footerNav.filter(
     (item) => item.href === "/privacy" || item.href === "/terms",
   );
+  const host = (await headers()).get("host");
 
   return (
     <footer className="border-border mt-auto border-t bg-white">
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,16rem)_1fr]">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(16rem,20rem)_1fr]">
         <div>
-          <Link href="/" className="block w-40" aria-label="Güd Vector home">
-            <BrandLogo variant="full" />
+          <Link
+            href="/"
+            className="block w-full max-w-[18rem]"
+            aria-label="Güd Vector home"
+          >
+            <BrandLogo variant="wordmark" />
           </Link>
           <p className="text-ink-soft mt-4 text-sm leading-6">
             {ENTITY.name}
@@ -65,12 +72,10 @@ export function SiteFooter() {
             <p className="font-heading text-lg">Also</p>
             <ul className="mt-3 space-y-2">
               <li>
-                <a
-                  href={LIVE_PORTAL}
+                <PortalLoginLink
+                  host={host}
                   className="text-ink-soft hover:text-ink min-h-11 inline-flex items-center text-sm font-semibold"
-                >
-                  Client portal login
-                </a>
+                />
               </li>
               {legalLinks.map((item) => (
                 <li key={item.href}>

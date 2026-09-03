@@ -11,9 +11,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { headerNav, LIVE_PORTAL } from "@/lib/site";
+import { headerNav, LIVE_PORTAL, portalLoginLabel } from "@/lib/site";
 
-export function MobileNav() {
+export function MobileNav({ host }: { host: string | null }) {
   return (
     <Sheet>
       <SheetTrigger
@@ -48,7 +48,7 @@ export function MobileNav() {
             render={<a href={LIVE_PORTAL} />}
             className="min-h-11 rounded-xl px-3 py-2.5 text-base font-semibold"
           >
-            Client portal login
+            {portalLoginLabel(host)}
           </SheetClose>
         </nav>
       </SheetContent>

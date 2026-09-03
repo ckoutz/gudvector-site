@@ -17,8 +17,8 @@ export function BrandLogo({
       <Image
         src="/brand/logo.png"
         alt="Güd Vector Consulting Services"
-        width={1254}
-        height={1254}
+        width={972}
+        height={960}
         priority={priority}
         className={cn("h-auto w-full", className)}
       />
@@ -28,9 +28,9 @@ export function BrandLogo({
   return (
     <Image
       src="/brand/logo-wordmark.png"
-      alt="Güd Vector"
-      width={1019}
-      height={781}
+      alt="Güd Vector Consulting Services"
+      width={950}
+      height={751}
       priority={priority}
       className={cn("h-auto w-full", className)}
     />

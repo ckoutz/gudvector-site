@@ -15,6 +15,14 @@ export const ENTITY = {
 
 export const LIVE_PORTAL = "https://gudvector.com/portal";
 
+export function portalLoginLabel(host: string | null | undefined) {
+  const hostname = (host ?? "").split(":")[0].toLowerCase();
+  if (hostname === "gudvector.com" || hostname === "www.gudvector.com") {
+    return "Client portal login";
+  }
+  return "Client portal login (live site)";
+}
+
 export type NavLink = {
   href: string;
   label: string;
@@ -36,6 +44,7 @@ export const footerNav: NavLink[] = [
   { href: "/website-booking", label: "Website + booking" },
   { href: "/owner-approved-quoting", label: "Owner-approved quoting" },
   { href: "/dont-want-to-learn-software", label: "I don't want to learn software" },
+  { href: "/contact", label: "Contact" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
 ];
@@ -66,6 +75,7 @@ export const publicPaths = [
   "/dont-want-to-learn-software",
   "/environmental-testing",
   "/concord",
+  "/contact",
 ] as const;
 
 export function absoluteUrl(path: string) {
