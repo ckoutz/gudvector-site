@@ -21,7 +21,10 @@ export function Section({
   };
 
   return (
-    <section id={id} className={cn("py-16 sm:py-20", tones[tone], className)}>
+    <section
+      id={id}
+      className={cn("py-16 sm:py-20", id && "scroll-mt-[6.5rem]", tones[tone], className)}
+    >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">{children}</div>
     </section>
   );

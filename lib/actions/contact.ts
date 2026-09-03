@@ -1,9 +1,10 @@
 "use server";
 
-import { headers } from "next/headers";
 import { Resend } from "resend";
 import { needLabels, contactSchema } from "@/lib/validations/contact";
 import { ENTITY } from "@/lib/site";
+// An in-memory Map is not a rate limit on Vercel (each invocation is isolated).
+// Production needs Cloudflare Turnstile (with keys) or a shared store. Honeypot stays.
 
 export type ContactState = {
   status: "idle" | "success" | "error";
@@ -12,21 +13,6 @@ export type ContactState = {
     Record<"name" | "email" | "need" | "message", string>
   >;
 };
-
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_HITS = 5;
-const hits = new Map<string, { count: number; start: number }>();
-
-function rateLimited(ip: string) {
-  const now = Date.now();
-  const current = hits.get(ip);
-  if (!current || now - current.start > WINDOW_MS) {
-    hits.set(ip, { count: 1, start: now });
-    return false;
-  }
-  current.count += 1;
-  return current.count > MAX_HITS;
-}
 
 export async function submitContact(
   _prev: ContactState,
@@ -61,19 +47,6 @@ export async function submitContact(
       status: "error",
       message: "Check the highlighted fields and try again.",
       fieldErrors,
-    };
-  }
-
-  const headerList = await headers();
-  const ip =
-    headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    headerList.get("x-real-ip") ||
-    "unknown";
-
-  if (rateLimited(ip)) {
-    return {
-      status: "error",
-      message: "That is too many messages in a short time. Email us at info@gudvector.com.",
     };
   }
 

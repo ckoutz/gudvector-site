@@ -32,7 +32,7 @@ export function SiteHeader() {
           </a>
           <Link
             href="/#contact"
-            className="bg-brand hover:bg-brand-deep min-h-11 rounded-full px-4 py-2 text-[0.95rem] font-semibold text-white"
+            className="bg-brand-deep hover:bg-[#a34000] min-h-11 rounded-full px-4 py-2 text-[0.95rem] font-semibold text-white"
           >
             Get in touch
           </Link>
@@ -40,7 +40,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-2 lg:hidden">
           <Link
             href="/#contact"
-            className="bg-brand hover:bg-brand-deep min-h-11 rounded-full px-4 py-2 text-sm font-semibold text-white"
+            className="bg-brand-deep hover:bg-[#a34000] min-h-11 rounded-full px-4 py-2 text-sm font-semibold text-white"
           >
             Get in touch
           </Link>

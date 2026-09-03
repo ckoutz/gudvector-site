@@ -34,7 +34,7 @@ export function PhoneMockup() {
               <div className="flex items-center gap-3">
                 <span
                   aria-hidden
-                  className="bg-brand flex size-11 items-center justify-center rounded-2xl text-lg font-bold text-white"
+                  className="bg-brand-deep flex size-11 items-center justify-center rounded-2xl text-lg font-bold text-white"
                 >
                   Y
                 </span>
@@ -50,7 +50,7 @@ export function PhoneMockup() {
               </ul>
               <Link
                 href="#contact"
-                className="bg-brand mt-5 flex min-h-11 items-center justify-center rounded-full text-sm font-semibold text-white"
+                className="bg-brand-deep mt-5 flex min-h-11 items-center justify-center rounded-full text-sm font-semibold text-white"
               >
                 Book now
               </Link>

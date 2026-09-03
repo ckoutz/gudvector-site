@@ -44,7 +44,7 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-brand: #fc7004;
-  --color-brand-deep: #d65c00;
+  --color-brand-deep: #c44e00;
   --color-cream: #fff6ec;
   --color-peach: #ffe0c2;
   --color-wash: #fff1e3;
@@ -66,7 +66,7 @@
   --card-foreground: #2a2118;
   --popover: #ffffff;
   --popover-foreground: #2a2118;
-  --primary: #fc7004;
+  --primary: #c44e00;
   --primary-foreground: #fffdf9;
   --secondary: #ffe0c2;
   --secondary-foreground: #2a2118;
@@ -86,7 +86,7 @@
   --radius: 0.9rem;
   --sidebar: #fffdf9;
   --sidebar-foreground: #2a2118;
-  --sidebar-primary: #fc7004;
+  --sidebar-primary: #c44e00;
   --sidebar-primary-foreground: #fffdf9;
   --sidebar-accent: #fff1e3;
   --sidebar-accent-foreground: #2a2118;
@@ -101,6 +101,20 @@
 
   html {
     @apply font-sans scroll-smooth;
+    /* Sticky header is 4.25rem; extra room for focus rings / field labels (WCAG 2.4.11). */
+    scroll-padding-top: 6.5rem;
+  }
+
+  #main,
+  #contact,
+  #services,
+  #how-it-works,
+  #about {
+    scroll-margin-top: 6.5rem;
+  }
+
+  #contact :is(input:not([tabindex="-1"]), textarea, select, button) {
+    scroll-margin-top: 6.5rem;
   }
 
   body {

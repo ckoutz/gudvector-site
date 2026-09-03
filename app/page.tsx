@@ -93,7 +93,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="#contact"
-                className="bg-brand hover:bg-brand-deep inline-flex min-h-11 items-center rounded-full px-5 py-2.5 font-semibold text-white"
+                className="bg-brand-deep hover:bg-[#a34000] inline-flex min-h-11 items-center rounded-full px-5 py-2.5 font-semibold text-white"
               >
                 Get in touch
               </Link>

@@ -109,7 +109,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={pending}
-        className="bg-brand hover:bg-brand-deep min-h-11 rounded-full px-6 py-2.5 font-semibold text-white disabled:opacity-70"
+        className="bg-brand-deep hover:bg-[#a34000] min-h-11 rounded-full px-6 py-2.5 font-semibold text-white disabled:opacity-70"
       >
         {pending ? "Sending…" : "Send"}
       </button>
