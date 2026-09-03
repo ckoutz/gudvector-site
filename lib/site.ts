@@ -37,6 +37,11 @@ export const footerNav: NavLink[] = [
   { href: "/website-booking", label: "Website + booking" },
   { href: "/owner-approved-quoting", label: "Owner-approved quoting" },
   { href: "/dont-want-to-learn-software", label: "I don't want to learn software" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+];
+
+export const comparisonNav: NavLink[] = [
   { href: "/jobber-alternative", label: "Jobber alternative" },
   { href: "/housecall-pro-alternative", label: "Housecall Pro alternative" },
   { href: "/servicetitan-alternative", label: "ServiceTitan alternative" },
@@ -44,8 +49,6 @@ export const footerNav: NavLink[] = [
     href: "/jobber-housecall-site-builder",
     label: "Site builder vs custom",
   },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Terms" },
 ];
 
 export const publicPaths = [
