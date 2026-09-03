@@ -153,8 +153,8 @@ export default function HomePage() {
             <p className="text-ink-soft mt-3 leading-7">
               For businesses with no site, or one that isn&apos;t pulling its
               weight. Clean, mobile-first pages for their shop — real copy,
-              local SEO, click-to-call on their number, and previews you
-              approve before anything goes live.
+              local SEO, and a click-to-call button on their site, plus
+              previews you approve before anything goes live.
             </p>
           </PeachCard>
           <PeachCard>

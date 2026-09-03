@@ -21,10 +21,9 @@ export type NavLink = {
 };
 
 export const headerNav: NavLink[] = [
-  { href: "/#services", label: "Services" },
-  { href: "/#how-it-works", label: "How it works" },
   { href: "/concord", label: "Concord" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/owner-approved-quoting", label: "Owner-approved quoting" },
+  { href: "/landscapers", label: "Landscapers" },
 ];
 
 export const footerNav: NavLink[] = [

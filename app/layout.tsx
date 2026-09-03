@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito } from "next/font/google";
-import { JsonLd } from "@/components/site/json-ld";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { SkipLink } from "@/components/site/skip-link";
@@ -46,7 +45,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col bg-cream font-sans text-ink">
         <SkipLink />
-        <JsonLd />
         <SiteHeader />
         {children}
         <SiteFooter />

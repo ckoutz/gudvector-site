@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { footerNav, LIVE_PORTAL } from "@/lib/site";
+import { headerNav, LIVE_PORTAL } from "@/lib/site";
 
 export function MobileNav() {
   return (
@@ -35,17 +35,15 @@ export function MobileNav() {
           </SheetTitle>
         </SheetHeader>
         <nav aria-label="Mobile" className="flex flex-col gap-1 px-4 pb-8">
-          {footerNav
-            .filter((item) => item.href !== "/privacy" && item.href !== "/terms")
-            .map((item) => (
-              <SheetClose
-                key={item.href}
-                render={<Link href={item.href} />}
-                className="min-h-11 rounded-xl px-3 py-2.5 text-base font-semibold"
-              >
-                {item.label}
-              </SheetClose>
-            ))}
+          {headerNav.map((item) => (
+            <SheetClose
+              key={item.href}
+              render={<Link href={item.href} />}
+              className="min-h-11 rounded-xl px-3 py-2.5 text-base font-semibold"
+            >
+              {item.label}
+            </SheetClose>
+          ))}
           <SheetClose
             render={<a href={LIVE_PORTAL} />}
             className="min-h-11 rounded-xl px-3 py-2.5 text-base font-semibold"
