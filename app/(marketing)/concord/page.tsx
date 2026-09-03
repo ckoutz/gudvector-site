@@ -4,13 +4,12 @@ import { PageHero } from "@/components/site/page-hero";
 import { RelatedLinks } from "@/components/site/related-links";
 import { PeachCard, Section } from "@/components/site/section";
 import { pageMetadata } from "@/lib/metadata";
-import { ENTITY } from "@/lib/site";
 
 export function generateMetadata() {
   return pageMetadata({
     title: "Concord & Contra Costa Websites for Trades | Güd Vector",
     description:
-      "Güd Vector Consulting Services is a Bay Area firm that builds custom websites and owner-approved quoting for local service businesses. Email info@gudvector.com.",
+      "Güd Vector Consulting Services is a Bay Area firm that builds websites and owner-approved quoting for local service businesses. Email info@gudvector.com.",
     path: "/concord",
   });
 }
@@ -20,41 +19,35 @@ export default function ConcordPage() {
     <main id="main">
       <PageHero
         eyebrow="Concord · Contra Costa · East Bay"
-        title="Custom websites for Concord and Contra Costa service shops."
-        lede="Güd Vector Consulting Services is a Bay Area firm that builds custom websites and owner-approved quoting for local service businesses."
+        title="Websites for Concord and Contra Costa service shops."
+        lede="Güd Vector Consulting Services is a Bay Area firm that builds websites and owner-approved quoting for local service businesses."
       />
       <Section tone="white">
         <PeachCard>
-          <h2 className="text-2xl font-semibold">The entity, in one place</h2>
+          <h2 className="text-2xl font-semibold">Who we are</h2>
           <p className="mt-3 text-lg leading-8">
-            Güd Vector Consulting Services is a Bay Area firm that builds custom
-            websites and owner-approved quoting for local service businesses.
+            Güd Vector Consulting Services (Güd Vector) serves the San
+            Francisco Bay Area. Email info@gudvector.com. You send the quote.
+            The customer reviews it, pays, pauses, or cancels in a portal with
+            your name on it.
           </p>
-          <ul className="text-ink-soft mt-4 space-y-2 leading-7">
-            <li>Name: {ENTITY.name}</li>
-            <li>Also called: {ENTITY.alternateName}</li>
-            <li>Area: {ENTITY.areaServed}</li>
-            <li>Email: {ENTITY.email}</li>
-            <li>Quotes are custom and owner-approved. You send the quote.</li>
-          </ul>
         </PeachCard>
       </Section>
       <Section tone="wash">
-        <h2 className="text-3xl font-semibold">Service area</h2>
+        <h2 className="text-3xl font-semibold">Where we work</h2>
         <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
           Concord, Pleasant Hill, Walnut Creek, Martinez, Clayton, Pittsburg,
-          and the rest of Contra Costa and the San Francisco Bay Area. We do
-          not publish thin pages for every city.
+          and the rest of Contra Costa and the San Francisco Bay Area.
         </p>
       </Section>
       <Section tone="white">
-        <h2 className="text-3xl font-semibold">Trades this hub points to</h2>
+        <h2 className="text-3xl font-semibold">Trades we build for</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {[
-            ["/landscapers", "Landscapers", "Concord and East Bay, including C-27 shops."],
+            ["/landscapers", "Landscapers", "Concord and East Bay crews."],
             ["/plumbers", "Plumbers", "Bay Area pages that work on a phone."],
-            ["/home-inspectors", "Home inspectors", "Report, fee, escrow time."],
-            ["/environmental-testing", "Environmental testing", "Sampling portal. No invented lab certs."],
+            ["/home-inspectors", "Home inspectors", "Report, fee, and escrow timing."],
+            ["/environmental-testing", "Environmental testing", "Report and bill in one place."],
           ].map(([href, title, text]) => (
             <PeachCard key={href}>
               <h3 className="text-xl font-semibold">
@@ -73,7 +66,7 @@ export default function ConcordPage() {
           {
             href: "/owner-approved-quoting",
             title: "Owner-approved quoting",
-            text: "The product page behind the hub sentence.",
+            text: "You send the quote.",
           },
           {
             href: "/website-booking",
@@ -88,7 +81,7 @@ export default function ConcordPage() {
           {
             href: "/",
             title: "Home",
-            text: "Bay Area shop, two pillars, five steps.",
+            text: "Two things we build. Five short steps.",
           },
         ]}
       />

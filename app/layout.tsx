@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s",
   },
   description:
-    "Fast, mobile-first websites and simple business systems for local service companies in the San Francisco Bay Area. Email info@gudvector.com.",
+    "Websites and simple systems for Bay Area service shops. You send the quote. The customer pays, pauses, or cancels in a portal. The site is yours. Email info@gudvector.com.",
   applicationName: ENTITY.alternateName,
   authors: [{ name: ENTITY.name, url: SITE_URL }],
   formatDetection: {

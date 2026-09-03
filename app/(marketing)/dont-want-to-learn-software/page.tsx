@@ -10,7 +10,7 @@ export function generateMetadata() {
   return pageMetadata({
     title: "I Don't Want to Learn Software | Güd Vector",
     description:
-      "If the shop owner has to learn a product, it is the wrong product for a one-truck or small crew. Owner-approved quoting and a portal. Email info@gudvector.com.",
+      "If the owner has to learn a product, it is the wrong product for a one-truck or small crew. You send the quote. Email info@gudvector.com.",
     path: "/dont-want-to-learn-software",
   });
 }
@@ -19,7 +19,7 @@ export default function DontWantSoftwarePage() {
   return (
     <main id="main">
       <PageHero
-        eyebrow="A spoken objection"
+        eyebrow="For owners who already quit a trial"
         title="I don’t want to learn software."
         lede="If the shop owner has to learn a product, it is the wrong product for a one-truck or small crew. You should approve a quote on one screen. You should not become the software admin."
       />
@@ -28,7 +28,7 @@ export default function DontWantSoftwarePage() {
           <h2 className="text-2xl font-semibold">What Tuesday should feel like</h2>
           <p className="text-ink-soft mt-3 text-lg leading-8">
             A lead comes in. You send the quote from your phone. The customer
-            reviews it, pays, or asks to pause. You are not configuring
+            reviews it, pays, or asks to pause. You are not setting up
             automations. You are not hunting a report. You are running the
             jobs.
           </p>
@@ -51,7 +51,7 @@ export default function DontWantSoftwarePage() {
               {
                 question: "I tried a scheduler for two weeks and quit. Now what?",
                 answer:
-                  "That is common. A custom path encodes how you already quote. You do not migrate a company onto a product you already abandoned.",
+                  "That is common. We set up how you already quote. You do not move the company onto a product you already abandoned.",
               },
               {
                 question: "Will my crew have to learn this?",
@@ -59,10 +59,11 @@ export default function DontWantSoftwarePage() {
                   "The customer uses a simple portal. You approve quotes. We do not hand the shop a new office job.",
               },
               {
-                question: "Is this “simpler software” with a new login?",
+                question: "Is this simpler software with a new login?",
                 answer: (
                   <>
-                    It is a site plus a system for this shop. Compare fairly on{" "}
+                    It is a site plus a system for this shop. Compare fairly on
+                    the{" "}
                     <Link href="/jobber-alternative" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
                       Jobber
                     </Link>
@@ -73,15 +74,15 @@ export default function DontWantSoftwarePage() {
                     , and{" "}
                     <Link href="/servicetitan-alternative" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
                       ServiceTitan
-                    </Link>
-                    .
+                    </Link>{" "}
+                    pages.
                   </>
                 ),
               },
               {
                 question: "What if I am not a tech person?",
                 answer:
-                  "You should not need to be. One screen: approve or don’t approve. Email info@gudvector.com if you want that walk-through.",
+                  "You should not need to be. One screen: approve or don’t. Email info@gudvector.com if you want that walk-through.",
               },
               {
                 question: "Can I keep my notebook for prices?",
@@ -105,7 +106,7 @@ export default function DontWantSoftwarePage() {
           {
             href: "/owner-approved-quoting",
             title: "Owner-approved quoting",
-            text: "The differentiator, without a new product class.",
+            text: "You send the quote.",
           },
           {
             href: "/website-booking",
@@ -120,7 +121,7 @@ export default function DontWantSoftwarePage() {
           {
             href: "/concord",
             title: "Concord hub",
-            text: "Bay Area entity page.",
+            text: "Concord and the East Bay.",
           },
         ]}
       />

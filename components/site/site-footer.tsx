@@ -1,17 +1,15 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { BrandLogo } from "@/components/site/brand-logo";
 import { PortalLoginLink } from "@/components/site/portal-login-link";
 import { comparisonNav, ENTITY, footerNav } from "@/lib/site";
 
-export async function SiteFooter() {
+export function SiteFooter() {
   const workLinks = footerNav.filter(
     (item) => item.href !== "/privacy" && item.href !== "/terms",
   );
   const legalLinks = footerNav.filter(
     (item) => item.href === "/privacy" || item.href === "/terms",
   );
-  const host = (await headers()).get("host");
 
   return (
     <footer className="border-border mt-auto border-t bg-white">
@@ -72,10 +70,7 @@ export async function SiteFooter() {
             <p className="font-heading text-lg">Also</p>
             <ul className="mt-3 space-y-2">
               <li>
-                <PortalLoginLink
-                  host={host}
-                  className="text-ink-soft hover:text-ink min-h-11 inline-flex items-center text-sm font-semibold"
-                />
+                <PortalLoginLink className="text-ink-soft hover:text-ink min-h-11 inline-flex items-center text-sm font-semibold" />
               </li>
               {legalLinks.map((item) => (
                 <li key={item.href}>

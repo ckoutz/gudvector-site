@@ -5,7 +5,7 @@ export function generateMetadata() {
   return pageMetadata({
     title: "Contact | Güd Vector",
     description:
-      "Email info@gudvector.com or use the form. Say whether you need a website, help with systems, or both.",
+      "Email info@gudvector.com or use the form. Say whether you need a website, help sending quotes, or both.",
     path: "/contact",
   });
 }

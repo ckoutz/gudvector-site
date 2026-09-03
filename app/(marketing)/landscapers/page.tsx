@@ -10,7 +10,7 @@ export function generateMetadata() {
   return pageMetadata({
     title: "Landscaper Websites in Concord & East Bay | Güd Vector",
     description:
-      "Custom websites for Concord and East Bay landscapers. Owner-approved quotes, a customer portal, and a site you own. Email info@gudvector.com.",
+      "Websites for Concord and East Bay landscapers. You send the quote. The customer pays in a portal. The site is yours. Email info@gudvector.com.",
     path: "/landscapers",
   });
 }
@@ -19,18 +19,18 @@ export default function LandscapersPage() {
   return (
     <main id="main">
       <PageHero
-        eyebrow="Concord / East Bay · C-27"
+        eyebrow="Concord / East Bay"
         title="A landscaping site homeowners can find."
-        lede="Güd Vector builds custom websites for Concord and East Bay landscapers. After a good review, many people still open the website. If they cannot find you, they call someone else."
+        lede="Güd Vector builds websites for Concord and East Bay landscapers. After a good review, many people still open the website. If they cannot find you, they call someone else."
       />
       <Section tone="white">
         <div className="grid gap-4 md:grid-cols-2">
           <PeachCard>
-            <h2 className="text-2xl font-semibold">A site you own, written for the yard</h2>
+            <h2 className="text-2xl font-semibold">Built for the yard, not a leftover template</h2>
             <p className="text-ink-soft mt-3 leading-7">
-              Real services. Real service area. Phone-first pages. Previews you
-              approve before anything goes live. The site is yours — canceling
-              a software login does not take it down.
+              Real services. Real service area. Pages that work on a phone.
+              Previews you approve before anything goes live. The site is yours
+              — canceling a software login does not take it down.
             </p>
           </PeachCard>
           <PeachCard>
@@ -47,11 +47,11 @@ export default function LandscapersPage() {
       <Section tone="wash">
         <h2 className="text-3xl font-semibold">Concord, Pleasant Hill, Walnut Creek, Martinez</h2>
         <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
-          This page is for East Bay landscape contractors — including C-27
-          shops — who already get work from neighbors and listings, and need a
-          site that does not leak that click. Start from the{" "}
+          For East Bay landscape contractors who already get work from
+          neighbors and listings, and need a site that does not lose that
+          click. Start from the{" "}
           <Link href="/concord" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-            Concord / Contra Costa hub
+            Concord and Contra Costa page
           </Link>
           .
         </p>
@@ -62,9 +62,9 @@ export default function LandscapersPage() {
           <FaqList
             items={[
               {
-                question: "Do I need a site if Angi is already 4.9?",
+                question: "Do I need a site if the listing is already strong?",
                 answer:
-                  "A strong listing helps. BrightLocal’s 2026 consumer survey found that after good reviews, 54% of people still hit the website next. A missing or weak site is the leak.",
+                  "A strong listing helps. After a good review, more than half of people still open the website next (BrightLocal, 2026). A missing or weak site is the leak.",
               },
               {
                 question: "What if I already have a site inside my scheduler?",
@@ -72,7 +72,7 @@ export default function LandscapersPage() {
                   <>
                     Those builders are a brochure on someone else’s host. See{" "}
                     <Link href="/jobber-housecall-site-builder" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-                      site builder vs a site you own
+                      site builder vs a contractor site you own
                     </Link>
                     .
                   </>
@@ -80,15 +80,7 @@ export default function LandscapersPage() {
               },
               {
                 question: "Can quotes still require my approval?",
-                answer: (
-                  <>
-                    Yes. That is the point. Read{" "}
-                    <Link href="/owner-approved-quoting" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-                      owner-approved quoting
-                    </Link>
-                    .
-                  </>
-                ),
+                answer: "Yes. That is the point. You send the quote.",
               },
             ]}
           />
@@ -110,7 +102,7 @@ export default function LandscapersPage() {
           {
             href: "/concord",
             title: "Concord & Contra Costa",
-            text: "The Bay Area hub for trades pages.",
+            text: "Concord and the East Bay.",
           },
           {
             href: "/dont-want-to-learn-software",

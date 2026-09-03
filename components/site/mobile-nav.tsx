@@ -11,9 +11,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { headerNav, LIVE_PORTAL, portalLoginLabel } from "@/lib/site";
+import { headerHashNav, headerNav } from "@/lib/site";
 
-export function MobileNav({ host }: { host: string | null }) {
+export function MobileNav() {
   return (
     <Sheet>
       <SheetTrigger
@@ -35,7 +35,7 @@ export function MobileNav({ host }: { host: string | null }) {
           </SheetTitle>
         </SheetHeader>
         <nav aria-label="Mobile" className="flex flex-col gap-1 px-4 pb-8">
-          {headerNav.map((item) => (
+          {[...headerNav, ...headerHashNav].map((item) => (
             <SheetClose
               key={item.href}
               render={<Link href={item.href} />}
@@ -45,10 +45,10 @@ export function MobileNav({ host }: { host: string | null }) {
             </SheetClose>
           ))}
           <SheetClose
-            render={<a href={LIVE_PORTAL} />}
+            render={<Link href="/portal" />}
             className="min-h-11 rounded-xl px-3 py-2.5 text-base font-semibold"
           >
-            {portalLoginLabel(host)}
+            Customer portal
           </SheetClose>
         </nav>
       </SheetContent>

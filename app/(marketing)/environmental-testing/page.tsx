@@ -21,7 +21,7 @@ export default function EnvironmentalTestingPage() {
       <PageHero
         eyebrow="Environmental testing · Bay Area"
         title="A portal for the report and the bill."
-        lede="Güd Vector builds custom websites and customer portals for environmental testing and inspection firms. Chain-of-custody, a PDF, and a fee — not a dispatch board. We do not invent lab certifications."
+        lede="Güd Vector builds custom websites and customer portals for environmental testing and inspection firms. Chain-of-custody, a PDF, and a fee — not a dispatch board."
       />
       <Section tone="white">
         <div className="grid gap-4 md:grid-cols-2">
@@ -102,7 +102,7 @@ export default function EnvironmentalTestingPage() {
           {
             href: "/concord",
             title: "Concord hub",
-            text: "Bay Area entity paragraph.",
+            text: "Concord and the East Bay.",
           },
         ]}
       />

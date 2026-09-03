@@ -36,7 +36,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold">What we collect</h2>
             <p className="text-ink-soft mt-3">
               When you use the contact form on this site, we collect your name,
-              email, whether you need a website, systems, or both, and your
+              email, whether you need a website, help sending quotes, or both, and your
               message.
             </p>
           </section>

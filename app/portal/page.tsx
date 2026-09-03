@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { LIVE_PORTAL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Client portal login | Güd Vector",
+  title: "Customer portal | Güd Vector",
   robots: { index: false, follow: false },
 };
 

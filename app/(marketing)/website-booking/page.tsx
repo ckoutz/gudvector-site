@@ -68,14 +68,13 @@ export default function WebsiteBookingPage() {
         <h2 className="text-3xl font-semibold">Cleaning and landscaping first</h2>
         <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
           Weekly clean and weekly mow are the jobs where a book button sounds
-          easy — and where a bad one steals the afternoon. The Concord finder
-          work started with those two trades. See{" "}
+          easy — and where a bad one steals the afternoon. See{" "}
           <Link href="/landscapers" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
             landscapers
           </Link>{" "}
           and the{" "}
           <Link href="/concord" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-            Concord hub
+            Concord page
           </Link>
           .
         </p>
@@ -122,7 +121,7 @@ export default function WebsiteBookingPage() {
           {
             href: "/landscapers",
             title: "Landscapers",
-            text: "Concord / East Bay industry page.",
+            text: "Concord and East Bay landscapers.",
           },
           {
             href: "/plumbers",

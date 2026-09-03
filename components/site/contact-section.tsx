@@ -13,7 +13,7 @@ export function ContactSection() {
           <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">Get in touch.</h2>
           <p className="text-ink-soft mt-4 max-w-xl text-lg leading-8">
             The only public contact is email. Say whether you need a website,
-            help with systems, or both. You will not become the software admin.
+            help sending quotes, or both.
           </p>
           <p className="mt-5 text-lg font-semibold">
             <a

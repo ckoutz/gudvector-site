@@ -10,7 +10,7 @@ export function generateMetadata() {
   return pageMetadata({
     title: "Güd Vector | Websites & Systems for Bay Area Service Businesses",
     description:
-      "Fast, mobile-first websites and simple business systems for local service companies in the San Francisco Bay Area. Email info@gudvector.com.",
+      "Websites and simple systems for Bay Area service shops. You send the quote. The customer pays, pauses, or cancels in a portal. The site is yours. Email info@gudvector.com.",
     path: "/",
   });
 }
@@ -18,18 +18,18 @@ export function generateMetadata() {
 const steps = [
   {
     n: "01",
-    title: "Tell us what's missing",
+    title: "Tell us what’s missing",
     text: "No site, a weak one, or follow-up that keeps falling through.",
   },
   {
     n: "02",
-    title: "Get a clear plan",
-    text: "See the pages and workflows before we build anything.",
+    title: "See the plan",
+    text: "Look at the pages before we build anything.",
   },
   {
     n: "03",
     title: "Approve on your phone",
-    text: "Every preview is phone-ready, because that's how your customers will see it.",
+    text: "Every preview is phone-ready, because that’s how your customers will see it.",
   },
   {
     n: "04",
@@ -39,7 +39,7 @@ const steps = [
   {
     n: "05",
     title: "Go live",
-    text: "A site and quotes you can run from your phone.",
+    text: "Launch a site and a system your crew can actually run.",
   },
 ];
 
@@ -47,7 +47,7 @@ const industries = [
   {
     href: "/landscapers",
     title: "Landscapers",
-    text: "Concord and East Bay shops that look strong on Angi and thin on their own domain.",
+    text: "Concord and East Bay crews that look strong on a listing and thin on their own site.",
   },
   {
     href: "/plumbers",
@@ -57,12 +57,12 @@ const industries = [
   {
     href: "/home-inspectors",
     title: "Home inspectors",
-    text: "Trust, report delivery, and a fee — without a new dashboard to learn.",
+    text: "Trust, a report, and a fee — without a new dashboard to learn.",
   },
   {
     href: "/environmental-testing",
     title: "Environmental testing",
-    text: "A portal for the report and the bill. We do not invent lab certs.",
+    text: "A place for the report and the bill.",
   },
 ];
 
@@ -82,17 +82,15 @@ export default function HomePage() {
               {ENTITY.h1}
             </h1>
             <p className="text-ink-soft mt-5 max-w-2xl text-lg leading-8">
-              After a good review they still look you up on Google — and a lot
-              of them now ask ChatGPT who to call.
-            </p>
-            <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
-              You get a phone-ready page you own, live fast. Then quoting and
-              pay are wired to how you already work — not another dashboard you
+              We build a website and a system around how a Bay Area service shop
+              already works. You send the quote. The customer pays, pauses, or
+              cancels in a portal with your name on it. The site is yours — not
+              a template you have to live in, and not another dashboard to
               learn.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/contact"
+                href="#contact"
                 className="bg-brand-deep hover:bg-[#a34000] inline-flex min-h-11 items-center rounded-full px-5 py-2.5 font-semibold text-white"
               >
                 Get in touch
@@ -101,7 +99,7 @@ export default function HomePage() {
                 href="#how-it-works"
                 className="inline-flex min-h-11 items-center rounded-full border border-[#f0d2b4] bg-white px-5 py-2.5 font-semibold"
               >
-                See how it works
+                See the steps
               </Link>
             </div>
           </div>
@@ -110,16 +108,13 @@ export default function HomePage() {
       </Section>
 
       <Section tone="white">
-        <p className="bg-peach text-brand-ink inline-flex rounded-full px-3 py-1 text-sm font-semibold">
-          What a customer opens on their phone
-        </p>
-        <h2 className="mt-4 max-w-3xl text-3xl font-semibold sm:text-4xl">
-          Their shop vs a page a homeowner can use.
+        <h2 className="max-w-3xl text-3xl font-semibold sm:text-4xl">
+          After the review, they still open a page.
         </h2>
         <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
-          After a good review, a lot of people still hit the website next. If
-          that site is missing or broken, they call someone else. This is a
-          labeled preview — not a live client.
+          A good listing gets them curious. The website is where they decide
+          whether to call you or the next name. If that page is missing or
+          broken, they call someone else.
         </p>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <PeachCard>
@@ -128,17 +123,17 @@ export default function HomePage() {
             </p>
             <h3 className="mt-2 text-2xl font-semibold">A directory card</h3>
             <p className="text-ink-soft mt-3 leading-7">
-              Stars on a listing. A Hotmail address. No owned page that lists
-              the real services or lets someone reach you without hunting.
+              Stars on a listing. A Hotmail address. No page that lists the
+              real work or lets someone reach you without hunting.
             </p>
           </PeachCard>
           <PeachCard>
             <p className="text-ink-soft text-sm font-semibold uppercase tracking-wide">
-              What a customer can open
+              What they can open
             </p>
-            <h3 className="mt-2 text-2xl font-semibold">A phone-first page</h3>
+            <h3 className="mt-2 text-2xl font-semibold">A page that works on a phone</h3>
             <p className="text-ink-soft mt-3 leading-7">
-              Your services. A way to ask for a quote. A portal later, if you
+              Your services. A way to ask for a quote. Later, a portal if you
               want them to pay, pause, or cancel without a phone tag.
             </p>
           </PeachCard>
@@ -146,24 +141,24 @@ export default function HomePage() {
       </Section>
 
       <Section id="services" tone="wash">
-        <h2 className="text-3xl font-semibold sm:text-4xl">Two pillars.</h2>
+        <h2 className="text-3xl font-semibold sm:text-4xl">Two things we build.</h2>
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
           <PeachCard>
-            <h3 className="text-2xl font-semibold">Website building for small business</h3>
+            <h3 className="text-2xl font-semibold">A website they can find</h3>
             <p className="text-ink-soft mt-3 leading-7">
-              For businesses with no site, or one that isn&apos;t pulling its
-              weight. Clean, mobile-first pages for their shop — real copy,
-              local SEO, and a click-to-call button on their site, plus
-              previews you approve before anything goes live.
+              For shops with no site, or one that isn’t pulling its weight.
+              Phone-ready pages, real copy, local search, click-to-call, and
+              previews you approve before anything goes live. You keep the
+              site.
             </p>
           </PeachCard>
           <PeachCard>
-            <h3 className="text-2xl font-semibold">Automating business systems</h3>
+            <h3 className="text-2xl font-semibold">A way to send the quote</h3>
             <p className="text-ink-soft mt-3 leading-7">
-              Practical systems for leads, follow-up, and simple workflows —
-              not enterprise software. You send the quote, and your customer
-              gets a portal to review it, set up service, pay, or pause and
-              cancel — no phone tag, no spreadsheets.
+              Practical tools for leads, follow-up, and getting paid — not
+              enterprise software. You send the quote. Your customer gets a
+              portal to review it, set up service, pay, or pause and cancel. No
+              phone tag. No spreadsheet.
             </p>
           </PeachCard>
         </div>
@@ -174,17 +169,16 @@ export default function HomePage() {
           {ENTITY.tagline}
         </h2>
         <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
-          Business owners who want running their business to be simple. If
-          you&apos;re chasing quotes, hunting for leads, or juggling separate
-          tools for payments and follow-up, this is for you — one site, one
-          system, less to manage.
+          For owners who want the business to stay simple. If you are chasing
+          quotes, hunting for leads, or juggling separate tools for payments
+          and follow-up, this is for you.
         </p>
         <WhiteCard className="border-border mt-8 border">
           <h3 className="text-2xl font-semibold">You will not become the software admin.</h3>
           <p className="text-ink-soft mt-3 max-w-3xl leading-7">
-            We encode how you already quote, get paid, pause, and cancel. You
-            stay in the loop on the number. You do not spend nights learning a
-            product built for a shop that is not yours.
+            We set up how you already quote, get paid, pause, and cancel. You
+            stay on the number. You do not spend nights learning a product
+            built for a shop that is not yours.
           </p>
         </WhiteCard>
       </Section>
@@ -207,11 +201,8 @@ export default function HomePage() {
       <Section tone="white">
         <h2 className="text-3xl font-semibold sm:text-4xl">Who this is for.</h2>
         <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
-          Start with the{" "}
-          <Link href="/concord" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
-            Concord and Contra Costa hub
-          </Link>
-          , then the trade page that matches the shop.
+          Local service shops in Concord, Contra Costa, and the rest of the Bay
+          Area.
         </p>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {industries.map((item) => (
@@ -226,7 +217,7 @@ export default function HomePage() {
           ))}
         </div>
         <p className="text-ink-soft mt-8">
-          Also see{" "}
+          Also:{" "}
           <Link href="/owner-approved-quoting" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
             owner-approved quoting
           </Link>{" "}
@@ -246,11 +237,11 @@ export default function HomePage() {
             </h2>
             <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
               Güd Vector Consulting Services is a San Francisco Bay Area shop.
-              Our motto: {ENTITY.motto} We build websites for local service
-              businesses and set up the practical systems that keep leads from
-              going cold — real copy, phone-ready pages, quotes and payments
-              through Stripe, and a customer portal for setup, payment, and
-              cancellation.
+              Our motto: sending your company in the right direction. We build
+              websites for local service businesses and the practical systems
+              that keep leads from going cold — real copy, phone-ready pages,
+              quotes and payments through Stripe, and a customer portal for
+              setup, payment, and cancellation.
             </p>
           </div>
           <div className="rounded-3xl bg-white p-4">

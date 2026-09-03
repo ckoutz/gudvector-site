@@ -11,7 +11,7 @@ export function generateMetadata() {
   return pageMetadata({
     title: "Owner-Approved Quoting for Service Shops | Güd Vector",
     description:
-      "Custom quoting means the shop owner still approves the number before the customer sees it. You send the quote. Email info@gudvector.com.",
+      "The shop owner still approves the number before the customer sees it. You send the quote. Email info@gudvector.com.",
     path: "/owner-approved-quoting",
   });
 }
@@ -20,13 +20,13 @@ export default function QuotingPage() {
   return (
     <main id="main">
       <PageHero
-        eyebrow="Owner-approved quoting"
+        eyebrow="Quotes"
         title="You approve the quote. Then it goes out."
-        lede="Custom quoting here means the shop owner still approves the number before the customer sees it. You send the quote. Your customer reviews it, sets up service, and pays in a simple portal."
+        lede="The shop owner still approves the number before the customer sees it. You send the quote. Your customer reviews it, sets up service, and pays in a simple portal."
       />
       <Section tone="white">
         <PeachCard>
-          <h2 className="text-2xl font-semibold">The definition, in one lift</h2>
+          <h2 className="text-2xl font-semibold">What that means</h2>
           <p className="text-ink-soft mt-3 text-lg leading-8">
             Owner-approved quoting is a quote the customer cannot see until the
             owner sends it. Not a homeowner pricing the job themselves. Not a
@@ -67,12 +67,10 @@ export default function QuotingPage() {
         </div>
       </Section>
       <Section tone="wash">
-        <h2 className="text-3xl font-semibold">The portal is theirs, not our checkout</h2>
+        <h2 className="text-3xl font-semibold">The portal looks like your shop</h2>
         <p className="text-ink-soft mt-4 max-w-2xl text-lg leading-8">
-          The live customer portal pattern already exists for shops: accept or
-          reject a quote, then pay, pause, or cancel. We do not put Güd
-          Vector&apos;s own checkout in the hero. The phone preview on the home
-          page is a labeled pattern, not a live client.
+          The customer accepts or rejects a quote, then pays, pauses, or
+          cancels — in a portal with your name on it, not a generic checkout.
         </p>
       </Section>
       <Section tone="white">
@@ -81,15 +79,15 @@ export default function QuotingPage() {
           <FaqList
             items={[
               {
-                question: "Do you advertise software that drafts the quote for me?",
+                question: "Does the software write the quote for me?",
                 answer:
-                  "No. The live copy is still “You send the quote.” We will not claim a drafting step that the owner cannot see.",
+                  "No. You send the quote. We will not claim a step you cannot see.",
               },
               {
                 question: "Is this a clone of the big field-service logins?",
                 answer: (
                   <>
-                    No. Fair comparison pages live here:{" "}
+                    No. Fair comparison pages:{" "}
                     <Link href="/jobber-alternative" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
                       Jobber
                     </Link>
@@ -134,7 +132,7 @@ export default function QuotingPage() {
           {
             href: "/landscapers",
             title: "Landscapers",
-            text: "Industry page with quoting linked from the work.",
+            text: "Concord and East Bay landscapers.",
           },
         ]}
       />

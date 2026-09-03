@@ -44,19 +44,22 @@ export function PhoneMockup() {
                 </div>
               </div>
               <ul className="mt-5 space-y-2 text-sm">
-                <li className="rounded-2xl bg-[#fff1e3] px-3 py-2.5">Yard cleanup</li>
-                <li className="rounded-2xl bg-[#fff1e3] px-3 py-2.5">Weekly service</li>
-                <li className="rounded-2xl bg-[#fff1e3] px-3 py-2.5">Ask for a quote</li>
+                <li className="rounded-2xl bg-[#fff1e3] px-3 py-2.5">
+                  Your actual services, listed clearly
+                </li>
+                <li className="rounded-2xl bg-[#fff1e3] px-3 py-2.5">
+                  Built for a phone, not a leftover desktop site
+                </li>
+                <li className="rounded-2xl bg-[#fff1e3] px-3 py-2.5">
+                  A way to reach you without hunting
+                </li>
               </ul>
               <Link
                 href="#contact"
                 className="bg-brand-deep mt-5 flex min-h-11 items-center justify-center rounded-full text-sm font-semibold text-white"
               >
-                Ask for a quote
+                Book now
               </Link>
-              <p className="text-ink-soft mt-3 text-center text-xs">
-                You still approve the quote.
-              </p>
             </div>
             <div
               aria-hidden
@@ -66,7 +69,7 @@ export function PhoneMockup() {
         </div>
       </div>
       <figcaption className="text-ink-soft mt-4 text-center text-sm">
-        What a customer sees on their phone. Labeled preview — not a live client.
+        What a customer sees on their phone
       </figcaption>
     </figure>
   );

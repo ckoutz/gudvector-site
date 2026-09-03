@@ -1,14 +1,13 @@
-import { LIVE_PORTAL, portalLoginLabel } from "@/lib/site";
+import Link from "next/link";
 
 type PortalLoginLinkProps = {
-  host: string | null;
   className?: string;
 };
 
-export function PortalLoginLink({ host, className }: PortalLoginLinkProps) {
+export function PortalLoginLink({ className }: PortalLoginLinkProps) {
   return (
-    <a href={LIVE_PORTAL} className={className}>
-      {portalLoginLabel(host)}
-    </a>
+    <Link href="/portal" className={className}>
+      Customer portal
+    </Link>
   );
 }

@@ -15,14 +15,6 @@ export const ENTITY = {
 
 export const LIVE_PORTAL = "https://gudvector.com/portal";
 
-export function portalLoginLabel(host: string | null | undefined) {
-  const hostname = (host ?? "").split(":")[0].toLowerCase();
-  if (hostname === "gudvector.com" || hostname === "www.gudvector.com") {
-    return "Client portal login";
-  }
-  return "Client portal login (live site)";
-}
-
 export type NavLink = {
   href: string;
   label: string;
@@ -32,6 +24,13 @@ export const headerNav: NavLink[] = [
   { href: "/concord", label: "Concord" },
   { href: "/owner-approved-quoting", label: "Owner-approved quoting" },
   { href: "/landscapers", label: "Landscapers" },
+];
+
+export const headerHashNav: NavLink[] = [
+  { href: "/#services", label: "Services" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#about", label: "About" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export const footerNav: NavLink[] = [

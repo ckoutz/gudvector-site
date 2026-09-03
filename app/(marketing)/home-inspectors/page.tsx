@@ -41,7 +41,7 @@ export default function HomeInspectorsPage() {
               <Link href="/environmental-testing" className="text-brand-deep font-semibold underline-offset-4 hover:underline">
                 environmental testing
               </Link>
-              . We do not invent lab certifications.
+              .
             </p>
           </PeachCard>
         </div>
@@ -101,7 +101,7 @@ export default function HomeInspectorsPage() {
           {
             href: "/concord",
             title: "Concord hub",
-            text: "Bay Area firm page with the crawlable entity sentence.",
+            text: "Concord and the East Bay.",
           },
         ]}
       />

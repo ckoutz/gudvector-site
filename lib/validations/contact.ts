@@ -15,7 +15,7 @@ export const contactSchema = z.object({
     .email("That email does not look right.")
     .max(200, "Email is too long."),
   need: z.enum(contactNeedValues, {
-    error: "Say whether you need a website, systems, or both.",
+    error: "Say whether you need a website, help sending quotes, or both.",
   }),
   message: z
     .string()
@@ -28,6 +28,6 @@ export type ContactInput = z.infer<typeof contactSchema>;
 
 export const needLabels: Record<(typeof contactNeedValues)[number], string> = {
   website: "Website",
-  systems: "Systems",
+  systems: "Sending quotes",
   both: "Both",
 };
