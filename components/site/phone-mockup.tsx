@@ -52,7 +52,7 @@ export function PhoneMockup() {
                 href="#contact"
                 className="bg-brand-deep mt-5 flex min-h-11 items-center justify-center rounded-full text-sm font-semibold text-white"
               >
-                Book now
+                Ask for a quote
               </Link>
               <p className="text-ink-soft mt-3 text-center text-xs">
                 You still approve the quote.

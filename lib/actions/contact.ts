@@ -18,7 +18,7 @@ export async function submitContact(
   _prev: ContactState,
   formData: FormData,
 ): Promise<ContactState> {
-  const honeypot = String(formData.get("website") ?? "");
+  const honeypot = String(formData.get("company_url_confirm") ?? "");
   if (honeypot.trim()) {
     return { status: "success", message: "Thanks. We will reply by email." };
   }

@@ -15,8 +15,14 @@ export function ContactForm() {
   return (
     <form action={formAction} noValidate className="space-y-5">
       <div className="absolute -left-[9999px]" aria-hidden="true">
-        <label htmlFor="website">Website</label>
-        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        <label htmlFor="company_url_confirm">Company URL confirm</label>
+        <input
+          id="company_url_confirm"
+          name="company_url_confirm"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
       </div>
 
       <Field
