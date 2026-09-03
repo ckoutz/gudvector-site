@@ -46,7 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col bg-cream font-sans text-ink">
         <SkipLink />
         <SiteHeader />
-        {children}
+        <div className="flex flex-1 flex-col bg-wash">{children}</div>
         <SiteFooter />
       </body>
     </html>

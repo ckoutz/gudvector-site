@@ -4,10 +4,10 @@ import { ENTITY } from "@/lib/site";
 
 export function ContactSection() {
   return (
-    <Section id="contact" tone="wash">
+    <Section id="contact" tone="wash" className="flex-1 pt-12 pb-10 sm:pt-14 sm:pb-12">
       <div className="grid gap-8 lg:grid-cols-[1fr_minmax(0,28rem)] lg:items-start">
         <div>
-          <p className="bg-peach text-brand-deep inline-flex rounded-full px-3 py-1 text-sm font-semibold">
+          <p className="bg-peach text-brand-ink inline-flex rounded-full px-3 py-1 text-sm font-semibold">
             Public contact
           </p>
           <h2 className="mt-4 text-3xl font-semibold sm:text-4xl">Get in touch.</h2>

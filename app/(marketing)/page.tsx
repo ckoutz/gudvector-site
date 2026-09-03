@@ -72,7 +72,7 @@ export default function HomePage() {
       <Section tone="cream" className="pt-10 sm:pt-14">
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_18.5rem]">
           <div>
-            <p className="bg-peach text-brand-deep inline-flex rounded-full px-3 py-1 text-sm font-semibold">
+            <p className="bg-peach text-brand-ink inline-flex rounded-full px-3 py-1 text-sm font-semibold">
               San Francisco Bay Area
             </p>
             <p className="text-ink-soft mt-5 text-lg">
@@ -110,7 +110,7 @@ export default function HomePage() {
       </Section>
 
       <Section tone="white">
-        <p className="bg-peach text-brand-deep inline-flex rounded-full px-3 py-1 text-sm font-semibold">
+        <p className="bg-peach text-brand-ink inline-flex rounded-full px-3 py-1 text-sm font-semibold">
           What a customer opens on their phone
         </p>
         <h2 className="mt-4 max-w-3xl text-3xl font-semibold sm:text-4xl">

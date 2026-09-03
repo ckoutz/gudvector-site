@@ -13,7 +13,7 @@ export function PageHero({ eyebrow, title, lede, children }: PageHeroProps) {
     <header className="bg-cream">
       <div className="mx-auto w-full max-w-6xl px-4 pt-12 pb-10 sm:px-6 sm:pt-16">
         {eyebrow ? (
-          <p className="bg-peach text-brand-deep inline-flex rounded-full px-3 py-1 text-sm font-semibold">
+          <p className="bg-peach text-brand-ink inline-flex rounded-full px-3 py-1 text-sm font-semibold">
             {eyebrow}
           </p>
         ) : null}
