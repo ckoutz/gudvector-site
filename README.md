@@ -4,6 +4,14 @@ Marketing/SEO frontend for Güd Vector Consulting Services (gudvector.com). Next
 Router, React 19, Tailwind v4. This is the marketing site only — it does not implement the
 customer portal, quotes, Stripe, or SMS. `/portal` redirects to the live production host.
 
+- **Do not** point production DNS/Vercel at this repo until Cameron signs off on cutover.
+- Live production still deploys from Cursor Origin `cameron-koutz/tmp-e9b7b4e7dd738742`.
+- Do **not** overwrite `ckoutz/gud-vector-agent-suite` (Python/GVAS backend).
+- `/portal` is a noindex route/redirect to the existing backend. Do not reimplement GVAS
+  or the customer portal here.
+
+Research and brand source assets for the rebuild are in `docs/` and `public/brand/`.
+
 ## Getting started
 
 ```bash
@@ -30,6 +38,8 @@ git-ignored) once a Resend account and verified sending domain exist for gudvect
   table, phone-frame mock, JSON-LD).
 - `src/lib/site-config.ts` — single source of truth for nav links and brand constants
   (name, motto, email, area served).
+- `docs/research/*`, `docs/skills/*` — the marketing/SEO/design research and build-spec
+  briefs this site was built from.
 
 ## Deploying
 
