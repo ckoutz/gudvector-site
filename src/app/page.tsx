@@ -9,22 +9,22 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <div className="bg-peach-2">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-16 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
-          <div>
+        <div className="mx-auto grid max-w-6xl items-start gap-12 px-4 pb-16 pt-14 sm:px-6 sm:pt-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+          <div className="flex flex-col lg:min-h-[700px] lg:justify-center">
             <Eyebrow>{siteConfig.areaServed}</Eyebrow>
-            <p className="mt-2 text-[15px] font-medium text-char">
+            <p className="mt-3 text-[16px] font-medium text-char">
               Güd Vector — {siteConfig.motto}.
             </p>
-            <h1 className="mt-4 max-w-xl font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem]">
+            <h1 className="mt-6 max-w-xl font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-[3.5rem]">
               If they can&apos;t find you, they call someone else.
             </h1>
-            <p className="mt-6 max-w-lg text-[18px] leading-relaxed text-muted">
+            <p className="mt-8 max-w-lg text-[19px] leading-relaxed text-muted">
               We build a website and a system around how a Bay Area service shop already
               works. You send the quote. The customer pays, pauses, or cancels in a portal
               with your name on it. The site is yours — not a template you have to live in,
               and not new software to learn.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap gap-3">
               <CtaButton href="/contact">Get in touch</CtaButton>
               <CtaButton href="#how-it-works" variant="ghost">
                 See the steps
