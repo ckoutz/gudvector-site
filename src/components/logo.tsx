@@ -6,8 +6,8 @@ export function LogoMarkImage({ className = "h-8 w-auto" }: { className?: string
     <Image
       src="/brand/logo-mark.png"
       alt="Güd Vector"
-      width={938}
-      height={730}
+      width={640}
+      height={498}
       className={className}
     />
   );
@@ -26,8 +26,8 @@ export function LogoLockup({ className = "h-20 w-auto" }: { className?: string }
     <Image
       src="/brand/logo.png"
       alt="Güd Vector Consulting Services — automating business systems, website building for small business"
-      width={938}
-      height={924}
+      width={640}
+      height={630}
       className={className}
     />
   );
