@@ -11,8 +11,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-6">
-        <LogoMark className="h-12 w-auto shrink-0 sm:h-14" />
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
+        <LogoMark className="h-16 w-auto shrink-0 sm:h-20" />
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
           {headerNav.map((link) => (
