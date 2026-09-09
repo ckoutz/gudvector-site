@@ -72,12 +72,9 @@ export function RequestForm({
           id="preferredDates"
           name="preferredDates"
           type="text"
-          placeholder="e.g. Tuesday afternoon, Friday morning"
+          placeholder="e.g. next Tuesday morning or Thursday after 2"
           className="mt-1.5 w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-[16px] text-ink outline-none placeholder:text-muted/70 focus:border-orange focus:ring-2 focus:ring-orange/20"
         />
-        <p className="mt-1 text-[13px] text-muted">
-          Separate multiple options with commas or new lines.
-        </p>
       </div>
 
       {state.status === "error" && state.message && (

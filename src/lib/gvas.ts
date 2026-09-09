@@ -488,7 +488,7 @@ export async function createBillingPortalUrl(
 
 export async function submitPortalRequest(
   sessionToken: string,
-  body: { message: string; preferredDates?: string[] },
+  body: { message: string; preferredDates?: string },
 ): Promise<void> {
   if (gvasEnv.mock) {
     assertMockSession(sessionToken);

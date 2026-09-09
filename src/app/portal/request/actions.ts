@@ -40,15 +40,12 @@ export async function submitPortalRequestAction(
     redirect("/portal/login");
   }
 
-  const preferredDates = parsed.data.preferredDates
-    .split(/[\n,]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const preferredDates = parsed.data.preferredDates;
 
   try {
     await submitPortalRequest(sessionToken, {
       message: parsed.data.message,
-      ...(preferredDates.length ? { preferredDates } : {}),
+      ...(preferredDates ? { preferredDates } : {}),
     });
   } catch (err) {
     redirectOnUnauthorized(err); // navigates to /portal/login?expired=1 on a 401
