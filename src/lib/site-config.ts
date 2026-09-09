@@ -38,8 +38,6 @@ export const footerNav: {
     heading: "Product",
     links: [
       { label: "Service businesses", href: "/service-businesses" },
-      { label: "Plumbers", href: "/plumbers" },
-      { label: "Home inspectors", href: "/home-inspectors" },
       { label: "Owner-approved quoting", href: "/owner-approved-quoting" },
       { label: "Website + booking", href: "/website-booking" },
       { label: "Bay Area", href: "/bay-area" },

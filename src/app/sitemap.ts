@@ -5,8 +5,6 @@ const routes = [
   { path: "/", priority: 1, changeFrequency: "monthly" as const },
   { path: "/bay-area", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/service-businesses", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/plumbers", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/home-inspectors", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/website-booking", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/owner-approved-quoting", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/dont-want-to-learn-software", priority: 0.7, changeFrequency: "monthly" as const },

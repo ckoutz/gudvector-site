@@ -11,20 +11,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/bay-area" },
 };
 
-const trades = [
-  { title: "Landscapers", body: "Bay Area crews — see service businesses." },
-  { title: "Plumbers", body: "Bay Area pages that work on a phone.", href: "/plumbers" },
-  {
-    title: "Home inspectors",
-    body: "Report, fee, and escrow timing.",
-    href: "/home-inspectors",
-  },
-  {
-    title: "Environmental testing",
-    body: "Report and bill in one place — see service businesses.",
-  },
-];
-
 export default function BayAreaPage() {
   return (
     <>
@@ -56,32 +42,23 @@ export default function BayAreaPage() {
 
       <Section tone="paper">
         <h2 className="font-display text-2xl font-semibold text-ink">Trades we build for</h2>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {trades.map((trade) => (
-            <div key={trade.title} className="rounded-2xl border border-line p-6">
-              <h3 className="font-display text-lg font-semibold text-ink">{trade.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-muted">{trade.body}</p>
-              {trade.href && (
-                <Link
-                  href={trade.href}
-                  className="mt-3 inline-block text-[14px] font-medium text-orange-ink underline underline-offset-2"
-                >
-                  Learn more
-                </Link>
-              )}
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 text-[15px] text-muted">
-          Landscaping and environmental testing crews: see{" "}
-          <Link
-            href="/service-businesses"
-            className="font-medium text-orange-ink underline underline-offset-2"
-          >
-            service businesses
-          </Link>
-          .
-        </p>
+        <Link
+          href="/service-businesses"
+          className="mt-8 flex flex-col gap-4 rounded-2xl border border-line p-8 transition-colors hover:border-orange/40 hover:bg-peach-2 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <h3 className="font-display text-lg font-semibold text-ink">
+              Service businesses
+            </h3>
+            <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-muted">
+              Landscapers, plumbers, HVAC, electrical, roofing, cleaning, home inspectors,
+              environmental testing, and similar owner-run crews across the Bay Area.
+            </p>
+          </div>
+          <span className="shrink-0 text-[14px] font-medium text-orange-ink underline underline-offset-2">
+            Learn more
+          </span>
+        </Link>
       </Section>
     </>
   );

@@ -188,34 +188,24 @@ export default function HomePage() {
           Local service shops in Concord, Contra Costa, and the rest of the Bay Area.
         </p>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
-          {[
-            {
-              title: "Service businesses",
-              body: "Landscapers, environmental testing, and similar mom-and-pop crews that look strong on a listing and thin on their own site.",
-              href: "/service-businesses",
-            },
-            {
-              title: "Plumbers",
-              body: "Bay Area pages that work when someone searches from a wet floor.",
-              href: "/plumbers",
-            },
-            {
-              title: "Home inspectors",
-              body: "Trust, a report, and a fee — without new software to learn.",
-              href: "/home-inspectors",
-            },
-          ].map((card) => (
-            <Link
-              key={card.href}
-              href={card.href}
-              className="rounded-2xl border border-line p-6 transition-colors hover:border-orange/40 hover:bg-peach-2"
-            >
-              <h3 className="font-display text-lg font-semibold text-ink">{card.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-muted">{card.body}</p>
-            </Link>
-          ))}
-        </div>
+        <Link
+          href="/service-businesses"
+          className="mt-10 flex flex-col gap-4 rounded-2xl border border-line p-8 transition-colors hover:border-orange/40 hover:bg-peach-2 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <h3 className="font-display text-xl font-semibold text-ink">
+              Service businesses
+            </h3>
+            <p className="mt-2 max-w-xl text-[16px] leading-relaxed text-muted">
+              Landscapers, plumbers, HVAC, electrical, roofing, cleaning, home inspectors,
+              environmental testing, and similar owner-run crews that look strong on a
+              listing and thin on their own site.
+            </p>
+          </div>
+          <span className="shrink-0 font-medium text-orange-ink underline underline-offset-2">
+            See who this is for
+          </span>
+        </Link>
 
         <p className="mt-8 text-[16px] text-char">
           Also:{" "}
