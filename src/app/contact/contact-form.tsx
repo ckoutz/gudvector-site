@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { IntakeChat } from "@/components/intake-chat";
 import { submitContact, type ContactState } from "./actions";
 
 const initialState: ContactState = { status: "idle" };
@@ -21,22 +22,26 @@ export function ContactForm() {
         <p className="mt-2 text-[16px] leading-relaxed text-muted">
           We&apos;ll reply from info@gudvector.com.
         </p>
-        {state.bookingUrl && (
-          <div className="mt-6 border-t border-orange/20 pt-6">
-            <p className="text-[15px] text-char">
-              Want to skip the back-and-forth? Pick a time now — your name and email are
-              already filled in.
+        <div className="mt-6 border-t border-orange/20 pt-6">
+          <p className="text-[15px] text-char">
+            Want to skip the back-and-forth? Book an inspection right here — a few quick
+            questions, then pick a time.
+          </p>
+          <IntakeChat className="mt-4" />
+          {state.bookingUrl && (
+            <p className="mt-3 text-[13px] text-muted">
+              or{" "}
+              <a
+                href={state.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-orange-ink underline underline-offset-2"
+              >
+                book directly on Calendly
+              </a>
             </p>
-            <a
-              href={state.bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-orange px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-orange-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-ink"
-            >
-              Book your inspection
-            </a>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }

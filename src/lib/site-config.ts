@@ -29,6 +29,7 @@ export const headerNav: NavLink[] = [
   { label: "Owner-approved quoting", href: "/owner-approved-quoting" },
   { label: "Service businesses", href: "/service-businesses" },
   { label: "Customer portal", href: "/portal" },
+  { label: "Book", href: "/book" },
 ];
 
 export const footerNav: {
@@ -56,6 +57,7 @@ export const footerNav: {
     heading: "Company",
     links: [
       { label: "Contact", href: "/contact" },
+      { label: "Book an inspection", href: "/book" },
       { label: "Customer portal", href: "/portal" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
