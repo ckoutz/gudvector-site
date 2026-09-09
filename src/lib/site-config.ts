@@ -28,6 +28,7 @@ export const headerNav: NavLink[] = [
   { label: "Bay Area", href: "/bay-area" },
   { label: "Owner-approved quoting", href: "/owner-approved-quoting" },
   { label: "Service businesses", href: "/service-businesses" },
+  { label: "Customer portal", href: "/portal" },
 ];
 
 export const footerNav: {

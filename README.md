@@ -1,15 +1,16 @@
 # Güd Vector marketing site
 
 Marketing/SEO frontend for Güd Vector Consulting Services (gudvector.com). Next.js 16 App
-Router, React 19, Tailwind v4. This repo also hosts the public quote portal page (`/q/<token>`),
-which is a thin frontend over the GVAS API — no database, auth, or Stripe SDK lives here.
-`/portal` redirects to the live production host.
+Router, React 19, Tailwind v4. This repo also hosts the public quote portal page (`/q/<token>`)
+and the customer portal (`/portal`, magic-link sign-in, quotes, subscriptions, service
+requests) — both are thin frontends over the GVAS API; no database, auth library, or Stripe
+SDK lives here.
 
 - **Do not** point production DNS/Vercel at this repo until Cameron signs off on cutover.
 - Live production still deploys from Cursor Origin `cameron-koutz/tmp-e9b7b4e7dd738742`.
 - Do **not** overwrite `ckoutz/gud-vector-agent-suite` (Python/GVAS backend).
-- `/portal` is a noindex route/redirect to the existing backend. Do not reimplement GVAS
-  or the customer portal here.
+- `/portal` and `/q/<token>` are noindex routes served by this repo; all state lives in
+  GVAS. Do not add a database or auth library here.
 
 Research and brand source assets for the rebuild are in `docs/` and `public/brand/`.
 
@@ -27,8 +28,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `RESEND_API_KEY` | For the contact form to actually send email | Used in `src/app/contact/actions.ts` to email submissions to `info@gudvector.com` via [Resend](https://resend.com). Without it, the form still validates correctly but shows the visitor a graceful fallback message and logs the attempt server-side instead of sending — it will not crash or silently drop submissions, but no email goes out until this is set. |
-| `NEXT_PUBLIC_GVAS_API_URL` | For `/q/<token>` and the contact-form booking button | Base URL of the GVAS API (production: `https://web-production-9d848.up.railway.app`). Used by `src/lib/gvas.ts`. |
-| `NEXT_PUBLIC_GVAS_BUSINESS_KEY` | Optional | Public key of the Güd Vector business in GVAS. When set, the contact form's success state fetches the booking link from `GET /v1/businesses/{key}/booking-link`. |
+| `NEXT_PUBLIC_GVAS_API_URL` | For `/q/<token>`, `/portal/*`, and the contact-form booking button | Base URL of the GVAS API (production: `https://web-production-9d848.up.railway.app`). Used by `src/lib/gvas.ts`. |
+| `NEXT_PUBLIC_GVAS_BUSINESS_KEY` | For `/portal/*` | Public key of the Güd Vector business in GVAS. The portal login form posts to `POST /v1/businesses/{key}/portal/login`; the contact form also uses it to fetch a booking link from `GET /v1/businesses/{key}/booking-link`. |
 | `NEXT_PUBLIC_CALENDLY_URL` | Optional | Fallback Calendly URL for the "Book your inspection" button when the business key is unset or the booking-link call fails. |
 | `GVAS_MOCK` | Local dev only | Set to `1` to make `src/lib/gvas.ts` return an in-memory sample quote (tokens `sample`, `sample-paid`, `sample-declined`) and a fake booking link, so `/q/sample` and the contact success state render with no backend. Also skips the Resend send when `RESEND_API_KEY` is unset. Never set this on Vercel. |
 
@@ -40,6 +41,7 @@ Local dev without a backend:
 ```bash
 GVAS_MOCK=1 npm run dev
 # then open /q/sample, /q/sample-paid, /q/sample-declined, /q/anything-else (not found)
+# portal: /portal/login shows a dev sign-in link; any ?token= value issues a mock session
 ```
 
 ## Quote portal
@@ -57,6 +59,28 @@ The quoting backend is [GVAS](https://github.com/ckoutz/gud-vector-agent-suite).
 
 The route is `noindex`, excluded from `sitemap.ts`, and disallowed in `robots.ts`.
 
+## Customer portal
+
+`/portal` is a thin frontend over the GVAS portal API — magic-link sign-in, quote list,
+subscriptions, Stripe billing-portal hand-off, and service requests. Flow:
+
+1. `/portal/login` posts the email to `POST /v1/businesses/{key}/portal/login` (always 202)
+   and shows a "check your email" state either way, so it can't be used to probe accounts.
+2. The magic link lands on `/portal/login?token=…`, which forwards to the
+   `/portal/session` route handler. The handler exchanges the token via
+   `POST /v1/portal/sessions`, stores the returned `sessionToken` in an httpOnly,
+   Secure, SameSite=Lax cookie, and redirects to `/portal`.
+3. `/portal` (server-rendered) calls `GET /v1/portal/me`, `/v1/portal/quotes`,
+   `/v1/portal/subscriptions`, and `POST /v1/portal/billing-portal` with the Bearer
+   cookie — the billing URL is fetched at render time so the "Manage billing" button
+   can be hidden when GVAS answers 404 (no billing yet).
+4. `/portal/request` posts `{message, preferredDates?}` to `POST /v1/portal/requests`
+   and offers the business's Calendly link (from `/v1/portal/me`) on success.
+5. Any 401 (missing/expired session) redirects to `/portal/login`; sign out calls
+   `DELETE /v1/portal/sessions` and clears the cookie.
+
+All `/portal/*` routes are `noindex` and disallowed in `robots.ts`.
+
 ## Structure
 
 - `src/app/*` — one route per marketing page (App Router). `robots.ts` / `sitemap.ts` are
@@ -72,4 +96,6 @@ The route is `noindex`, excluded from `sitemap.ts`, and disallowed in `robots.ts
 
 Deploy as a separate Vercel project — do not attach the `gudvector.com` domain. Production
 today serves the real product (portal, quotes, Stripe, Twilio) from a different repo; do
-not cut DNS over without preserving `/portal`, `/api`, and `/q`.
+not cut DNS over without preserving `/portal`, `/api`, and `/q`. This repo now has its own
+`/portal` and `/q` implementations backed by GVAS, so cutover needs `/api/*` traffic to
+reach the GVAS host (via `NEXT_PUBLIC_GVAS_API_URL`) and no clashing `/portal` rewrites.
