@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Eyebrow } from "@/components/section";
-import { getPortalMe, type PortalMe } from "@/lib/gvas";
+import { getPortalMe, intakeTransport, type PortalMe } from "@/lib/gvas";
 import { redirectOnUnauthorized, requirePortalSessionToken } from "@/lib/portal-session";
-import { RequestForm } from "./request-form";
+import { RequestTabs } from "./request-tabs";
 
 export const metadata: Metadata = {
   title: "Request a service — customer portal",
@@ -31,14 +31,15 @@ export default async function PortalRequestPage() {
         Request a service.
       </h1>
       <p className="mt-4 text-[16px] leading-relaxed text-muted">
-        Send a note to {me?.business.displayName ?? "the business"} and they&apos;ll get
-        back to you.
+        Chat to schedule a visit — {me?.business.displayName ?? "the business"} confirms
+        every booking — or just send a note and they&apos;ll get back to you.
       </p>
 
       <div className="mt-8 rounded-2xl border border-line bg-paper p-6 sm:p-8">
-        <RequestForm
+        <RequestTabs
           businessName={me?.business.displayName ?? "The business"}
           calendlyUrl={me?.business.calendlyUrl ?? null}
+          intakeTransport={intakeTransport()}
         />
       </div>
 

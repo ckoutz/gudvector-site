@@ -41,6 +41,7 @@ export type GvasErrorKind =
   | "not_found"
   | "unauthorized"
   | "conflict"
+  | "rate_limited"
   | "unavailable"
   | "not_configured"
   | "network"
@@ -198,6 +199,7 @@ function kindFor(status: number): GvasErrorKind {
   if (status === 401) return "unauthorized";
   if (status === 404) return "not_found";
   if (status === 409) return "conflict";
+  if (status === 429) return "rate_limited";
   if (status === 503) return "unavailable";
   return "unexpected";
 }
@@ -500,4 +502,241 @@ export async function submitPortalRequest(
     headers: jsonHeaders,
     body: JSON.stringify(body),
   });
+}
+
+// ---------------------------------------------------------------------------
+// Booking intake API (chat-style "Book an inspection"). Field names match the
+// GVAS contract — do not rename. The owner approves every booking on the
+// backend; the site only collects info and lets the customer pick a slot.
+// ---------------------------------------------------------------------------
+
+export type IntakeState =
+  | "collecting"
+  | "proposing_slots"
+  | "awaiting_owner"
+  | "approved"
+  | "declined"
+  | "closed";
+
+export type IntakeSlot = { start: string; end: string };
+
+export type IntakeSummary = {
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  problem: string | null;
+};
+
+export type IntakeMessage = {
+  role: "user" | "agent" | "owner";
+  content: string;
+  createdAt: string;
+};
+
+export type IntakeStartResponse = {
+  conversationId: string;
+  conversationToken: string;
+  state: IntakeState;
+  reply: string;
+  slots: IntakeSlot[] | null;
+};
+
+export type IntakeReplyResponse = {
+  state: IntakeState;
+  reply: string;
+  slots: IntakeSlot[] | null;
+  summary: IntakeSummary | null;
+};
+
+export type IntakeConversation = {
+  state: IntakeState;
+  messages: IntakeMessage[];
+  slots: IntakeSlot[] | null;
+  summary: IntakeSummary | null;
+};
+
+export const INTAKE_SLOT_PREFIX = "slot:";
+
+/**
+ * How the IntakeChat client should reach the intake API. Anonymous traffic
+ * must hit GVAS directly (it rate-limits per client IP); the site's
+ * /api/intake/* handlers are only used when the mock agent lives on the server.
+ */
+export function intakeTransport(): "direct" | "proxy" {
+  return gvasEnv.mock || !gvasEnv.apiUrl ? "proxy" : "direct";
+}
+
+type MockIntakeConversation = IntakeConversation & {
+  token: string;
+  step: "name" | "email" | "address" | "problem" | "slot" | "done";
+};
+
+const mockIntake: Map<string, MockIntakeConversation> = (() => {
+  const g = globalThis as { __gvasMockIntake?: Map<string, MockIntakeConversation> };
+  if (!g.__gvasMockIntake) g.__gvasMockIntake = new Map<string, MockIntakeConversation>();
+  return g.__gvasMockIntake;
+})();
+
+const MOCK_INTAKE_GREETING =
+  "Hi! I can help you book an inspection with Diablo Valley Mold Inspection. First, what's your name?";
+
+function mockIntakeSlots(): IntakeSlot[] {
+  const base = new Date();
+  base.setDate(base.getDate() + 2);
+  base.setHours(9, 0, 0, 0);
+  return [0, 1, 2].map((i) => {
+    const start = new Date(base);
+    start.setDate(base.getDate() + i);
+    start.setHours(9 + i * 3);
+    const end = new Date(start);
+    end.setHours(start.getHours() + 2);
+    return { start: start.toISOString(), end: end.toISOString() };
+  });
+}
+
+function mockIntakeStart(name: string | null): IntakeStartResponse {
+  const conversationId = `conv_${Math.random().toString(36).slice(2, 10)}`;
+  const token = `mock-conv-${Math.random().toString(36).slice(2)}`;
+  const now = new Date().toISOString();
+  const greeting = name
+    ? `Hi ${name}! I can help you book an inspection. What's the service address?`
+    : MOCK_INTAKE_GREETING;
+  mockIntake.set(conversationId, {
+    token,
+    step: name ? "address" : "name",
+    state: "collecting",
+    messages: [{ role: "agent", content: greeting, createdAt: now }],
+    slots: null,
+    summary: {
+      name,
+      email: name ? MOCK_CUSTOMER.email : null,
+      phone: name ? MOCK_CUSTOMER.phone : null,
+      address: null,
+      problem: null,
+    },
+  });
+  return { conversationId, conversationToken: token, state: "collecting", reply: greeting, slots: null };
+}
+
+function mockIntakeConversation(conversationId: string, token: string): MockIntakeConversation {
+  const conv = mockIntake.get(conversationId);
+  if (!conv || conv.token !== token) {
+    throw new GvasError("unauthorized", "This conversation has expired.", 401);
+  }
+  return conv;
+}
+
+function mockIntakeReply(conv: MockIntakeConversation, message: string): IntakeReplyResponse {
+  const now = new Date().toISOString();
+  conv.messages.push({ role: "user", content: message, createdAt: now });
+  const summary = conv.summary ?? { name: null, email: null, phone: null, address: null, problem: null };
+  let reply: string;
+
+  switch (conv.step) {
+    case "name":
+      summary.name = message;
+      conv.step = "email";
+      reply = `Thanks, ${message}. What's the best email to reach you at?`;
+      break;
+    case "email":
+      summary.email = message;
+      conv.step = "address";
+      reply = "Got it. What's the address of the property you'd like inspected?";
+      break;
+    case "address":
+      summary.address = message;
+      conv.step = "problem";
+      reply = "Perfect. Briefly, what's going on? (Visible growth, a musty smell, recent water damage…)";
+      break;
+    case "problem":
+      summary.problem = message;
+      conv.step = "slot";
+      conv.state = "proposing_slots";
+      conv.slots = mockIntakeSlots();
+      reply = "That's everything I need. Here are a few times that could work — pick one and Cameron will confirm.";
+      break;
+    case "slot": {
+      const start = message.startsWith(INTAKE_SLOT_PREFIX)
+        ? message.slice(INTAKE_SLOT_PREFIX.length)
+        : null;
+      const picked = conv.slots?.find((s) => s.start === start);
+      if (!picked) {
+        reply = "Please pick one of the times above so I can send it to Cameron.";
+        break;
+      }
+      conv.step = "done";
+      conv.state = "awaiting_owner";
+      conv.slots = null;
+      reply = "Great — I've sent that time to Cameron for approval. You'll get a confirmation by email or text shortly.";
+      break;
+    }
+    default:
+      reply = "This request is with Cameron now — you'll hear back by email or text.";
+  }
+
+  conv.summary = summary;
+  conv.messages.push({ role: "agent", content: reply, createdAt: new Date().toISOString() });
+  return { state: conv.state, reply, slots: conv.slots, summary: conv.summary };
+}
+
+/** Anonymous visitor: start an intake conversation for the configured business. */
+export async function startIntakeConversation(): Promise<IntakeStartResponse> {
+  if (gvasEnv.mock) return mockIntakeStart(null);
+  if (!gvasEnv.businessKey) {
+    throw new GvasError("not_configured", "NEXT_PUBLIC_GVAS_BUSINESS_KEY is not set.");
+  }
+  return request<IntakeStartResponse>(
+    `/v1/businesses/${encode(gvasEnv.businessKey)}/intake/conversations`,
+    { method: "POST", headers: jsonHeaders, body: "{}" },
+  );
+}
+
+/** Logged-in customer: start an intake conversation tied to their portal session. */
+export async function startPortalIntakeConversation(
+  sessionToken: string,
+): Promise<IntakeStartResponse> {
+  if (gvasEnv.mock) {
+    assertMockSession(sessionToken);
+    return mockIntakeStart(MOCK_CUSTOMER.displayName);
+  }
+  return authedRequest<IntakeStartResponse>("/v1/portal/intake/conversations", sessionToken, {
+    method: "POST",
+    headers: jsonHeaders,
+    body: "{}",
+  });
+}
+
+/** Send a customer message (or `slot:<start ISO>` to pick a proposed slot). */
+export async function sendIntakeMessage(
+  conversationId: string,
+  conversationToken: string,
+  message: string,
+): Promise<IntakeReplyResponse> {
+  if (gvasEnv.mock) {
+    return mockIntakeReply(mockIntakeConversation(conversationId, conversationToken), message);
+  }
+  return authedRequest<IntakeReplyResponse>(
+    `/v1/intake/conversations/${encode(conversationId)}/messages`,
+    conversationToken,
+    { method: "POST", headers: jsonHeaders, body: JSON.stringify({ message }) },
+  );
+}
+
+/** Full transcript + state, used to resume after a page refresh. */
+export async function getIntakeConversation(
+  conversationId: string,
+  conversationToken: string,
+): Promise<IntakeConversation> {
+  if (gvasEnv.mock) {
+    const { state, messages, slots, summary } = mockIntakeConversation(
+      conversationId,
+      conversationToken,
+    );
+    return { state, messages, slots, summary };
+  }
+  return authedRequest<IntakeConversation>(
+    `/v1/intake/conversations/${encode(conversationId)}`,
+    conversationToken,
+  );
 }
