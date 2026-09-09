@@ -16,8 +16,8 @@ const routes = [
   { path: "/sms-opt-in", priority: 0.3, changeFrequency: "yearly" as const },
 ];
 
-// Intentionally excluded: /q/[token] (private, per-customer quote links; also
-// disallowed in robots.ts) and /portal (redirect).
+// Intentionally excluded: /q/[token] (private, per-customer quote links) and
+// /portal/* (private customer portal) — both disallowed in robots.ts.
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

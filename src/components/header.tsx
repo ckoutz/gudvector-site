@@ -24,12 +24,6 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/portal"
-            className="text-[16px] font-medium text-char hover:text-orange-ink"
-          >
-            Customer portal
-          </Link>
         </nav>
 
         <div className="hidden md:block">
@@ -71,7 +65,7 @@ export function Header() {
           className="border-t border-line bg-paper px-4 pb-5 pt-2 md:hidden"
         >
           <ul className="flex flex-col gap-1">
-            {[...headerNav, { label: "Customer portal", href: "/portal" }].map((link) => (
+            {headerNav.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
