@@ -21,6 +21,22 @@ export function ContactForm() {
         <p className="mt-2 text-[16px] leading-relaxed text-muted">
           We&apos;ll reply from info@gudvector.com.
         </p>
+        {state.bookingUrl && (
+          <div className="mt-6 border-t border-orange/20 pt-6">
+            <p className="text-[15px] text-char">
+              Want to skip the back-and-forth? Pick a time now — your name and email are
+              already filled in.
+            </p>
+            <a
+              href={state.bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-orange px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-orange-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-ink"
+            >
+              Book your inspection
+            </a>
+          </div>
+        )}
       </div>
     );
   }
