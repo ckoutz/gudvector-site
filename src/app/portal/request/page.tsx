@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Eyebrow } from "@/components/section";
-import { getPortalMe, type PortalMe } from "@/lib/gvas";
+import { getPortalMe, intakeTransport, type PortalMe } from "@/lib/gvas";
 import { redirectOnUnauthorized, requirePortalSessionToken } from "@/lib/portal-session";
 import { RequestTabs } from "./request-tabs";
 
@@ -39,6 +39,7 @@ export default async function PortalRequestPage() {
         <RequestTabs
           businessName={me?.business.displayName ?? "The business"}
           calendlyUrl={me?.business.calendlyUrl ?? null}
+          intakeTransport={intakeTransport()}
         />
       </div>
 

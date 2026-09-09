@@ -558,6 +558,15 @@ export type IntakeConversation = {
 
 export const INTAKE_SLOT_PREFIX = "slot:";
 
+/**
+ * How the IntakeChat client should reach the intake API. Anonymous traffic
+ * must hit GVAS directly (it rate-limits per client IP); the site's
+ * /api/intake/* handlers are only used when the mock agent lives on the server.
+ */
+export function intakeTransport(): "direct" | "proxy" {
+  return gvasEnv.mock || !gvasEnv.apiUrl ? "proxy" : "direct";
+}
+
 type MockIntakeConversation = IntakeConversation & {
   token: string;
   step: "name" | "email" | "address" | "problem" | "slot" | "done";

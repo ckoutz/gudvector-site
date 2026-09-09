@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   IntakeConversation,
   IntakeReplyResponse,
@@ -78,14 +78,55 @@ class HttpError extends Error {
   }
 }
 
-async function api<T>(path: string, init: RequestInit & { token?: string } = {}): Promise<T> {
-  const { token, ...rest } = init;
-  const res = await fetch(`/api/intake${path}`, {
-    ...rest,
+export type IntakeTransport = "direct" | "proxy";
+
+type Endpoint = { url: string; token?: string };
+
+// Anonymous traffic goes straight to GVAS from the browser (GVAS rate-limits
+// per client IP, so it must not be funnelled through the site's server). The
+// site's /api/intake/* handlers are used only for the portal start (needs the
+// httpOnly session cookie) and in GVAS_MOCK mode, where the server holds the
+// scripted mock agent.
+const DIRECT_API_URL = (process.env.NEXT_PUBLIC_GVAS_API_URL ?? "").replace(/\/+$/, "");
+const DIRECT_BUSINESS_KEY = process.env.NEXT_PUBLIC_GVAS_BUSINESS_KEY ?? "";
+
+function endpoints(transport: IntakeTransport) {
+  const direct = transport === "direct";
+  const enc = encodeURIComponent;
+  return {
+    start(mode: "anonymous" | "portal"): Endpoint & { body: string } {
+      if (mode === "anonymous" && direct) {
+        return {
+          url: `${DIRECT_API_URL}/v1/businesses/${enc(DIRECT_BUSINESS_KEY)}/intake/conversations`,
+          body: "{}",
+        };
+      }
+      return {
+        url: "/api/intake/conversations",
+        body: JSON.stringify(mode === "portal" ? { portal: true } : {}),
+      };
+    },
+    conversation(stored: Stored): Endpoint {
+      return {
+        url: direct
+          ? `${DIRECT_API_URL}/v1/intake/conversations/${enc(stored.conversationId)}`
+          : `/api/intake/conversations/${enc(stored.conversationId)}`,
+        token: stored.conversationToken,
+      };
+    },
+    messages(stored: Stored): Endpoint {
+      return { url: `${this.conversation(stored).url}/messages`, token: stored.conversationToken };
+    },
+  };
+}
+
+async function api<T>(endpoint: Endpoint, init: RequestInit = {}): Promise<T> {
+  const res = await fetch(endpoint.url, {
+    ...init,
     headers: {
       accept: "application/json",
-      ...(rest.body ? { "content-type": "application/json" } : {}),
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...(init.body ? { "content-type": "application/json" } : {}),
+      ...(endpoint.token ? { authorization: `Bearer ${endpoint.token}` } : {}),
     },
   });
   if (!res.ok) {
@@ -138,11 +179,13 @@ type Booted = {
   messages: ChatMessage[];
 };
 
-async function startConversation(mode: "anonymous" | "portal", storageKey: string): Promise<Booted> {
-  const res = await api<IntakeStartResponse>("/conversations", {
-    method: "POST",
-    body: JSON.stringify(mode === "portal" ? { portal: true } : {}),
-  });
+async function startConversation(
+  ep: ReturnType<typeof endpoints>,
+  mode: "anonymous" | "portal",
+  storageKey: string,
+): Promise<Booted> {
+  const { body, ...endpoint } = ep.start(mode);
+  const res = await api<IntakeStartResponse>(endpoint, { method: "POST", body });
   const stored = { conversationId: res.conversationId, conversationToken: res.conversationToken };
   writeStored(storageKey, stored);
   return {
@@ -154,14 +197,15 @@ async function startConversation(mode: "anonymous" | "portal", storageKey: strin
 }
 
 /** Resume the stored conversation via GET, falling back to a fresh start when it expired. */
-async function bootConversation(mode: "anonymous" | "portal", storageKey: string): Promise<Booted> {
+async function bootConversation(
+  ep: ReturnType<typeof endpoints>,
+  mode: "anonymous" | "portal",
+  storageKey: string,
+): Promise<Booted> {
   const stored = readStored(storageKey);
-  if (!stored) return startConversation(mode, storageKey);
+  if (!stored) return startConversation(ep, mode, storageKey);
   try {
-    const res = await api<IntakeConversation>(
-      `/conversations/${encodeURIComponent(stored.conversationId)}`,
-      { token: stored.conversationToken },
-    );
+    const res = await api<IntakeConversation>(ep.conversation(stored));
     return {
       stored,
       state: res.state,
@@ -171,7 +215,7 @@ async function bootConversation(mode: "anonymous" | "portal", storageKey: string
   } catch (err) {
     if (err instanceof HttpError && (err.status === 401 || err.status === 404)) {
       writeStored(storageKey, null);
-      return startConversation(mode, storageKey);
+      return startConversation(ep, mode, storageKey);
     }
     throw err;
   }
@@ -179,10 +223,13 @@ async function bootConversation(mode: "anonymous" | "portal", storageKey: string
 
 export function IntakeChat({
   mode = "anonymous",
+  transport,
   className = "",
 }: {
   /** `portal` starts the conversation with the signed-in customer's session. */
   mode?: "anonymous" | "portal";
+  /** From `intakeTransport()` on the server: `proxy` in GVAS_MOCK mode, else `direct`. */
+  transport: IntakeTransport;
   className?: string;
 }) {
   const [phase, setPhase] = useState<Phase>("booting");
@@ -194,7 +241,8 @@ export function IntakeChat({
   const [draft, setDraft] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const storageKey = `${STORAGE_KEY}:${mode}`;
+  const storageKey = `${STORAGE_KEY}:${mode}:${transport}`;
+  const ep = useMemo(() => endpoints(transport), [transport]);
 
   const applyReply = useCallback((reply: IntakeReplyResponse) => {
     setState(reply.state);
@@ -208,7 +256,7 @@ export function IntakeChat({
 
   useEffect(() => {
     let cancelled = false;
-    bootConversation(mode, storageKey).then(
+    bootConversation(ep, mode, storageKey).then(
       (booted) => {
         if (cancelled) return;
         setConversation(booted.stored);
@@ -227,7 +275,7 @@ export function IntakeChat({
     return () => {
       cancelled = true;
     };
-  }, [mode, storageKey, bootCount]);
+  }, [ep, mode, storageKey, bootCount]);
 
   useEffect(() => {
     const el = listRef.current;
@@ -242,14 +290,10 @@ export function IntakeChat({
       setSlots(null);
       setPhase("sending");
       try {
-        const res = await api<IntakeReplyResponse>(
-          `/conversations/${encodeURIComponent(conversation.conversationId)}/messages`,
-          {
-            method: "POST",
-            token: conversation.conversationToken,
-            body: JSON.stringify({ message }),
-          },
-        );
+        const res = await api<IntakeReplyResponse>(ep.messages(conversation), {
+          method: "POST",
+          body: JSON.stringify({ message }),
+        });
         applyReply(res);
         setPhase("ready");
         requestAnimationFrame(() => inputRef.current?.focus());
@@ -263,7 +307,7 @@ export function IntakeChat({
         setPhase("ready");
       }
     },
-    [applyReply, conversation, phase, storageKey],
+    [applyReply, conversation, ep, phase, storageKey],
   );
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {

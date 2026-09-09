@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/page-hero";
 import { Section } from "@/components/section";
 import { IntakeChat } from "@/components/intake-chat";
-import { gvasEnv } from "@/lib/gvas";
+import { gvasEnv, intakeTransport } from "@/lib/gvas";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function BookPage() {
       />
       <Section tone="peach" className="pt-0">
         <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
-          <IntakeChat />
+          <IntakeChat transport={intakeTransport()} />
           <div className="flex flex-col justify-center gap-3">
             <p className="text-[16px] text-char">
               Every booking is reviewed by a person before it&apos;s confirmed, so you&apos;ll

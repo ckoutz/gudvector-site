@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { IntakeChat } from "@/components/intake-chat";
+import { IntakeChat, type IntakeTransport } from "@/components/intake-chat";
 import { submitContact, type ContactState } from "./actions";
 
 const initialState: ContactState = { status: "idle" };
@@ -12,7 +12,7 @@ const needOptions = [
   { value: "both", label: "Both" },
 ];
 
-export function ContactForm() {
+export function ContactForm({ intakeTransport }: { intakeTransport: IntakeTransport }) {
   const [state, action, pending] = useActionState(submitContact, initialState);
 
   if (state.status === "success") {
@@ -27,7 +27,7 @@ export function ContactForm() {
             Want to skip the back-and-forth? Book an inspection right here — a few quick
             questions, then pick a time.
           </p>
-          <IntakeChat className="mt-4" />
+          <IntakeChat transport={intakeTransport} className="mt-4" />
           {state.bookingUrl && (
             <p className="mt-3 text-[13px] text-muted">
               or{" "}

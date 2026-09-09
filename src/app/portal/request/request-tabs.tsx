@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { IntakeChat } from "@/components/intake-chat";
+import { IntakeChat, type IntakeTransport } from "@/components/intake-chat";
 import { RequestForm } from "./request-form";
 
 type Tab = "chat" | "note";
@@ -14,9 +14,11 @@ const tabs: { id: Tab; label: string }[] = [
 export function RequestTabs({
   businessName,
   calendlyUrl,
+  intakeTransport,
 }: {
   businessName: string;
   calendlyUrl: string | null;
+  intakeTransport: IntakeTransport;
 }) {
   const [active, setActive] = useState<Tab>("chat");
   const baseId = useId();
@@ -69,7 +71,7 @@ export function RequestTabs({
         hidden={active !== "chat"}
         className="mt-6"
       >
-        {active === "chat" && <IntakeChat mode="portal" />}
+        {active === "chat" && <IntakeChat mode="portal" transport={intakeTransport} />}
       </div>
       <div
         id={`${baseId}-panel-note`}
