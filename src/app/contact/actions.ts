@@ -3,12 +3,19 @@
 import { Resend } from "resend";
 import { contactSchema } from "./schema";
 import { siteConfig } from "@/lib/site-config";
+import { gvasEnv, resolveBookingUrl, withCalendlyPrefill } from "@/lib/gvas";
 
 export type ContactState = {
   status: "idle" | "success" | "error";
   message?: string;
   fieldErrors?: Record<string, string>;
+  bookingUrl?: string | null;
 };
+
+async function bookingUrlFor(name: string, email: string): Promise<string | null> {
+  const base = await resolveBookingUrl();
+  return base ? withCalendlyPrefill(base, { name, email }) : null;
+}
 
 const needLabels: Record<string, string> = {
   website: "Website",
@@ -42,12 +49,18 @@ export async function submitContact(
 
   // Honeypot tripped — pretend success, do not send.
   if (parsed.data.website) {
-    return { status: "success" };
+    return { status: "success", bookingUrl: null };
   }
 
   const { name, email, business, need, message } = parsed.data;
 
   const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey && gvasEnv.mock) {
+    // Local dev with GVAS_MOCK=1: skip email so the success state is reachable.
+    console.warn("submitContact: GVAS_MOCK=1 and no RESEND_API_KEY — skipping email send.");
+    return { status: "success", bookingUrl: await bookingUrlFor(name, email) };
+  }
 
   if (!apiKey) {
     // RESEND_API_KEY is not set in this environment. Set it in your Vercel
@@ -96,5 +109,5 @@ export async function submitContact(
     };
   }
 
-  return { status: "success" };
+  return { status: "success", bookingUrl: await bookingUrlFor(name, email) };
 }

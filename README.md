@@ -1,8 +1,9 @@
 # Güd Vector marketing site
 
 Marketing/SEO frontend for Güd Vector Consulting Services (gudvector.com). Next.js 16 App
-Router, React 19, Tailwind v4. This is the marketing site only — it does not implement the
-customer portal, quotes, Stripe, or SMS. `/portal` redirects to the live production host.
+Router, React 19, Tailwind v4. This repo also hosts the public quote portal page (`/q/<token>`),
+which is a thin frontend over the GVAS API — no database, auth, or Stripe SDK lives here.
+`/portal` redirects to the live production host.
 
 - **Do not** point production DNS/Vercel at this repo until Cameron signs off on cutover.
 - Live production still deploys from Cursor Origin `cameron-koutz/tmp-e9b7b4e7dd738742`.
@@ -26,9 +27,35 @@ Open [http://localhost:3000](http://localhost:3000).
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `RESEND_API_KEY` | For the contact form to actually send email | Used in `src/app/contact/actions.ts` to email submissions to `info@gudvector.com` via [Resend](https://resend.com). Without it, the form still validates correctly but shows the visitor a graceful fallback message and logs the attempt server-side instead of sending — it will not crash or silently drop submissions, but no email goes out until this is set. |
+| `NEXT_PUBLIC_GVAS_API_URL` | For `/q/<token>` and the contact-form booking button | Base URL of the GVAS API (production: `https://web-production-9d848.up.railway.app`). Used by `src/lib/gvas.ts`. |
+| `NEXT_PUBLIC_GVAS_BUSINESS_KEY` | Optional | Public key of the Güd Vector business in GVAS. When set, the contact form's success state fetches the booking link from `GET /v1/businesses/{key}/booking-link`. |
+| `NEXT_PUBLIC_CALENDLY_URL` | Optional | Fallback Calendly URL for the "Book your inspection" button when the business key is unset or the booking-link call fails. |
+| `GVAS_MOCK` | Local dev only | Set to `1` to make `src/lib/gvas.ts` return an in-memory sample quote (tokens `sample`, `sample-paid`, `sample-declined`) and a fake booking link, so `/q/sample` and the contact success state render with no backend. Also skips the Resend send when `RESEND_API_KEY` is unset. Never set this on Vercel. |
 
-Set `RESEND_API_KEY` in Vercel project settings (or a local `.env.local`, which is
-git-ignored) once a Resend account and verified sending domain exist for gudvector.com.
+Set these in Vercel project settings (or a local `.env.local`, which is git-ignored).
+`RESEND_API_KEY` needs a Resend account and verified sending domain for gudvector.com.
+
+Local dev without a backend:
+
+```bash
+GVAS_MOCK=1 npm run dev
+# then open /q/sample, /q/sample-paid, /q/sample-declined, /q/anything-else (not found)
+```
+
+## Quote portal
+
+The quoting backend is [GVAS](https://github.com/ckoutz/gud-vector-agent-suite). Flow:
+
+1. The business owner approves a quote in GVAS (Slack or SMS).
+2. GVAS emails/texts the customer a link to `https://gudvector.com/q/<claimToken>`.
+3. `src/app/q/[token]/page.tsx` (server component) calls `GET /v1/quotes/{token}` and renders
+   the line items, total, note, and status. Unknown tokens render a generic not-found state.
+4. The client island (`quote-actions.tsx`) posts to `/accept` or `/decline` via server actions.
+   Accept returns a Stripe Checkout `checkoutUrl` and the browser is redirected there.
+5. Stripe redirects back to `/q/<token>?paid=1` on success (paid confirmation state) or
+   `/q/<token>` on cancel.
+
+The route is `noindex`, excluded from `sitemap.ts`, and disallowed in `robots.ts`.
 
 ## Structure
 

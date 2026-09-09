@@ -58,6 +58,7 @@ export const footerNav: {
       { label: "Customer portal", href: "/portal" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
+      { label: "SMS notifications", href: "/sms-opt-in" },
     ],
   },
 ];
