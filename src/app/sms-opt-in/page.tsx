@@ -10,9 +10,7 @@ export const metadata: Metadata = {
 };
 
 const smsNumber = "+1 (877) 541-1550";
-const supportPhone = "+1 (925) 858-8301";
 const supportEmail = "cameron@gudvector.com";
-const mailingAddress = "3125 Wildwood Dr, Concord, CA 94518";
 
 export default function SmsOptInPage() {
   return (
@@ -57,10 +55,6 @@ export default function SmsOptInPage() {
               any time. Reply HELP for help or contact{" "}
               <a href={`mailto:${supportEmail}`} className="font-medium text-orange-ink">
                 {supportEmail}
-              </a>{" "}
-              /{" "}
-              <a href="tel:+19258588301" className="font-medium text-orange-ink">
-                {supportPhone}
               </a>
               .
             </p>
@@ -75,7 +69,7 @@ export default function SmsOptInPage() {
             <li>Message and data rates may apply.</li>
             <li>Reply STOP to unsubscribe at any time.</li>
             <li>
-              Reply HELP for help or contact {supportEmail} / {supportPhone}.
+              Reply HELP for help or contact {supportEmail}.
             </li>
           </ul>
         </section>
@@ -95,9 +89,6 @@ export default function SmsOptInPage() {
           </p>
         </section>
 
-        <p className="text-[15px] text-muted">
-          {siteConfig.name}, {mailingAddress}.
-        </p>
       </div>
     </div>
   );
