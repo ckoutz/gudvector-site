@@ -11,6 +11,7 @@ const routes = [
   { path: "/compare", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/jobber-housecall-site-builder", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" as const },
+  { path: "/book", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },
   { path: "/terms", priority: 0.3, changeFrequency: "yearly" as const },
   { path: "/sms-opt-in", priority: 0.3, changeFrequency: "yearly" as const },
