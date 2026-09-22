@@ -21,6 +21,7 @@ type Phase = "booting" | "ready" | "sending" | "expired" | "error";
 type Stored = { conversationId: string; conversationToken: string };
 
 const STORAGE_KEY = "gv_intake_conversation";
+const OWNER_POLL_MS = 15_000;
 
 const TERMINAL_COPY: Partial<Record<IntakeState, { title: string; body: string }>> = {
   awaiting_owner: {
@@ -282,11 +283,39 @@ export function IntakeChat({
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, slots, phase]);
 
+  // The owner approves or declines out of band; keep the transcript current
+  // while the request waits on them.
+  useEffect(() => {
+    if (state !== "awaiting_owner" || !conversation || phase !== "ready") return;
+    let cancelled = false;
+    const timer = window.setInterval(async () => {
+      try {
+        const res = await api<IntakeConversation>(ep.conversation(conversation));
+        if (cancelled) return;
+        setState(res.state);
+        setSlots(res.slots);
+        setMessages(res.messages.map((m) => ({ id: mid(), role: m.role, content: m.content })));
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof HttpError && err.status === 401) {
+          writeStored(storageKey, null);
+          setPhase("expired");
+        }
+      }
+    }, OWNER_POLL_MS);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [state, conversation, phase, ep, storageKey]);
+
   const send = useCallback(
     async (message: string, echo: string = message) => {
       if (!conversation || phase === "sending") return;
+      const previousSlots = slots;
+      const echoId = mid();
       setError(null);
-      setMessages((prev) => [...prev, { id: mid(), role: "user", content: echo }]);
+      setMessages((prev) => [...prev, { id: echoId, role: "user", content: echo }]);
       setSlots(null);
       setPhase("sending");
       try {
@@ -303,11 +332,13 @@ export function IntakeChat({
           setPhase("expired");
           return;
         }
+        setMessages((prev) => prev.filter((m) => m.id !== echoId));
+        setSlots(previousSlots);
         setError(errorCopy(err));
         setPhase("ready");
       }
     },
-    [applyReply, conversation, ep, phase, storageKey],
+    [applyReply, conversation, ep, phase, slots, storageKey],
   );
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
