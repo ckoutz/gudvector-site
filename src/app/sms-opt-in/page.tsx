@@ -45,8 +45,9 @@ export default function SmsOptInPage() {
                 aria-describedby="sms-consent-terms"
               />
               <span>
-                I agree to receive SMS messages from {siteConfig.name} at the number I
-                provided.
+                I agree to receive business-update SMS messages from {siteConfig.name} at
+                the number I provided: quote drafts for my approval, quote sent/approved
+                confirmations, and job status updates, each in reply to a text I sent.
               </span>
             </label>
             <p id="sms-consent-terms" className="mt-3 text-[13px] leading-relaxed text-muted">
@@ -64,6 +65,10 @@ export default function SmsOptInPage() {
         <section>
           <h2 className="font-display text-xl font-semibold text-ink">Program details</h2>
           <ul className="mt-2 list-disc space-y-1.5 pl-6">
+            <li>
+              Message types: quote drafts awaiting approval, quote confirmations, and job
+              status updates (business updates, staff-only).
+            </li>
             <li>Consent is not a condition of purchase.</li>
             <li>Message frequency varies (approx. 100 messages/month).</li>
             <li>Message and data rates may apply.</li>
