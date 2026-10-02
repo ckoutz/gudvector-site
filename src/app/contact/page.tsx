@@ -3,7 +3,7 @@ import { PageHero } from "@/components/page-hero";
 import { Section } from "@/components/section";
 import { ContactForm } from "./contact-form";
 import { siteConfig } from "@/lib/site-config";
-import { intakeTransport } from "@/lib/gvas";
+import { OpenChatButton } from "@/components/chat-bubble";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -23,7 +23,7 @@ export default function ContactPage() {
       <Section tone="peach" className="pt-0">
         <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
           <div className="rounded-2xl bg-paper p-8">
-            <ContactForm intakeTransport={intakeTransport()} />
+            <ContactForm />
           </div>
           <div className="flex flex-col justify-center gap-3">
             <p className="text-[16px] text-char">
@@ -34,6 +34,13 @@ export default function ContactPage() {
               >
                 {siteConfig.email}
               </a>
+              .
+            </p>
+            <p className="text-[16px] text-char">
+              Or{" "}
+              <OpenChatButton className="font-medium text-orange-ink underline underline-offset-2">
+                use the chat bubble to book a call
+              </OpenChatButton>
               .
             </p>
             <p className="text-[15px] text-muted">

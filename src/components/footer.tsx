@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoLockup } from "@/components/logo";
+import { OpenChatButton } from "@/components/chat-bubble";
 import { footerNav, siteConfig } from "@/lib/site-config";
 
 export function Footer() {
@@ -36,6 +37,11 @@ export function Footer() {
                     </Link>
                   </li>
                 ))}
+                {group.heading === "Company" && (
+                  <li>
+                    <OpenChatButton className="text-[15px] text-char hover:text-orange-ink" />
+                  </li>
+                )}
               </ul>
             </div>
           ))}

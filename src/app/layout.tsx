@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Lora, Figtree } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { ChatBubble } from "@/components/chat-bubble";
 import { OrganizationJsonLd } from "@/components/json-ld";
 import { siteConfig } from "@/lib/site-config";
+import { intakeTransport } from "@/lib/gvas";
 import "./globals.css";
 
 const lora = Lora({
@@ -57,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
+        <ChatBubble transport={intakeTransport()} />
       </body>
     </html>
   );

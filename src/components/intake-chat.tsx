@@ -225,12 +225,15 @@ async function bootConversation(
 export function IntakeChat({
   mode = "anonymous",
   transport,
+  embedded = false,
   className = "",
 }: {
   /** `portal` starts the conversation with the signed-in customer's session. */
   mode?: "anonymous" | "portal";
   /** From `intakeTransport()` on the server: `proxy` in GVAS_MOCK mode, else `direct`. */
   transport: IntakeTransport;
+  /** Fill a host container (e.g. the chat bubble) that supplies its own header and frame. */
+  embedded?: boolean;
   className?: string;
 }) {
   const [phase, setPhase] = useState<Phase>("booting");
@@ -365,23 +368,25 @@ export function IntakeChat({
 
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-2xl border border-line bg-paper ${className}`}
+      className={`flex flex-col overflow-hidden bg-paper ${embedded ? "" : "rounded-2xl border border-line"} ${className}`}
       data-intake-state={state}
     >
-      <div className="flex items-center gap-3 border-b border-line bg-peach-2 px-5 py-3">
-        <span
-          aria-hidden="true"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange text-[13px] font-semibold text-white"
-        >
-          GV
-        </span>
-        <div>
-          <p className="text-[15px] font-semibold text-ink">Book an inspection</p>
-          <p className="text-[13px] text-muted">
-            A few quick questions, then pick a time. Cameron confirms every booking.
-          </p>
+      {!embedded && (
+        <div className="flex items-center gap-3 border-b border-line bg-peach-2 px-5 py-3">
+          <span
+            aria-hidden="true"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange text-[13px] font-semibold text-white"
+          >
+            GV
+          </span>
+          <div>
+            <p className="text-[15px] font-semibold text-ink">Book an inspection</p>
+            <p className="text-[13px] text-muted">
+              A few quick questions, then pick a time. Cameron confirms every booking.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div
         ref={listRef}
@@ -389,7 +394,7 @@ export function IntakeChat({
         aria-live="polite"
         aria-relevant="additions"
         aria-label="Booking conversation"
-        className="flex max-h-[26rem] min-h-[16rem] flex-col gap-3 overflow-y-auto px-5 py-4"
+        className={`flex flex-col gap-3 overflow-y-auto px-5 py-4 ${embedded ? "min-h-0 flex-1" : "max-h-[26rem] min-h-[16rem]"}`}
       >
         {phase === "booting" && messages.length === 0 && (
           <p className="text-[14px] text-muted">Starting your conversation…</p>

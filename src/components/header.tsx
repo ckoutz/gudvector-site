@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { LogoMark } from "@/components/logo";
 import { CtaButton } from "@/components/cta-button";
+import { OpenChatButton } from "@/components/chat-bubble";
 import { headerNav } from "@/lib/site-config";
 
 export function Header() {
@@ -24,6 +25,7 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          <OpenChatButton className="text-[16px] font-medium text-char hover:text-orange-ink" />
         </nav>
 
         <div className="hidden md:block">
@@ -76,6 +78,12 @@ export function Header() {
                 </Link>
               </li>
             ))}
+            <li>
+              <OpenChatButton
+                onClick={() => setOpen(false)}
+                className="block w-full rounded-lg px-2 py-3 text-left text-[16px] font-medium text-char hover:bg-chip"
+              />
+            </li>
           </ul>
           <CtaButton href="/contact" className="mt-3 w-full">
             Get in touch
