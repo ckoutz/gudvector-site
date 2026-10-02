@@ -7,7 +7,7 @@ import { RequestForm } from "./request-form";
 type Tab = "chat" | "note";
 
 const tabs: { id: Tab; label: string }[] = [
-  { id: "chat", label: "Chat to schedule" },
+  { id: "chat", label: "Chat to book a call" },
   { id: "note", label: "Send a note" },
 ];
 

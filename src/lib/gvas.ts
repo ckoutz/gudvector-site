@@ -76,7 +76,7 @@ export const gvasEnv = {
 // ---------------------------------------------------------------------------
 
 const MOCK_BUSINESS: QuoteBusiness = {
-  displayName: "Diablo Valley Mold Inspection",
+  displayName: "Güd Vector",
   siteUrl: "https://example.com",
 };
 

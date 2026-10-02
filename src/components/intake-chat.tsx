@@ -383,7 +383,7 @@ export function IntakeChat({
             GV
           </span>
           <div>
-            <p className="text-[15px] font-semibold text-ink">Book an inspection</p>
+            <p className="text-[15px] font-semibold text-ink">Chat to book a call</p>
             <p className="text-[13px] text-muted">
               A few quick questions, then pick a time. Cameron confirms every booking.
             </p>
