@@ -39,11 +39,16 @@ export default function PrivacyPage() {
             <li>Send quotes and respond to what you send us through the contact form.</li>
             <li>Run portal accounts, including signing in with email, phone, or Google.</li>
             <li>
-              Send quote links and one-time login codes by SMS through Twilio Verify.
+              Send quote links, booking confirmations, and appointment updates by SMS through
+              Telnyx, only to people who opt in.
             </li>
             <li>Take payment through Stripe. Payment is processed by Stripe.</li>
           </ul>
           <p className="mt-3">We do not sell this information.</p>
+          <p className="mt-3">
+            Mobile numbers and SMS opt-in consent are never shared with or sold to third
+            parties or affiliates for marketing or promotional purposes.
+          </p>
         </section>
 
         <section>

@@ -31,6 +31,8 @@ export async function submitContact(
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
     business: String(formData.get("business") ?? ""),
+    phone: String(formData.get("phone") ?? ""),
+    smsConsent: formData.get("sms_consent") === "yes",
     need: String(formData.get("need") ?? ""),
     message: String(formData.get("message") ?? ""),
     website: String(formData.get("website") ?? ""),
@@ -52,7 +54,8 @@ export async function submitContact(
     return { status: "success", bookingUrl: null };
   }
 
-  const { name, email, business, need, message } = parsed.data;
+  const { name, email, business, phone, need, message } = parsed.data;
+  const smsConsent = Boolean(phone) && parsed.data.smsConsent;
 
   const apiKey = process.env.RESEND_API_KEY;
 
@@ -86,6 +89,8 @@ export async function submitContact(
         `Name: ${name}`,
         `Email: ${email}`,
         business ? `Business: ${business}` : null,
+        phone ? `Phone: ${phone}` : null,
+        phone ? `SMS consent: ${smsConsent ? "Yes — opted in to booking/quote texts" : "No"}` : null,
         `Need: ${needLabels[need] ?? need}`,
         "",
         message,

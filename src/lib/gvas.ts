@@ -547,6 +547,8 @@ export type IntakeReplyResponse = {
   reply: string;
   slots: IntakeSlot[] | null;
   summary: IntakeSummary | null;
+  /** Echoed by the mock; GVAS may omit it. */
+  sms_consent?: boolean;
 };
 
 export type IntakeConversation = {
@@ -570,6 +572,7 @@ export function intakeTransport(): "direct" | "proxy" {
 type MockIntakeConversation = IntakeConversation & {
   token: string;
   step: "name" | "email" | "address" | "problem" | "slot" | "done";
+  smsConsent?: boolean;
 };
 
 const mockIntake: Map<string, MockIntakeConversation> = (() => {
@@ -627,8 +630,13 @@ function mockIntakeConversation(conversationId: string, token: string): MockInta
   return conv;
 }
 
-function mockIntakeReply(conv: MockIntakeConversation, message: string): IntakeReplyResponse {
+function mockIntakeReply(
+  conv: MockIntakeConversation,
+  message: string,
+  smsConsent: boolean,
+): IntakeReplyResponse {
   const now = new Date().toISOString();
+  conv.smsConsent = smsConsent;
   conv.messages.push({ role: "user", content: message, createdAt: now });
   const summary = conv.summary ?? { name: null, email: null, phone: null, address: null, problem: null };
   let reply: string;
@@ -677,7 +685,13 @@ function mockIntakeReply(conv: MockIntakeConversation, message: string): IntakeR
 
   conv.summary = summary;
   conv.messages.push({ role: "agent", content: reply, createdAt: new Date().toISOString() });
-  return { state: conv.state, reply, slots: conv.slots, summary: conv.summary };
+  return {
+    state: conv.state,
+    reply,
+    slots: conv.slots,
+    summary: conv.summary,
+    sms_consent: conv.smsConsent,
+  };
 }
 
 /** Anonymous visitor: start an intake conversation for the configured business. */
@@ -712,14 +726,23 @@ export async function sendIntakeMessage(
   conversationId: string,
   conversationToken: string,
   message: string,
+  smsConsent: boolean,
 ): Promise<IntakeReplyResponse> {
   if (gvasEnv.mock) {
-    return mockIntakeReply(mockIntakeConversation(conversationId, conversationToken), message);
+    return mockIntakeReply(
+      mockIntakeConversation(conversationId, conversationToken),
+      message,
+      smsConsent,
+    );
   }
   return authedRequest<IntakeReplyResponse>(
     `/v1/intake/conversations/${encode(conversationId)}/messages`,
     conversationToken,
-    { method: "POST", headers: jsonHeaders, body: JSON.stringify({ message }) },
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ message, sms_consent: smsConsent }),
+    },
   );
 }
 
