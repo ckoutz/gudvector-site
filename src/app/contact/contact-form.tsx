@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { IntakeChat, type IntakeTransport } from "@/components/intake-chat";
+import { OpenChatButton } from "@/components/chat-bubble";
 import { submitContact, type ContactState } from "./actions";
 
 const initialState: ContactState = { status: "idle" };
@@ -12,7 +12,7 @@ const needOptions = [
   { value: "both", label: "Both" },
 ];
 
-export function ContactForm({ intakeTransport }: { intakeTransport: IntakeTransport }) {
+export function ContactForm() {
   const [state, action, pending] = useActionState(submitContact, initialState);
 
   if (state.status === "success") {
@@ -24,10 +24,12 @@ export function ContactForm({ intakeTransport }: { intakeTransport: IntakeTransp
         </p>
         <div className="mt-6 border-t border-orange/20 pt-6">
           <p className="text-[15px] text-char">
-            Want to skip the back-and-forth? Book an inspection right here — a few quick
-            questions, then pick a time.
+            Want to skip the back-and-forth?{" "}
+            <OpenChatButton className="font-medium text-orange-ink underline underline-offset-2">
+              Use the chat bubble to book a call
+            </OpenChatButton>
+            .
           </p>
-          <IntakeChat transport={intakeTransport} className="mt-4" />
           {state.bookingUrl && (
             <p className="mt-3 text-[13px] text-muted">
               or{" "}
