@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -52,8 +53,17 @@ export default function TermsPage() {
         <section>
           <h2 className="font-display text-xl font-semibold text-ink">Payment and SMS</h2>
           <p className="mt-2">
-            Payment is processed by Stripe. We use Twilio to send quote links and one-time
-            login codes.
+            Payment is processed by Stripe. Text messages are sent through Telnyx from
+            +1 (877) 541-1550, only to people who opt in. Message frequency varies. Message
+            and data rates may apply. Reply STOP to opt out or HELP for help. Details are on
+            the{" "}
+            <Link
+              href="/sms-opt-in"
+              className="font-medium text-orange-ink underline underline-offset-2"
+            >
+              SMS notifications
+            </Link>{" "}
+            page.
           </p>
         </section>
 
