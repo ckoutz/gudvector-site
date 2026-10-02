@@ -26,7 +26,8 @@ export default function SmsOptInPage() {
         <p>
           {siteConfig.name} staff and enrolled business owners can receive text messages
           from <a href="tel:+18775411550" className="font-medium text-orange-ink">{smsNumber}</a>{" "}
-          for quote requests, quote confirmations, and job updates.
+          for business updates: quote drafts awaiting approval, quote approval and
+          delivery confirmations, and appointment updates.
         </p>
 
         <section>
@@ -45,8 +46,9 @@ export default function SmsOptInPage() {
                 aria-describedby="sms-consent-terms"
               />
               <span>
-                I agree to receive SMS messages from {siteConfig.name} at the number I
-                provided.
+                I agree to receive business update SMS messages from {siteConfig.name}
+                (quote drafts for approval, quote approval and delivery confirmations, and
+                appointment updates) at the number I provided.
               </span>
             </label>
             <p id="sms-consent-terms" className="mt-3 text-[13px] leading-relaxed text-muted">
