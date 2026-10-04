@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { OpenChatButton } from "@/components/chat-bubble";
 import { SMS_CONSENT_COPY } from "@/lib/sms";
+import { siteConfig } from "@/lib/site-config";
 import { submitContact, type ContactState } from "./actions";
 
 const initialState: ContactState = { status: "idle" };
@@ -21,7 +22,7 @@ export function ContactForm() {
       <div className="rounded-2xl border border-orange/30 bg-peach-2 p-8">
         <h2 className="font-display text-2xl font-semibold text-ink">Message sent.</h2>
         <p className="mt-2 text-[16px] leading-relaxed text-muted">
-          We&apos;ll reply from info@gudvector.com.
+          We&apos;ll reply from {siteConfig.email}.
         </p>
         <div className="mt-6 border-t border-orange/20 pt-6">
           <p className="text-[15px] text-char">

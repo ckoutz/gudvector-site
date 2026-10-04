@@ -75,8 +75,10 @@ export const gvasEnv = {
 // backend. Status transitions persist for the life of the dev server process.
 // ---------------------------------------------------------------------------
 
+// The mock business is a placeholder client shop, so quote/portal screens read
+// as "your customer's view" — never Güd Vector's own pricing or a real client.
 const MOCK_BUSINESS: QuoteBusiness = {
-  displayName: "Güd Vector",
+  displayName: "Your Business",
   siteUrl: "https://example.com",
 };
 
@@ -85,15 +87,16 @@ function mockQuote(id: string, status: QuoteStatus): Quote {
     id,
     status,
     customerName: "Jordan Alvarez",
-    serviceAddress: "1420 Oak Grove Rd, Walnut Creek, CA 94598",
+    serviceAddress: null,
     items: [
-      { description: "Whole-home mold inspection", quantity: 1, amountCents: 25000 },
-      { description: "Air sampling (per sample)", quantity: 2, amountCents: 12500 },
+      { description: "Water heater replacement (50 gal)", quantity: 1, amountCents: 165000 },
+      { description: "Haul-away of old unit", quantity: 1, amountCents: 15000 },
+      { description: "Shut-off valve replacement", quantity: 2, amountCents: 10000 },
     ],
-    subtotalCents: 50000,
-    totalCents: 50000,
+    subtotalCents: 200000,
+    totalCents: 200000,
     currency: "USD",
-    note: "Includes a written report within 48 hours of the visit. Lab fees for the two air samples are included.",
+    note: "Price includes parts and labor. We can usually schedule within a week of approval.",
     createdAt: "2026-09-01T17:12:00Z",
     approvedAt: "2026-09-02T09:30:00Z",
   };
@@ -114,7 +117,7 @@ const mockStore: Map<string, Quote> = (() => {
   return g.__gvasMockStore;
 })();
 
-const MOCK_CALENDLY_URL = "https://calendly.com/gudvector/inspection";
+const MOCK_CALENDLY_URL = "https://calendly.com/gudvector/discovery-call";
 
 // ---------------------------------------------------------------------------
 // Customer portal mock state (GVAS_MOCK=1)
@@ -141,7 +144,7 @@ const MOCK_PORTAL_QUOTES: PortalQuote[] = [
   {
     id: "q_portal_2",
     status: "sent",
-    totalCents: 32500,
+    totalCents: 200000,
     currency: "USD",
     createdAt: "2026-09-05T18:05:00Z",
     approvedAt: null,
@@ -152,7 +155,7 @@ const MOCK_PORTAL_QUOTES: PortalQuote[] = [
   {
     id: "q_portal_1",
     status: "paid",
-    totalCents: 50000,
+    totalCents: 4500,
     currency: "USD",
     createdAt: "2026-08-15T16:40:00Z",
     approvedAt: "2026-08-16T09:00:00Z",
@@ -168,7 +171,7 @@ const MOCK_PORTAL_SUBSCRIPTIONS: PortalSubscription[] = [
     quoteId: "q_portal_1",
     status: "active",
     interval: "month",
-    amountCents: 50000,
+    amountCents: 4500,
     currency: "USD",
     currentPeriodEnd: "2026-10-15T00:00:00Z",
     cancelAtPeriodEnd: false,
@@ -505,7 +508,7 @@ export async function submitPortalRequest(
 }
 
 // ---------------------------------------------------------------------------
-// Booking intake API (chat-style "Book an inspection"). Field names match the
+// Booking intake API (chat-style "Book a call"). Field names match the
 // GVAS contract — do not rename. The owner approves every booking on the
 // backend; the site only collects info and lets the customer pick a slot.
 // ---------------------------------------------------------------------------

@@ -1,68 +1,59 @@
-export type ComparisonRow = {
-  feature: string;
-  gudVector: string;
-  competitor: string;
+export type Mark = "yes" | "maybe" | "no";
+
+const markStyles: Record<Mark, { symbol: string; label: string; className: string }> = {
+  yes: { symbol: "✓", label: "Yes", className: "font-semibold text-orange-ink" },
+  maybe: { symbol: "~", label: "Depends", className: "text-muted" },
+  no: { symbol: "—", label: "No", className: "text-muted/60" },
 };
 
 export function ComparisonTable({
-  competitorName,
-  caption,
+  columns,
   rows,
 }: {
-  competitorName: string;
-  caption?: string;
-  rows: ComparisonRow[];
+  columns: readonly string[];
+  rows: { feature: string; marks: Mark[] }[];
 }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-line">
-      <table className="w-full min-w-[560px] border-collapse text-left text-[15px]">
-        {caption && (
-          <caption className="border-b border-line bg-chip px-5 py-3 text-left text-[13px] font-semibold uppercase tracking-wide text-orange-ink caption-top">
-            {caption}
-          </caption>
-        )}
+    <div className="relative -mx-5 overflow-x-auto sm:mx-0">
+      <table className="w-full min-w-[600px] border-collapse text-left text-[15px]">
         <thead>
-          <tr className="bg-peach-2">
-            <th scope="col" className="px-5 py-3 font-semibold text-char">
-              &nbsp;
+          <tr className="border-b border-ink/80">
+            <th scope="col" className="sticky left-0 z-10 bg-paper py-3 pl-5 pr-4 font-medium text-muted sm:static sm:pl-0">
+              <span className="sr-only">Feature</span>
             </th>
-            <th scope="col" className="px-5 py-3 font-semibold text-char">
-              Güd Vector
-            </th>
-            <th scope="col" className="px-5 py-3 font-semibold text-char">
-              {competitorName}
-            </th>
+            {columns.map((name, i) => (
+              <th
+                key={name}
+                scope="col"
+                className={`px-4 py-3 text-center font-semibold ${i === 0 ? "text-orange-ink" : "text-ink"}`}
+              >
+                {name}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
-            <tr key={row.feature} className={i % 2 === 1 ? "bg-paper" : "bg-peach-2/40"}>
-              <th scope="row" className="px-5 py-4 align-top font-medium text-char">
+          {rows.map((row) => (
+            <tr key={row.feature} className="border-b border-line">
+              <th scope="row" className="sticky left-0 z-10 bg-paper py-4 pl-5 pr-4 font-medium text-char sm:static sm:pl-0">
                 {row.feature}
               </th>
-              <td className="px-5 py-4 align-top text-muted">{row.gudVector}</td>
-              <td className="px-5 py-4 align-top text-muted">{row.competitor}</td>
+              {row.marks.map((mark, j) => {
+                const { symbol, label, className } = markStyles[mark];
+                return (
+                  <td
+                    key={columns[j]}
+                    className={`px-4 py-4 text-center text-[17px] ${className} ${j === 0 ? "bg-chip/50" : ""}`}
+                  >
+                    <span aria-hidden="true">{symbol}</span>
+                    <span className="sr-only">{label}</span>
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
-  );
-}
-
-export function WhenTheyreRight({
-  name,
-  children,
-}: {
-  name: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl border border-line bg-peach-2 p-6">
-      <p className="text-[13px] font-semibold uppercase tracking-wide text-orange-ink">
-        When {name} is the right answer
-      </p>
-      <p className="mt-2 max-w-[65ch] text-[16px] leading-relaxed text-char">{children}</p>
     </div>
   );
 }

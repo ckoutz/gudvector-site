@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Lora, Figtree } from "next/font/google";
+import { Figtree } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ChatBubble } from "@/components/chat-bubble";
@@ -7,11 +7,6 @@ import { OrganizationJsonLd } from "@/components/json-ld";
 import { siteConfig } from "@/lib/site-config";
 import { intakeTransport } from "@/lib/gvas";
 import "./globals.css";
-
-const lora = Lora({
-  variable: "--font-lora",
-  subsets: ["latin"],
-});
 
 const figtree = Figtree({
   variable: "--font-figtree",
@@ -21,11 +16,11 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} | Websites & Systems for Bay Area Service Businesses`,
+    default: `${siteConfig.name} | Websites & Automation for Local Service Businesses`,
     template: `%s | ${siteConfig.name}`,
   },
   description:
-    "Fast, mobile-first websites and owner-approved quoting systems for local service companies in the San Francisco Bay Area. Email info@gudvector.com.",
+    "Websites, owner-approved quoting and an AI booking chat for plumbers, HVAC, cleaners and contractors.",
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
@@ -44,7 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${lora.variable} ${figtree.variable} h-full antialiased`}
+      className={`${figtree.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-paper font-sans text-ink">
         <a
