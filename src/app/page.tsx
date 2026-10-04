@@ -11,9 +11,9 @@ const products = [
     href: "/websites",
   },
   {
-    title: siteConfig.managerName,
-    body: "A booking chat, quotes you approve, and a portal where customers pay.",
-    href: "/manager",
+    title: siteConfig.officeName,
+    body: "Meet Gus, your automated office manager: schedule, quotes, estimates and billing.",
+    href: "/office",
   },
   {
     title: "Custom AI",
@@ -56,7 +56,7 @@ export default function HomePage() {
       </Section>
 
       <Section>
-        <SectionHeading eyebrow={siteConfig.managerName} title="What your customers see" />
+        <SectionHeading eyebrow={siteConfig.officeName} title="What your customers see" />
         <div className="mt-12 grid gap-12 sm:mt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10">
           <Figure
             name="chat"

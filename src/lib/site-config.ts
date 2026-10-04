@@ -3,10 +3,10 @@ export const siteConfig = {
   legalName: "Güd Vector Consulting Services",
   url: "https://gudvector.com",
   motto: "sending your company in the right direction",
-  email: "cameron@gudvector.com",
+  email: "info@gudvector.com",
   areaServed: "San Francisco Bay Area",
   portalUrl: "https://gudvector.com/portal",
-  managerName: "Güd Manager",
+  officeName: "Güd Office",
 } as const;
 
 export type NavLink = {
@@ -16,7 +16,7 @@ export type NavLink = {
 
 export const headerNav: NavLink[] = [
   { label: "Websites", href: "/websites" },
-  { label: siteConfig.managerName, href: "/manager" },
+  { label: siteConfig.officeName, href: "/office" },
   { label: "Custom AI", href: "/custom-ai" },
   { label: "Contact", href: "/contact" },
 ];
@@ -29,7 +29,7 @@ export const footerNav: {
     heading: "Product",
     links: [
       { label: "Websites", href: "/websites" },
-      { label: siteConfig.managerName, href: "/manager" },
+      { label: siteConfig.officeName, href: "/office" },
       { label: "Custom AI", href: "/custom-ai" },
       { label: "Compare", href: "/compare" },
     ],

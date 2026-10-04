@@ -52,10 +52,10 @@ export default function WebsitesPage() {
                 answer: (
                   <>
                     Yes. Add{" "}
-                    <Link href="/manager" className="text-ink underline underline-offset-4">
-                      {siteConfig.managerName}
+                    <Link href="/office" className="text-ink underline underline-offset-4">
+                      {siteConfig.officeName}
                     </Link>{" "}
-                    for a booking chat, quotes and a customer portal, now or later.
+                    and Gus handles booking, quotes and billing, now or later.
                   </>
                 ),
               },

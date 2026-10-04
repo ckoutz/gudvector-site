@@ -8,34 +8,34 @@ import { CtaBand } from "@/components/cta-band";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.managerName}: Booking Chat, Owner-Approved Quotes and a Customer Portal`,
+  title: `${siteConfig.officeName}: Meet Gus, Your Automated Office Manager`,
   description:
-    "A booking chat on your site, quotes you approve before they go out, and a portal where customers accept and pay.",
-  alternates: { canonical: "/manager" },
+    "Gus runs your schedule, sends quotes, books estimates and handles billing. Nothing goes out until you OK it.",
+  alternates: { canonical: "/office" },
 };
 
 const points = [
   {
-    title: "A chat that books",
-    body: "It answers the basics, collects the details and offers open times. You confirm.",
+    title: "Books estimates",
+    body: "Gus answers visitors on your site, collects the details and offers open times. You confirm.",
   },
   {
-    title: "Quotes you approve",
-    body: "You set every price. Customers review, accept and pay from one link.",
+    title: "Sends quotes",
+    body: "You set the price. Gus sends it, and customers accept and pay from one link.",
   },
   {
-    title: "A portal with your name",
-    body: "Customers see quotes, pay, and pause or cancel without calling you.",
+    title: "Handles billing",
+    body: "Customers pay, pause or cancel in their own portal, without calling you.",
   },
 ];
 
-export default function ManagerPage() {
+export default function OfficePage() {
   return (
     <>
       <PageHero
-        eyebrow={siteConfig.managerName}
-        h1="Booking and quoting that still go through you."
-        lede="Visitors book a time and get a quote online. Nothing reaches your calendar or your customer until you OK it."
+        eyebrow={siteConfig.officeName}
+        h1="Meet Gus, your automated office manager."
+        lede="Gus runs your schedule, sends quotes, books estimates and handles billing. Nothing goes out until you OK it."
       />
 
       <Section className="border-t border-line">
@@ -72,7 +72,7 @@ export default function ManagerPage() {
           <Faq
             items={[
               {
-                question: "Does it book jobs or send quotes on its own?",
+                question: "Does Gus book jobs or send quotes on his own?",
                 answer: "No. You confirm every time slot and approve every price first.",
               },
               {
