@@ -2,25 +2,29 @@ import { BookCallButton } from "@/components/cta-button";
 import { CtaBand } from "@/components/cta-band";
 import { Figure } from "@/components/screenshot";
 import { Container, Eyebrow, FeatureList, Section, SectionHeading } from "@/components/section";
+import { siteConfig } from "@/lib/site-config";
 
-const outcomes = [
+const products = [
   {
-    title: "A site that gets the call",
-    body: "Fast, phone-ready and built for local search. You own it.",
+    title: "Websites",
+    body: "Fast sites you own, built to show up in Google and AI answers.",
+    href: "/websites",
   },
   {
-    title: "Quotes you approve",
-    body: "Nothing goes out until you OK the price. Customers accept and pay online.",
+    title: siteConfig.managerName,
+    body: "A booking chat, quotes you approve, and a portal where customers pay.",
+    href: "/manager",
   },
   {
-    title: "Booking while you work",
-    body: "A chat on your site answers visitors and books the call. You confirm the time.",
+    title: "Custom AI",
+    body: "Tools built around your crew's paperwork, inside apps you already use.",
+    href: "/custom-ai",
   },
 ];
 
 const steps = [
-  { title: "Book a call", body: "Tell us how you quote, book and get paid today." },
-  { title: "We build it", body: "Site, quoting and booking, set up around how you already work." },
+  { title: "Book a call", body: "Tell us where the time goes today." },
+  { title: "We build it", body: "Set up around how you already work, not the other way round." },
   { title: "You go live", body: "Preview everything on your phone. Nothing launches without your OK." },
 ];
 
@@ -28,13 +32,13 @@ export default function HomePage() {
   return (
     <>
       <Container className="pb-20 pt-20 sm:pb-28 sm:pt-32">
-        <Eyebrow>For plumbers, HVAC, cleaners and contractors</Eyebrow>
+        <Eyebrow>For local service businesses</Eyebrow>
         <h1 className="mt-5 max-w-4xl font-display text-[2.75rem] font-semibold leading-[1.02] tracking-[-0.04em] text-ink sm:text-7xl lg:text-[5.5rem]">
-          Your website should book the job.
+          Get found. Get booked. Skip the busywork.
         </h1>
         <p className="mt-7 max-w-xl text-[19px] leading-relaxed text-muted sm:text-[21px]">
-          We build sites and automations for local service businesses: a booking chat, quotes
-          you approve, and a portal where customers pay.
+          Websites, booking and quoting, and custom AI for plumbers, HVAC, cleaners and
+          contractors.
         </p>
         <div className="mt-10">
           <BookCallButton size="lg" />
@@ -42,8 +46,8 @@ export default function HomePage() {
       </Container>
 
       <Section className="border-t border-line">
-        <SectionHeading title="Less phone tag. More booked work." />
-        <FeatureList items={outcomes} />
+        <SectionHeading title="Three ways we help." />
+        <FeatureList items={products} />
       </Section>
 
       <Section tone="muted" id="how-it-works">
@@ -52,7 +56,7 @@ export default function HomePage() {
       </Section>
 
       <Section>
-        <SectionHeading eyebrow="The product" title="What your customers see" />
+        <SectionHeading eyebrow={siteConfig.managerName} title="What your customers see" />
         <div className="mt-12 grid gap-12 sm:mt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10">
           <Figure
             name="chat"

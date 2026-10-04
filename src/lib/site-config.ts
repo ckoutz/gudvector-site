@@ -6,6 +6,7 @@ export const siteConfig = {
   email: "cameron@gudvector.com",
   areaServed: "San Francisco Bay Area",
   portalUrl: "https://gudvector.com/portal",
+  managerName: "Güd Manager",
 } as const;
 
 export type NavLink = {
@@ -14,9 +15,9 @@ export type NavLink = {
 };
 
 export const headerNav: NavLink[] = [
-  { label: "Quoting", href: "/owner-approved-quoting" },
-  { label: "Booking", href: "/website-booking" },
-  { label: "Compare", href: "/compare" },
+  { label: "Websites", href: "/websites" },
+  { label: siteConfig.managerName, href: "/manager" },
+  { label: "Custom AI", href: "/custom-ai" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -27,8 +28,9 @@ export const footerNav: {
   {
     heading: "Product",
     links: [
-      { label: "Owner-approved quoting", href: "/owner-approved-quoting" },
-      { label: "Website + booking", href: "/website-booking" },
+      { label: "Websites", href: "/websites" },
+      { label: siteConfig.managerName, href: "/manager" },
+      { label: "Custom AI", href: "/custom-ai" },
       { label: "Compare", href: "/compare" },
     ],
   },

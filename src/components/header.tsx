@@ -21,7 +21,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-5 sm:h-[72px] sm:px-8">
         <LogoMark className="h-9 w-auto shrink-0 sm:h-10" />
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           {headerNav.map((link) => (
             <Link key={link.href} href={link.href} className={linkClass(link.href)}>
               {link.label}
@@ -29,7 +29,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-6 md:flex">
+        <div className="hidden items-center gap-6 lg:flex">
           <Link href="/portal" className={linkClass("/portal")}>
             Customer login
           </Link>
@@ -38,7 +38,7 @@ export function Header() {
 
         <button
           type="button"
-          className="-mr-2 inline-flex items-center justify-center rounded-md p-2 text-ink md:hidden"
+          className="-mr-2 inline-flex items-center justify-center rounded-md p-2 text-ink lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -68,7 +68,7 @@ export function Header() {
         <nav
           id="mobile-nav"
           aria-label="Mobile"
-          className="border-t border-line bg-paper px-5 pb-6 pt-2 md:hidden"
+          className="border-t border-line bg-paper px-5 pb-6 pt-2 lg:hidden"
         >
           <ul className="flex flex-col divide-y divide-line">
             {[...headerNav, { label: "Customer login", href: "/portal" }].map((link) => (

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description:
-    "Websites, owner-approved quoting and an AI booking chat for plumbers, HVAC, cleaners and contractors.",
+    "Websites built for search and AI, booking and owner-approved quoting, and custom AI tools for local service businesses.",
   openGraph: {
     type: "website",
     siteName: siteConfig.name,

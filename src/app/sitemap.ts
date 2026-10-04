@@ -3,8 +3,9 @@ import { siteConfig } from "@/lib/site-config";
 
 const routes = [
   { path: "/", priority: 1, changeFrequency: "monthly" as const },
-  { path: "/owner-approved-quoting", priority: 0.8, changeFrequency: "monthly" as const },
-  { path: "/website-booking", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/websites", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/manager", priority: 0.8, changeFrequency: "monthly" as const },
+  { path: "/custom-ai", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/compare", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" as const },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },

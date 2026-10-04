@@ -9,7 +9,7 @@ export function OrganizationJsonLd() {
     url: siteConfig.url,
     email: siteConfig.email,
     description:
-      "Websites and owner-approved quoting systems for Bay Area local service businesses.",
+      "Websites, booking and owner-approved quoting, and custom AI tools for local service businesses.",
     address: {
       "@type": "PostalAddress",
       addressRegion: "CA",

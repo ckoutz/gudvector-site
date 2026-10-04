@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       { source: "/service-businesses", destination: "/", permanent: true },
       { source: "/dont-want-to-learn-software", destination: "/compare", permanent: true },
       { source: "/jobber-housecall-site-builder", destination: "/compare", permanent: true },
+      { source: "/owner-approved-quoting", destination: "/manager", permanent: true },
+      { source: "/website-booking", destination: "/manager", permanent: true },
     ];
   },
 };

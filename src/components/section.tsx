@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Container({
   children,
   className = "",
@@ -63,7 +65,7 @@ export function FeatureList({
   items,
   numbered = false,
 }: {
-  items: { title: string; body: string }[];
+  items: { title: string; body: string; href?: string }[];
   numbered?: boolean;
 }) {
   const Tag = numbered ? "ol" : "ul";
@@ -78,7 +80,16 @@ export function FeatureList({
             {String(i + 1).padStart(2, "0")}
           </span>
           <h3 className="mt-3 text-[20px] font-semibold tracking-[-0.01em] text-ink">
-            {item.title}
+            {item.href ? (
+              <Link href={item.href} className="group inline-flex items-baseline gap-1.5 hover:text-orange-ink">
+                {item.title}
+                <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </Link>
+            ) : (
+              item.title
+            )}
           </h3>
           <p className="mt-2 text-[16px] leading-relaxed text-muted">{item.body}</p>
         </li>
