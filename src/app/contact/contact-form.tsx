@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { OpenChatButton } from "@/components/chat-bubble";
+import { SMS_CONSENT_COPY } from "@/lib/sms";
 import { submitContact, type ContactState } from "./actions";
 
 const initialState: ContactState = { status: "idle" };
@@ -108,6 +109,36 @@ export function ContactForm() {
           type="text"
           className="mt-1.5 w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-[16px] text-ink outline-none focus:border-orange focus:ring-2 focus:ring-orange/20"
         />
+      </div>
+
+      <div>
+        <label htmlFor="phone" className="block text-[14px] font-semibold text-char">
+          Phone <span className="font-normal text-muted">(optional)</span>
+        </label>
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+          inputMode="tel"
+          aria-invalid={Boolean(state.fieldErrors?.phone)}
+          aria-describedby={state.fieldErrors?.phone ? "phone-error" : undefined}
+          className="mt-1.5 w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-[16px] text-ink outline-none focus:border-orange focus:ring-2 focus:ring-orange/20"
+        />
+        {state.fieldErrors?.phone && (
+          <p id="phone-error" className="mt-1 text-[13px] text-orange-ink">
+            {state.fieldErrors.phone}
+          </p>
+        )}
+        <label className="mt-2 flex items-start gap-2 text-[13px] leading-snug text-muted">
+          <input
+            type="checkbox"
+            name="sms_consent"
+            value="yes"
+            className="mt-0.5 h-4 w-4 shrink-0 accent-orange"
+          />
+          <span>{SMS_CONSENT_COPY}</span>
+        </label>
       </div>
 
       <fieldset>
