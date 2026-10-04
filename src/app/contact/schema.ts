@@ -4,6 +4,12 @@ export const contactSchema = z.object({
   name: z.string().trim().min(1, "Enter your name."),
   email: z.string().trim().min(1, "Enter your email.").email("Enter a valid email."),
   business: z.string().trim().optional(),
+  phone: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || v.replace(/\D/g, "").length >= 10, "Enter a valid phone number.")
+    .optional(),
+  smsConsent: z.boolean(),
   need: z.enum(["website", "quoting", "both"], {
     message: "Choose what you need.",
   }),

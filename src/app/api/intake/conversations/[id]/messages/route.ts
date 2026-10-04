@@ -14,9 +14,11 @@ export async function POST(
   if (!token) return NextResponse.json({ error: "Missing token." }, { status: 401 });
 
   let message: string | null = null;
+  let smsConsent = false;
   try {
-    const body = (await request.json()) as { message?: unknown };
+    const body = (await request.json()) as { message?: unknown; sms_consent?: unknown };
     if (typeof body.message === "string") message = body.message.trim();
+    smsConsent = body.sms_consent === true;
   } catch {
     // handled below
   }
@@ -26,7 +28,7 @@ export async function POST(
 
   const { id } = await params;
   try {
-    return NextResponse.json(await sendIntakeMessage(id, token, message));
+    return NextResponse.json(await sendIntakeMessage(id, token, message, smsConsent));
   } catch (err) {
     return intakeErrorResponse(err, "intake message");
   }

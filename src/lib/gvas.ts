@@ -76,7 +76,7 @@ export const gvasEnv = {
 // ---------------------------------------------------------------------------
 
 const MOCK_BUSINESS: QuoteBusiness = {
-  displayName: "Diablo Valley Mold Inspection",
+  displayName: "Güd Vector",
   siteUrl: "https://example.com",
 };
 
@@ -547,6 +547,8 @@ export type IntakeReplyResponse = {
   reply: string;
   slots: IntakeSlot[] | null;
   summary: IntakeSummary | null;
+  /** Echoed by the mock; GVAS may omit it. */
+  sms_consent?: boolean;
 };
 
 export type IntakeConversation = {
@@ -569,7 +571,9 @@ export function intakeTransport(): "direct" | "proxy" {
 
 type MockIntakeConversation = IntakeConversation & {
   token: string;
-  step: "name" | "email" | "address" | "problem" | "slot" | "done";
+  step: "need" | "business" | "tools" | "timeline" | "name" | "email" | "slot" | "done";
+  details: string[];
+  smsConsent?: boolean;
 };
 
 const mockIntake: Map<string, MockIntakeConversation> = (() => {
@@ -578,8 +582,8 @@ const mockIntake: Map<string, MockIntakeConversation> = (() => {
   return g.__gvasMockIntake;
 })();
 
-const MOCK_INTAKE_GREETING =
-  "Hi! I can help you book an inspection with Diablo Valley Mold Inspection. First, what's your name?";
+const MOCK_INTAKE_OPENING =
+  "I can help you book a free discovery call with Güd Vector. Are you looking for a website, automation, or both?";
 
 function mockIntakeSlots(): IntakeSlot[] {
   const base = new Date();
@@ -599,12 +603,11 @@ function mockIntakeStart(name: string | null): IntakeStartResponse {
   const conversationId = `conv_${Math.random().toString(36).slice(2, 10)}`;
   const token = `mock-conv-${Math.random().toString(36).slice(2)}`;
   const now = new Date().toISOString();
-  const greeting = name
-    ? `Hi ${name}! I can help you book an inspection. What's the service address?`
-    : MOCK_INTAKE_GREETING;
+  const greeting = `Hi${name ? ` ${name}` : ""}! ${MOCK_INTAKE_OPENING}`;
   mockIntake.set(conversationId, {
     token,
-    step: name ? "address" : "name",
+    step: "need",
+    details: [],
     state: "collecting",
     messages: [{ role: "agent", content: greeting, createdAt: now }],
     slots: null,
@@ -627,13 +630,50 @@ function mockIntakeConversation(conversationId: string, token: string): MockInta
   return conv;
 }
 
-function mockIntakeReply(conv: MockIntakeConversation, message: string): IntakeReplyResponse {
+function mockIntakeReply(
+  conv: MockIntakeConversation,
+  message: string,
+  smsConsent: boolean,
+): IntakeReplyResponse {
   const now = new Date().toISOString();
+  conv.smsConsent = smsConsent;
   conv.messages.push({ role: "user", content: message, createdAt: now });
   const summary = conv.summary ?? { name: null, email: null, phone: null, address: null, problem: null };
   let reply: string;
 
+  const proposeSlots = () => {
+    summary.problem = conv.details.join("\n");
+    conv.step = "slot";
+    conv.state = "proposing_slots";
+    conv.slots = mockIntakeSlots();
+    return "That's everything I need. Here are a few times for a quick call — pick one and Cameron will confirm.";
+  };
+
   switch (conv.step) {
+    case "need":
+      conv.details.push(`Looking for: ${message}`);
+      conv.step = "business";
+      reply = "Got it. What's your business called, and what trade are you in?";
+      break;
+    case "business":
+      conv.details.push(`Business: ${message}`);
+      conv.step = "tools";
+      reply = "Thanks. What do you use today to schedule jobs, send quotes, and get paid?";
+      break;
+    case "tools":
+      conv.details.push(`Current tools: ${message}`);
+      conv.step = "timeline";
+      reply = "Helpful. What's your timeline — when would you like this up and running?";
+      break;
+    case "timeline":
+      conv.details.push(`Timeline: ${message}`);
+      if (summary.name && summary.email) {
+        reply = proposeSlots();
+      } else {
+        conv.step = "name";
+        reply = "Great. What's your name?";
+      }
+      break;
     case "name":
       summary.name = message;
       conv.step = "email";
@@ -641,20 +681,7 @@ function mockIntakeReply(conv: MockIntakeConversation, message: string): IntakeR
       break;
     case "email":
       summary.email = message;
-      conv.step = "address";
-      reply = "Got it. What's the address of the property you'd like inspected?";
-      break;
-    case "address":
-      summary.address = message;
-      conv.step = "problem";
-      reply = "Perfect. Briefly, what's going on? (Visible growth, a musty smell, recent water damage…)";
-      break;
-    case "problem":
-      summary.problem = message;
-      conv.step = "slot";
-      conv.state = "proposing_slots";
-      conv.slots = mockIntakeSlots();
-      reply = "That's everything I need. Here are a few times that could work — pick one and Cameron will confirm.";
+      reply = proposeSlots();
       break;
     case "slot": {
       const start = message.startsWith(INTAKE_SLOT_PREFIX)
@@ -677,7 +704,13 @@ function mockIntakeReply(conv: MockIntakeConversation, message: string): IntakeR
 
   conv.summary = summary;
   conv.messages.push({ role: "agent", content: reply, createdAt: new Date().toISOString() });
-  return { state: conv.state, reply, slots: conv.slots, summary: conv.summary };
+  return {
+    state: conv.state,
+    reply,
+    slots: conv.slots,
+    summary: conv.summary,
+    sms_consent: conv.smsConsent,
+  };
 }
 
 /** Anonymous visitor: start an intake conversation for the configured business. */
@@ -712,14 +745,23 @@ export async function sendIntakeMessage(
   conversationId: string,
   conversationToken: string,
   message: string,
+  smsConsent: boolean,
 ): Promise<IntakeReplyResponse> {
   if (gvasEnv.mock) {
-    return mockIntakeReply(mockIntakeConversation(conversationId, conversationToken), message);
+    return mockIntakeReply(
+      mockIntakeConversation(conversationId, conversationToken),
+      message,
+      smsConsent,
+    );
   }
   return authedRequest<IntakeReplyResponse>(
     `/v1/intake/conversations/${encode(conversationId)}/messages`,
     conversationToken,
-    { method: "POST", headers: jsonHeaders, body: JSON.stringify({ message }) },
+    {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ message, sms_consent: smsConsent }),
+    },
   );
 }
 

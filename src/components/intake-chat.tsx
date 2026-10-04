@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type {
   IntakeConversation,
   IntakeReplyResponse,
@@ -9,6 +9,7 @@ import type {
   IntakeState,
 } from "@/lib/gvas";
 import { INTAKE_SLOT_PREFIX } from "@/lib/gvas";
+import { SMS_CONSENT_COPY } from "@/lib/sms";
 
 type ChatMessage = {
   id: string;
@@ -243,6 +244,8 @@ export function IntakeChat({
   const [slots, setSlots] = useState<IntakeSlot[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const [smsConsent, setSmsConsent] = useState(false);
+  const consentId = useId();
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const storageKey = `${STORAGE_KEY}:${mode}:${transport}`;
@@ -324,7 +327,7 @@ export function IntakeChat({
       try {
         const res = await api<IntakeReplyResponse>(ep.messages(conversation), {
           method: "POST",
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ message, sms_consent: smsConsent }),
         });
         applyReply(res);
         setPhase("ready");
@@ -341,7 +344,7 @@ export function IntakeChat({
         setPhase("ready");
       }
     },
-    [applyReply, conversation, ep, phase, slots, storageKey],
+    [applyReply, conversation, ep, phase, slots, smsConsent, storageKey],
   );
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -380,7 +383,7 @@ export function IntakeChat({
             GV
           </span>
           <div>
-            <p className="text-[15px] font-semibold text-ink">Book an inspection</p>
+            <p className="text-[15px] font-semibold text-ink">Chat to book a call</p>
             <p className="text-[13px] text-muted">
               A few quick questions, then pick a time. Cameron confirms every booking.
             </p>
@@ -533,6 +536,18 @@ export function IntakeChat({
           Send
         </button>
       </form>
+      <div className="flex items-start gap-2 px-4 pb-3">
+        <input
+          id={consentId}
+          type="checkbox"
+          checked={smsConsent}
+          onChange={(e) => setSmsConsent(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-orange"
+        />
+        <label htmlFor={consentId} className="text-[12px] leading-snug text-muted">
+          {SMS_CONSENT_COPY}
+        </label>
+      </div>
     </div>
   );
 }

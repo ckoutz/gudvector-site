@@ -31,7 +31,7 @@ export default async function PortalRequestPage() {
         Request a service.
       </h1>
       <p className="mt-4 text-[16px] leading-relaxed text-muted">
-        Chat to schedule a visit — {me?.business.displayName ?? "the business"} confirms
+        Chat to book a call — {me?.business.displayName ?? "the business"} confirms
         every booking — or just send a note and they&apos;ll get back to you.
       </p>
 
