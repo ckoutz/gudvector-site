@@ -27,15 +27,15 @@ const OWNER_POLL_MS = 15_000;
 const TERMINAL_COPY: Partial<Record<IntakeState, { title: string; body: string }>> = {
   awaiting_owner: {
     title: "Request sent.",
-    body: "Thanks — Cameron will confirm by email or text shortly.",
+    body: "Thanks — Güd Vector will confirm by email or text shortly.",
   },
   approved: {
     title: "You're booked.",
-    body: "Cameron approved your time. A confirmation is on its way by email or text.",
+    body: "Güd Vector approved your time. A confirmation is on its way by email or text.",
   },
   declined: {
     title: "That time didn't work out.",
-    body: "Cameron couldn't make that slot. Reply to the confirmation email or text to find another time.",
+    body: "That slot didn&apos;t work for Güd Vector. Reply to the confirmation email or text to find another time.",
   },
   closed: {
     title: "This conversation is closed.",
@@ -385,7 +385,7 @@ export function IntakeChat({
           <div>
             <p className="text-[15px] font-semibold text-ink">Chat to book a call</p>
             <p className="text-[13px] text-muted">
-              A few quick questions, then pick a time. Cameron confirms every booking.
+              A few quick questions, then pick a time. Every booking is confirmed by the team.
             </p>
           </div>
         </div>
@@ -419,7 +419,7 @@ export function IntakeChat({
             >
               {m.role === "owner" && (
                 <span className="block text-[12px] font-semibold uppercase tracking-wide text-orange-ink">
-                  Cameron
+                  Güd Vector
                 </span>
               )}
               <span className="whitespace-pre-wrap">{m.content}</span>
