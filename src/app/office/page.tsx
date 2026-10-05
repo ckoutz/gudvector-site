@@ -5,6 +5,7 @@ import { FeatureList, Section, SectionHeading } from "@/components/section";
 import { Figure } from "@/components/screenshot";
 import { Faq } from "@/components/faq";
 import { CtaBand } from "@/components/cta-band";
+import { GusPhones } from "@/components/gus-phone";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -37,6 +38,11 @@ export default function OfficePage() {
         h1="Meet Gus, your automated office manager."
         lede="Gus runs your schedule, sends quotes, books estimates and handles billing. Nothing goes out until you OK it."
       />
+
+      <Section className="border-t border-line">
+        <SectionHeading title="Your customer books. You get a text." />
+        <GusPhones className="mt-12 sm:mt-16" />
+      </Section>
 
       <Section className="border-t border-line">
         <SectionHeading title="Less phone tag. More booked work." />

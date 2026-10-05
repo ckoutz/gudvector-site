@@ -78,7 +78,7 @@ export const gvasEnv = {
 // The mock business is a placeholder client shop, so quote/portal screens read
 // as "your customer's view" — never Güd Vector's own pricing or a real client.
 const MOCK_BUSINESS: QuoteBusiness = {
-  displayName: "Your Business",
+  displayName: "Bay Area Services",
   siteUrl: "https://example.com",
 };
 
@@ -586,7 +586,7 @@ const mockIntake: Map<string, MockIntakeConversation> = (() => {
 })();
 
 const MOCK_INTAKE_OPENING =
-  "I can help you book a free discovery call with Güd Vector. Are you looking for a website, automation, or both?";
+  "I can help you book a free estimate with Bay Area Services. What do you need done?";
 
 function mockIntakeSlots(): IntakeSlot[] {
   const base = new Date();
@@ -649,24 +649,24 @@ function mockIntakeReply(
     conv.step = "slot";
     conv.state = "proposing_slots";
     conv.slots = mockIntakeSlots();
-    return "That's everything I need. Here are a few times for a quick call — pick one and Cameron will confirm.";
+    return "That's everything I need. Here are a few times for your estimate — pick one and we'll confirm.";
   };
 
   switch (conv.step) {
     case "need":
-      conv.details.push(`Looking for: ${message}`);
+      conv.details.push(`Job: ${message}`);
       conv.step = "business";
-      reply = "Got it. What's your business called, and what trade are you in?";
+      reply = "Got it. What city is the job in?";
       break;
     case "business":
-      conv.details.push(`Business: ${message}`);
+      conv.details.push(`City: ${message}`);
       conv.step = "tools";
-      reply = "Thanks. What do you use today to schedule jobs, send quotes, and get paid?";
+      reply = "Thanks. Anything we should know before we come out?";
       break;
     case "tools":
-      conv.details.push(`Current tools: ${message}`);
+      conv.details.push(`Notes: ${message}`);
       conv.step = "timeline";
-      reply = "Helpful. What's your timeline — when would you like this up and running?";
+      reply = "Helpful. How soon do you need it done?";
       break;
     case "timeline":
       conv.details.push(`Timeline: ${message}`);
@@ -692,17 +692,17 @@ function mockIntakeReply(
         : null;
       const picked = conv.slots?.find((s) => s.start === start);
       if (!picked) {
-        reply = "Please pick one of the times above so I can send it to Cameron.";
+        reply = "Please pick one of the times above so I can send it to the team.";
         break;
       }
       conv.step = "done";
       conv.state = "awaiting_owner";
       conv.slots = null;
-      reply = "Great — I've sent that time to Cameron for approval. You'll get a confirmation by email or text shortly.";
+      reply = "Great — I've sent that time to the team for approval. You'll get a confirmation by email or text shortly.";
       break;
     }
     default:
-      reply = "This request is with Cameron now — you'll hear back by email or text.";
+      reply = "This request is with the team now — you'll hear back by email or text.";
   }
 
   conv.summary = summary;

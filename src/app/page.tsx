@@ -1,6 +1,7 @@
 import { BookCallButton } from "@/components/cta-button";
 import { CtaBand } from "@/components/cta-band";
 import { Figure } from "@/components/screenshot";
+import { GusPhones } from "@/components/gus-phone";
 import { Container, Eyebrow, FeatureList, Section, SectionHeading } from "@/components/section";
 import { siteConfig } from "@/lib/site-config";
 
@@ -44,6 +45,11 @@ export default function HomePage() {
           <BookCallButton size="lg" />
         </div>
       </Container>
+
+      <Section className="border-t border-line">
+        <SectionHeading eyebrow={siteConfig.officeName} title="Meet Gus, your automated office manager." />
+        <GusPhones className="mt-12 sm:mt-16" />
+      </Section>
 
       <Section className="border-t border-line">
         <SectionHeading title="Three ways we help." />

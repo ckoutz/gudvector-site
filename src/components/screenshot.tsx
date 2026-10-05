@@ -7,7 +7,7 @@ export const screenshots = {
     src: "/screenshots/chat.png",
     width: 760,
     height: 1200,
-    alt: "Güd Vector booking chat asking a visitor what they need and offering call times",
+    alt: "Bay Area Services booking chat offering a customer times for an estimate",
   },
   quote: {
     src: "/screenshots/quote.png",
