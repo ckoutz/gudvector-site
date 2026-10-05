@@ -16,16 +16,15 @@ const ownerThread: Bubble[] = [
   { time: "Mon 8:14 AM" },
   {
     from: "gus",
-    text: "Estimate added to your calendar.",
+    text: "New Calendly booking. Estimate added to your calendar.",
     card: { label: "Calendar", title: "Thu 9–11 AM · Jordan Alvarez", sub: "Water heater leak, Walnut Creek" },
   },
-  { from: "gus", text: "Jordan's a repeat customer, so I linked it to the March valve job." },
   { time: "Thu 11:02 AM" },
   { from: "me", text: "Quote $1,650 for the 50 gal plus $150 haul-away" },
   {
     from: "gus",
-    text: "Here's the quote. Send it?",
-    card: { label: "Quote", title: "Jordan Alvarez", sub: "$1,800.00 · 2 items" },
+    text: "That's for Jordan's 9 AM estimate in Walnut Creek. Send it?",
+    card: { label: "Quote", title: "Jordan Alvarez · Water heater", sub: "$1,800.00 · 2 items" },
   },
   { from: "me", text: "Send it" },
   { from: "gus", text: "Quote sent to Jordan. I'll tell you when it's accepted." },
@@ -174,11 +173,11 @@ export function GusPhones({ className = "" }: { className?: string }) {
         </p>
       </div>
       <div>
-        <PhoneFrame label="Gus texts the owner that the estimate is on the calendar, then sends the quote once the owner OKs it.">
+        <PhoneFrame label="Gus texts the owner that a Calendly booking is on the calendar, matches the owner's quote to that job without being told which one, and sends it once the owner OKs it.">
           <OwnerScreen />
         </PhoneFrame>
         <p className="mt-5 text-center text-[15px] text-muted">
-          <span className="font-semibold text-ink">What you see.</span> Gus texts you. You OK the quote.
+          <span className="font-semibold text-ink">What you see.</span> Gus knows the job from your calendar. You just OK the quote.
         </p>
       </div>
     </div>
