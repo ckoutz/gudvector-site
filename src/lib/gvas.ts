@@ -363,8 +363,11 @@ export type PortalBusiness = {
 
 export type PortalSession = {
   sessionToken: string;
-  customer: { displayName: string; email: string };
-  business: { displayName: string; siteUrl: string };
+  /** "owner" when the link went to the business's owner e-mail. */
+  role?: "customer" | "owner";
+  customer?: { displayName: string; email: string };
+  owner?: { email: string };
+  business: { displayName: string; siteUrl: string | null };
 };
 
 export type PortalMe = {
@@ -422,6 +425,7 @@ export async function createPortalSession(token: string): Promise<PortalSession>
     mockPortalSessions.add(sessionToken);
     return {
       sessionToken,
+      role: "customer",
       customer: { displayName: MOCK_CUSTOMER.displayName, email: MOCK_CUSTOMER.email },
       business: {
         displayName: MOCK_BUSINESS.displayName,

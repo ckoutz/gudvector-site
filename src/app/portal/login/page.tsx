@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Eyebrow } from "@/components/section";
 import { gvasEnv } from "@/lib/gvas";
+import { getOwnerSessionToken } from "@/lib/owner-session";
 import { getPortalSessionToken } from "@/lib/portal-session";
 import { LoginForm } from "./login-form";
 
@@ -31,6 +32,7 @@ export default async function PortalLoginPage({
   }
 
   const hasSession = Boolean(await getPortalSessionToken());
+  const hasOwnerSession = Boolean(await getOwnerSessionToken());
   const notice =
     expired === "1"
       ? notices.expired
@@ -58,6 +60,29 @@ export default async function PortalLoginPage({
       <div className="mt-8 rounded-2xl border border-line bg-paper p-6 sm:p-8">
         <LoginForm mockDevHref={gvasEnv.mock ? "/portal/login?token=mock" : null} />
       </div>
+
+      {gvasEnv.mock && (
+        <p className="mt-4 text-[13px] text-muted">
+          Mock mode:{" "}
+          <Link href="/portal/login?token=mock-owner" className="underline underline-offset-2">
+            sign in as the business owner
+          </Link>
+          .
+        </p>
+      )}
+
+      {hasOwnerSession && (
+        <p className="mt-6 text-[14px] text-muted">
+          Signed in as the owner on this device?{" "}
+          <Link
+            href="/portal/owner"
+            className="font-medium text-orange-ink underline underline-offset-2"
+          >
+            Go to your dashboard
+          </Link>
+          .
+        </p>
+      )}
 
       {hasSession && (
         <p className="mt-6 text-[14px] text-muted">

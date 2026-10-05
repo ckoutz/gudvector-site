@@ -5,6 +5,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { isGvasError } from "@/lib/gvas";
+import { OWNER_SESSION_COOKIE } from "@/lib/owner-session";
 
 export const PORTAL_SESSION_COOKIE = "gv_portal_session";
 export const PORTAL_SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -17,7 +18,11 @@ export async function getPortalSessionToken(): Promise<string | null> {
 /** Returns the session token or redirects to /portal/login when absent. */
 export async function requirePortalSessionToken(): Promise<string> {
   const token = await getPortalSessionToken();
-  if (!token) redirect("/portal/login");
+  if (!token) {
+    // A signed-in owner who opens /portal goes to their dashboard.
+    const store = await cookies();
+    redirect(store.get(OWNER_SESSION_COOKIE) ? "/portal/owner" : "/portal/login");
+  }
   return token;
 }
 

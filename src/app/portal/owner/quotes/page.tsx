@@ -1,0 +1,179 @@
+import {
+  getOwnerBookings,
+  getOwnerQuotes,
+  getOwnerSubscriptions,
+  type OwnerBooking,
+  type OwnerQuote,
+  type OwnerSubscription,
+} from "@/lib/owner";
+import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
+import { BookingDecision, QuoteDecision } from "../decisions";
+import {
+  Card,
+  Empty,
+  LoadError,
+  Notice,
+  Pill,
+  firstParam,
+  formatDate,
+  formatDateTime,
+  formatMoney,
+  quoteStatus,
+} from "../ui";
+
+export const dynamic = "force-dynamic";
+
+const RETURN = "/portal/owner/quotes";
+
+function value<T>(result: PromiseSettledResult<T>, label: string): T | null {
+  if (result.status === "fulfilled") return result.value;
+  redirectOwnerOnUnauthorized(result.reason);
+  console.error(`OwnerQuotes: ${label} failed`, result.reason);
+  return null;
+}
+
+const bookingLabel: Record<OwnerBooking["state"], string> = {
+  collecting: "Chatting",
+  proposing_slots: "Picking a time",
+  awaiting_owner: "Needs your OK",
+  approved: "Approved",
+  declined: "Declined",
+  closed: "Closed",
+};
+
+export default async function OwnerQuotesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const token = await requireOwnerSessionToken();
+  const [q, s, b] = await Promise.allSettled([
+    getOwnerQuotes(token),
+    getOwnerSubscriptions(token),
+    getOwnerBookings(token),
+  ]);
+  const quotes: OwnerQuote[] | null = value(q, "quotes");
+  const subscriptions: OwnerSubscription[] | null = value(s, "subscriptions");
+  const bookings: OwnerBooking[] | null = value(b, "bookings");
+  const pending = (quotes ?? []).filter((quote) => quote.needsApproval);
+  const pendingBookings = (bookings ?? []).filter((booking) => booking.needsDecision);
+
+  return (
+    <div className="space-y-6">
+      <Notice code={firstParam(params.notice)} message={firstParam(params.message)} />
+      {(pending.length > 0 || pendingBookings.length > 0) && (
+        <Card title="Needs your OK">
+          <ul className="divide-y divide-line">
+            {pendingBookings.map((booking) => (
+              <BookingDecision key={booking.reference} booking={booking} returnTo={RETURN} />
+            ))}
+            {pending.map((quote) => (
+              <QuoteDecision key={quote.id} quote={quote} returnTo={RETURN} />
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      <Card title="Quotes">
+        {quotes === null ? (
+          <LoadError label="quotes" />
+        ) : quotes.length === 0 ? (
+          <Empty>No quotes yet.</Empty>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[620px] text-left text-[14px]">
+              <thead className="text-[12px] text-muted">
+                <tr className="border-b border-line">
+                  <th className="px-5 py-2.5 font-medium">Customer</th>
+                  <th className="px-5 py-2.5 font-medium">Work</th>
+                  <th className="px-5 py-2.5 font-medium">Status</th>
+                  <th className="px-5 py-2.5 font-medium">Created</th>
+                  <th className="px-5 py-2.5 text-right font-medium">Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {quotes.map((quote) => {
+                  const [label, tone] = quoteStatus(quote);
+                  return (
+                    <tr key={quote.id}>
+                      <td className="px-5 py-3 font-medium text-ink">
+                        {quote.customer.name ?? quote.customer.email ?? "—"}
+                      </td>
+                      <td className="max-w-[240px] truncate px-5 py-3 text-muted">
+                        {quote.lineItems.map((item) => item.description).join(", ") || "—"}
+                      </td>
+                      <td className="px-5 py-3">
+                        <Pill tone={tone}>{label}</Pill>
+                      </td>
+                      <td className="px-5 py-3 text-muted">{formatDate(quote.createdAt)}</td>
+                      <td className="px-5 py-3 text-right font-semibold tabular-nums text-ink">
+                        {formatMoney(quote.totalCents, quote.currency)}
+                        {quote.billing === "recurring" && quote.interval && (
+                          <span className="font-normal text-muted"> /{quote.interval === "month" ? "mo" : "yr"}</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+      <Card title="Monthly plans">
+        {subscriptions === null ? (
+          <LoadError label="plans" />
+        ) : subscriptions.length === 0 ? (
+          <Empty>No recurring plans yet.</Empty>
+        ) : (
+          <ul className="divide-y divide-line">
+            {subscriptions.map((plan) => (
+              <li key={plan.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+                <div>
+                  <p className="text-[14px] font-semibold tabular-nums text-ink">
+                    {formatMoney(plan.amountCents, plan.currency)} / {plan.interval}
+                  </p>
+                  <p className="text-[12px] text-muted">
+                    {plan.cancelAtPeriodEnd ? "Cancels" : "Renews"} {formatDate(plan.currentPeriodEnd)}
+                  </p>
+                </div>
+                <Pill tone={plan.status === "active" ? "green" : plan.status === "past_due" ? "red" : "muted"}>
+                  {plan.status.replace(/_/g, " ")}
+                </Pill>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      <Card title="Website booking requests">
+        {bookings === null ? (
+          <LoadError label="booking requests" />
+        ) : bookings.length === 0 ? (
+          <Empty>No booking requests yet.</Empty>
+        ) : (
+          <ul className="divide-y divide-line">
+            {bookings.map((booking) => (
+              <li key={booking.reference} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+                <div className="min-w-0">
+                  <p className="text-[14px] font-medium text-ink">
+                    {booking.customer.name ?? booking.customer.email ?? "Visitor"}
+                  </p>
+                  <p className="text-[12px] text-muted">
+                    {formatDateTime(booking.requestedStart)}
+                    {booking.details ? ` · ${booking.details}` : ""}
+                  </p>
+                </div>
+                <Pill tone={booking.needsDecision ? "orange" : booking.state === "approved" ? "green" : "muted"}>
+                  {bookingLabel[booking.state]}
+                </Pill>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </div>
+  );
+}
