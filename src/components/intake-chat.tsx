@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type {
+  IntakeBooking,
   IntakeConversation,
   IntakeReplyResponse,
   IntakeSlot,
@@ -24,15 +25,10 @@ type Stored = { conversationId: string; conversationToken: string };
 const STORAGE_KEY = "gv_intake_conversation";
 const OWNER_POLL_MS = 15_000;
 
+// awaiting_owner and approved are live states — the chat stays open so the
+// visitor can reschedule, cancel, or keep asking questions. Only declined and
+// closed end it.
 const TERMINAL_COPY: Partial<Record<IntakeState, { title: string; body: string }>> = {
-  awaiting_owner: {
-    title: "Request sent.",
-    body: "Thanks — Güd Vector will confirm by email or text shortly.",
-  },
-  approved: {
-    title: "You're booked.",
-    body: "Güd Vector approved your time. A confirmation is on its way by email or text.",
-  },
   declined: {
     title: "That time didn't work out.",
     body: "That slot didn&apos;t work for Güd Vector. Reply to the confirmation email or text to find another time.",
@@ -174,10 +170,28 @@ export function formatSlot(slot: IntakeSlot): string {
   return `${slotFormatter.format(start)}, ${timeFormatter.format(start)}–${timeFormatter.format(end)}${zone ? ` ${zone}` : ""}`;
 }
 
+function formatBooking(booking: IntakeBooking): string {
+  const start = new Date(booking.start);
+  const zone = zoneFormatter.formatToParts(start).find((p) => p.type === "timeZoneName")?.value;
+  const day = `${slotFormatter.format(start)}, ${timeFormatter.format(start)}`;
+  if (booking.end) {
+    return `${day}–${timeFormatter.format(new Date(booking.end))}${zone ? ` ${zone}` : ""}`;
+  }
+  return `${day}${zone ? ` ${zone}` : ""}`;
+}
+
+function returningGreeting(booking: IntakeBooking): string {
+  const label = formatBooking(booking);
+  return booking.status === "confirmed"
+    ? `You have a call booked for ${label} — want to keep it, change it, or ask me anything?`
+    : `Your request for ${label} is with the team — want to keep it, change it, or ask me anything?`;
+}
+
 type Booted = {
   stored: Stored;
   state: IntakeState;
   slots: IntakeSlot[] | null;
+  booking: IntakeBooking | null;
   messages: ChatMessage[];
 };
 
@@ -194,6 +208,7 @@ async function startConversation(
     stored,
     state: res.state,
     slots: res.slots,
+    booking: null,
     messages: res.reply ? [{ id: mid(), role: "agent", content: res.reply }] : [],
   };
 }
@@ -208,12 +223,14 @@ async function bootConversation(
   if (!stored) return startConversation(ep, mode, storageKey);
   try {
     const res = await api<IntakeConversation>(ep.conversation(stored));
-    return {
-      stored,
-      state: res.state,
-      slots: res.slots,
-      messages: res.messages.map((m) => ({ id: mid(), role: m.role, content: m.content })),
-    };
+    const booking = res.booking ?? null;
+    const messages = res.messages.map((m) => ({ id: mid(), role: m.role, content: m.content }));
+    // Returning visitor: greet them with the booking the stored conversation
+    // still holds, so they know they can keep, change or cancel it.
+    if (booking) {
+      messages.push({ id: mid(), role: "agent", content: returningGreeting(booking) });
+    }
+    return { stored, state: res.state, slots: res.slots, booking, messages };
   } catch (err) {
     if (err instanceof HttpError && (err.status === 401 || err.status === 404)) {
       writeStored(storageKey, null);
@@ -242,6 +259,7 @@ export function IntakeChat({
   const [state, setState] = useState<IntakeState>("collecting");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [slots, setSlots] = useState<IntakeSlot[] | null>(null);
+  const [booking, setBooking] = useState<IntakeBooking | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [smsConsent, setSmsConsent] = useState(false);
@@ -254,6 +272,7 @@ export function IntakeChat({
   const applyReply = useCallback((reply: IntakeReplyResponse) => {
     setState(reply.state);
     setSlots(reply.slots);
+    setBooking(reply.booking ?? null);
     if (reply.reply) {
       setMessages((prev) => [...prev, { id: mid(), role: "agent", content: reply.reply }]);
     }
@@ -269,6 +288,7 @@ export function IntakeChat({
         setConversation(booted.stored);
         setState(booted.state);
         setSlots(booted.slots);
+        setBooking(booted.booking);
         setMessages(booted.messages);
         setError(null);
         setPhase("ready");
@@ -300,6 +320,7 @@ export function IntakeChat({
         if (cancelled) return;
         setState(res.state);
         setSlots(res.slots);
+        setBooking(res.booking ?? null);
         setMessages(res.messages.map((m) => ({ id: mid(), role: m.role, content: m.content })));
       } catch (err) {
         if (cancelled) return;
@@ -360,6 +381,7 @@ export function IntakeChat({
     setConversation(null);
     setState("collecting");
     setSlots(null);
+    setBooking(null);
     setMessages([]);
     setError(null);
     setPhase("booting");
@@ -368,6 +390,7 @@ export function IntakeChat({
 
   const terminal = TERMINAL_COPY[state];
   const inputDisabled = phase !== "ready" || Boolean(terminal) || state === "proposing_slots";
+  const bookingLabel = booking ? formatBooking(booking) : null;
 
   return (
     <div
@@ -388,6 +411,19 @@ export function IntakeChat({
               A few quick questions, then pick a time. Every booking is confirmed by the team.
             </p>
           </div>
+        </div>
+      )}
+
+      {bookingLabel && !terminal && (
+        <div role="status" className="border-b border-line bg-peach-2 px-5 py-2.5">
+          <p className="text-[13px] font-semibold text-ink">
+            {booking?.status === "confirmed" ? "Call booked" : "Booking request sent"}
+            {" — "}
+            {bookingLabel}
+          </p>
+          <p className="text-[12px] text-muted">
+            Keep chatting, or ask me to move or cancel the call.
+          </p>
         </div>
       )}
 

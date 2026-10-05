@@ -531,6 +531,14 @@ export type IntakeSummary = {
   problem: string | null;
 };
 
+/** The conversation's live booking — present while state is awaiting_owner or approved. */
+export type IntakeBooking = {
+  start: string;
+  end: string | null;
+  status: "requested" | "confirmed";
+  reference: string;
+};
+
 export type IntakeMessage = {
   role: "user" | "agent" | "owner";
   content: string;
@@ -550,6 +558,8 @@ export type IntakeReplyResponse = {
   reply: string;
   slots: IntakeSlot[] | null;
   summary: IntakeSummary | null;
+  /** The live booking once one exists; GVAS keeps the chat open in that mode. */
+  booking?: IntakeBooking | null;
   /** Echoed by the mock; GVAS may omit it. */
   sms_consent?: boolean;
 };
@@ -559,6 +569,7 @@ export type IntakeConversation = {
   messages: IntakeMessage[];
   slots: IntakeSlot[] | null;
   summary: IntakeSummary | null;
+  booking?: IntakeBooking | null;
 };
 
 export const INTAKE_SLOT_PREFIX = "slot:";
@@ -577,6 +588,7 @@ type MockIntakeConversation = IntakeConversation & {
   step: "need" | "business" | "tools" | "timeline" | "name" | "email" | "slot" | "done";
   details: string[];
   smsConsent?: boolean;
+  booking: IntakeBooking | null;
 };
 
 const mockIntake: Map<string, MockIntakeConversation> = (() => {
@@ -611,6 +623,7 @@ function mockIntakeStart(name: string | null): IntakeStartResponse {
     token,
     step: "need",
     details: [],
+    booking: null,
     state: "collecting",
     messages: [{ role: "agent", content: greeting, createdAt: now }],
     slots: null,
@@ -695,10 +708,38 @@ function mockIntakeReply(
         reply = "Please pick one of the times above so I can send it to the team.";
         break;
       }
+      const rescheduling = conv.booking !== null;
       conv.step = "done";
       conv.state = "awaiting_owner";
       conv.slots = null;
-      reply = "Great — I've sent that time to the team for approval. You'll get a confirmation by email or text shortly.";
+      conv.booking = {
+        start: picked.start,
+        end: picked.end,
+        status: "requested",
+        reference: conv.booking?.reference ?? "mock01",
+      };
+      reply = rescheduling
+        ? "Done — I've updated your request to that time. The team will confirm by email or text shortly."
+        : "Great — I've sent that time to the team for approval. You'll get a confirmation by email or text shortly.";
+      break;
+    }
+    case "done": {
+      const text = message.toLowerCase();
+      if (conv.state === "awaiting_owner" || conv.state === "approved") {
+        if (/cancel/.test(text)) {
+          conv.state = "closed";
+          conv.booking = null;
+          reply = "Done — your call is canceled and the team has been told. Start a new conversation any time you want to book again.";
+        } else if (/reschedul|move|change|different time|another time|new time/.test(text)) {
+          conv.step = "slot";
+          conv.slots = mockIntakeSlots();
+          reply = "No problem — your current request stays in place until a new time is confirmed. Pick one of these and I'll update it.";
+        } else {
+          reply = "Happy to help — ask me anything about Bay Area Services. Your booking request stays in place meanwhile.";
+        }
+      } else {
+        reply = "This conversation is closed — start a new one if you'd like to book again.";
+      }
       break;
     }
     default:
@@ -712,6 +753,7 @@ function mockIntakeReply(
     reply,
     slots: conv.slots,
     summary: conv.summary,
+    booking: conv.booking,
     sms_consent: conv.smsConsent,
   };
 }
@@ -774,11 +816,11 @@ export async function getIntakeConversation(
   conversationToken: string,
 ): Promise<IntakeConversation> {
   if (gvasEnv.mock) {
-    const { state, messages, slots, summary } = mockIntakeConversation(
+    const { state, messages, slots, summary, booking } = mockIntakeConversation(
       conversationId,
       conversationToken,
     );
-    return { state, messages, slots, summary };
+    return { state, messages, slots, summary, booking };
   }
   return authedRequest<IntakeConversation>(
     `/v1/intake/conversations/${encode(conversationId)}`,
