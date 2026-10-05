@@ -35,6 +35,7 @@ export default function WebsitesPage() {
         eyebrow="Websites"
         h1="A website built for how people search now."
         lede="Customers ask Google, and more and more they ask AI. Your site should give both a clear answer: what you do, where, and how to book."
+        price={siteConfig.pricing.websites}
       />
 
       <Section className="border-t border-line">

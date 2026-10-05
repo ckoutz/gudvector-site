@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/page-hero";
 import { FeatureList, Section, SectionHeading } from "@/components/section";
 import { CtaBand } from "@/components/cta-band";
+import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Custom AI Tools for Service Businesses",
@@ -42,6 +43,7 @@ export default function CustomAiPage() {
         eyebrow="Custom AI"
         h1="AI built around how your crew already works."
         lede="When off-the-shelf software doesn't fit the job, we build the tool that does, inside the apps your team already uses."
+        price={siteConfig.pricing.customAi}
       />
 
       <Section className="border-t border-line">

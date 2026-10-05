@@ -5,11 +5,13 @@ export function PageHero({
   eyebrow,
   h1,
   lede,
+  price,
   cta = true,
 }: {
   eyebrow: string;
   h1: string;
   lede: string;
+  price?: string;
   cta?: boolean;
 }) {
   return (
@@ -21,6 +23,7 @@ export function PageHero({
       <p className="mt-6 max-w-2xl text-[18px] leading-relaxed text-muted sm:text-[20px]">
         {lede}
       </p>
+      {price && <p className="mt-4 text-[17px] font-semibold text-ink sm:text-[18px]">{price}</p>}
       {cta && (
         <div className="mt-10">
           <BookCallButton size="lg" />
