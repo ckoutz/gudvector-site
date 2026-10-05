@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
+/*
+ * One accent (brand orange) on a neutral, mostly-white base. Token names are
+ * shared with the portal and quote pages, so keep them stable.
+ */
 :root {
   --color-orange: #fc7004;
   --color-orange-deep: #e05f00;
   --color-orange-ink: #c24e00;
-  --color-peach: #fcece0;
-  --color-peach-2: #fff6ee;
-  --color-chip: #fce8d4;
-  --color-ink: #2c2c2c;
-  --color-char: #383838;
-  --color-muted: #5e5a56;
-  --color-line: #ede4d8;
-  --color-paper: #fdfdfd;
+  --color-peach: #f5f5f4;
+  --color-peach-2: #fafaf9;
+  --color-chip: #fff1e6;
+  --color-ink: #0c0a09;
+  --color-char: #292524;
+  --color-muted: #57534e;
+  --color-line: #e7e5e4;
+  --color-paper: #ffffff;
 }
 
 @theme inline {
@@ -27,13 +31,24 @@
   --color-line: var(--color-line);
   --color-paper: var(--color-paper);
 
-  --font-display: var(--font-lora);
+  --font-display: var(--font-figtree);
   --font-sans: var(--font-figtree);
 }
 
 body {
   background: var(--color-paper);
   color: var(--color-ink);
+  font-feature-settings: "ss01", "cv11";
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 ::selection {

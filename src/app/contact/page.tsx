@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHero } from "@/components/page-hero";
-import { Section } from "@/components/section";
+import { Container } from "@/components/section";
 import { ContactForm } from "./contact-form";
 import { siteConfig } from "@/lib/site-config";
 import { OpenChatButton } from "@/components/chat-bubble";
@@ -8,7 +9,7 @@ import { OpenChatButton } from "@/components/chat-bubble";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with Güd Vector Consulting Services. Email info@gudvector.com — say whether you need a website, help sending quotes, or both.",
+    "Get in touch with Güd Vector Consulting Services. Say whether you need a website, automation, or both.",
   alternates: { canonical: "/contact" },
 };
 
@@ -18,41 +19,40 @@ export default function ContactPage() {
       <PageHero
         eyebrow="Contact"
         h1="Get in touch."
-        lede="The only public contact is email. Say whether you need a website, help sending quotes, or both."
+        lede="Tell us whether you need a website, automation, or both."
+        cta={false}
       />
-      <Section tone="peach" className="pt-0">
-        <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
-          <div className="rounded-2xl bg-paper p-8">
-            <ContactForm />
-          </div>
-          <div className="flex flex-col justify-center gap-3">
-            <p className="text-[16px] text-char">
-              Prefer email? Write to us directly at{" "}
+      <Container className="pb-24 sm:pb-32">
+        <div className="grid gap-12 border-t border-line pt-12 lg:grid-cols-[1.3fr_1fr] lg:gap-20">
+          <ContactForm />
+          <div className="flex flex-col gap-6 text-[16px] text-muted">
+            <p>
+              <span className="block font-semibold text-ink">Email</span>
               <a
                 href={`mailto:${siteConfig.email}`}
-                className="font-medium text-orange-ink underline underline-offset-2"
+                className="text-ink underline decoration-line underline-offset-4 hover:decoration-orange"
               >
                 {siteConfig.email}
               </a>
-              .
             </p>
-            <p className="text-[16px] text-char">
-              Or{" "}
-              <OpenChatButton className="font-medium text-orange-ink underline underline-offset-2">
-                use the chat bubble to book a call
+            <p>
+              <span className="block font-semibold text-ink">Book a call</span>
+              <OpenChatButton className="text-ink underline decoration-line underline-offset-4 hover:decoration-orange">
+                Open the chat
               </OpenChatButton>
-              .
             </p>
-            <p className="text-[15px] text-muted">
-              Already a customer? The{" "}
-              <a href="/portal" className="font-medium text-orange-ink underline underline-offset-2">
-                customer portal
-              </a>{" "}
-              is where you review a quote, pay, pause, or cancel.
+            <p>
+              <span className="block font-semibold text-ink">Already a customer?</span>
+              <Link
+                href="/portal"
+                className="text-ink underline decoration-line underline-offset-4 hover:decoration-orange"
+              >
+                Customer portal
+              </Link>
             </p>
           </div>
         </div>
-      </Section>
+      </Container>
     </>
   );
 }

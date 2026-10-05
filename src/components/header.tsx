@@ -2,39 +2,43 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogoMark } from "@/components/logo";
-import { CtaButton } from "@/components/cta-button";
-import { OpenChatButton } from "@/components/chat-bubble";
+import { BookCallButton } from "@/components/cta-button";
 import { headerNav } from "@/lib/site-config";
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const linkClass = (href: string) =>
+    `text-[15px] font-medium transition-colors hover:text-ink ${
+      pathname === href ? "text-ink" : "text-muted"
+    }`;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
-        <LogoMark className="h-16 w-auto shrink-0 sm:h-20" />
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-5 sm:h-[72px] sm:px-8">
+        <LogoMark className="h-9 w-auto shrink-0 sm:h-10" />
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           {headerNav.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-[16px] font-medium text-char hover:text-orange-ink"
-            >
+            <Link key={link.href} href={link.href} className={linkClass(link.href)}>
               {link.label}
             </Link>
           ))}
-          <OpenChatButton className="text-[16px] font-medium text-char hover:text-orange-ink" />
         </nav>
 
-        <div className="hidden md:block">
-          <CtaButton href="/contact">Get in touch</CtaButton>
+        <div className="hidden items-center gap-6 lg:flex">
+          <Link href="/portal" className={linkClass("/portal")}>
+            Customer login
+          </Link>
+          <BookCallButton />
         </div>
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-md p-2 text-char md:hidden"
+          className="-mr-2 inline-flex items-center justify-center rounded-md p-2 text-ink lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -45,14 +49,14 @@ export function Header() {
               <path
                 d="M6 6l12 12M18 6L6 18"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.75"
                 strokeLinecap="round"
               />
             ) : (
               <path
-                d="M4 7h16M4 12h16M4 17h16"
+                d="M4 8h16M4 16h16"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.75"
                 strokeLinecap="round"
               />
             )}
@@ -64,30 +68,22 @@ export function Header() {
         <nav
           id="mobile-nav"
           aria-label="Mobile"
-          className="border-t border-line bg-paper px-4 pb-5 pt-2 md:hidden"
+          className="border-t border-line bg-paper px-5 pb-6 pt-2 lg:hidden"
         >
-          <ul className="flex flex-col gap-1">
-            {headerNav.map((link) => (
+          <ul className="flex flex-col divide-y divide-line">
+            {[...headerNav, { label: "Customer login", href: "/portal" }].map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-2 py-3 text-[16px] font-medium text-char hover:bg-chip"
+                  className="block py-4 text-[17px] font-medium text-ink"
                 >
                   {link.label}
                 </Link>
               </li>
             ))}
-            <li>
-              <OpenChatButton
-                onClick={() => setOpen(false)}
-                className="block w-full rounded-lg px-2 py-3 text-left text-[16px] font-medium text-char hover:bg-chip"
-              />
-            </li>
           </ul>
-          <CtaButton href="/contact" className="mt-3 w-full">
-            Get in touch
-          </CtaButton>
+          <BookCallButton size="lg" className="mt-4 w-full" onClick={() => setOpen(false)} />
         </nav>
       )}
     </header>

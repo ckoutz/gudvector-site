@@ -1,21 +1,21 @@
 import Link from "next/link";
-import { LogoLockup } from "@/components/logo";
+import { LogoMarkImage } from "@/components/logo";
 import { OpenChatButton } from "@/components/chat-bubble";
 import { footerNav, siteConfig } from "@/lib/site-config";
 
 export function Footer() {
   return (
-    <footer className="border-t border-line bg-peach-2">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <div className="grid gap-12 md:grid-cols-[minmax(0,1.1fr)_repeat(4,minmax(0,1fr))]">
+    <footer className="border-t border-line bg-paper">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+        <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div>
-            <LogoLockup className="h-28 w-auto" />
-            <p className="mt-4 max-w-xs text-[15px] text-muted">
-              {siteConfig.legalName} — {siteConfig.motto}.
+            <LogoMarkImage className="h-10 w-auto" />
+            <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-muted">
+              Websites and automation for local service businesses.
             </p>
             <a
               href={`mailto:${siteConfig.email}`}
-              className="mt-3 inline-block text-[15px] font-medium text-orange-ink hover:text-orange-deep"
+              className="mt-3 inline-block text-[15px] font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-orange"
             >
               {siteConfig.email}
             </a>
@@ -23,23 +23,18 @@ export function Footer() {
 
           {footerNav.map((group) => (
             <div key={group.heading}>
-              <h3 className="text-[13px] font-semibold uppercase tracking-wide text-muted">
-                {group.heading}
-              </h3>
-              <ul className="mt-3 space-y-2">
+              <h3 className="text-[13px] font-semibold text-ink">{group.heading}</h3>
+              <ul className="mt-4 space-y-3">
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-[15px] text-char hover:text-orange-ink"
-                    >
+                    <Link href={link.href} className="text-[15px] text-muted hover:text-ink">
                       {link.label}
                     </Link>
                   </li>
                 ))}
                 {group.heading === "Company" && (
                   <li>
-                    <OpenChatButton className="text-[15px] text-char hover:text-orange-ink" />
+                    <OpenChatButton className="text-[15px] text-muted hover:text-ink" />
                   </li>
                 )}
               </ul>
@@ -47,12 +42,9 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 text-[13px] text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            {siteConfig.legalName} · gudvector.com · {siteConfig.email}
-          </p>
-          <p>{siteConfig.areaServed}</p>
-        </div>
+        <p className="mt-16 border-t border-line pt-6 text-[13px] text-muted">
+          © {new Date().getFullYear()} {siteConfig.legalName}
+        </p>
       </div>
     </footer>
   );

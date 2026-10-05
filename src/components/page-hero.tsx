@@ -1,29 +1,31 @@
-import { Eyebrow } from "@/components/section";
-import { CtaButton } from "@/components/cta-button";
+import { Container, Eyebrow } from "@/components/section";
+import { BookCallButton } from "@/components/cta-button";
 
 export function PageHero({
   eyebrow,
   h1,
   lede,
-  cta,
+  cta = true,
 }: {
   eyebrow: string;
   h1: string;
   lede: string;
-  cta?: { label: string; href: string };
+  cta?: boolean;
 }) {
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-14 pt-14 sm:px-6 sm:pt-20">
+    <Container className="pb-14 pt-16 sm:pb-20 sm:pt-28">
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+      <h1 className="mt-4 max-w-4xl font-display text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-ink sm:text-6xl">
         {h1}
       </h1>
-      <p className="mt-5 max-w-2xl text-[18px] leading-relaxed text-muted">{lede}</p>
+      <p className="mt-6 max-w-2xl text-[18px] leading-relaxed text-muted sm:text-[20px]">
+        {lede}
+      </p>
       {cta && (
-        <div className="mt-8">
-          <CtaButton href={cta.href}>{cta.label}</CtaButton>
+        <div className="mt-10">
+          <BookCallButton size="lg" />
         </div>
       )}
-    </div>
+    </Container>
   );
 }
