@@ -10,16 +10,19 @@ const products = [
     title: "Websites",
     body: "Fast sites you own, built to show up in Google and AI answers.",
     href: "/websites",
+    price: siteConfig.pricing.websites,
   },
   {
     title: siteConfig.officeName,
     body: "Meet Gus, your automated office manager: schedule, quotes, estimates and billing.",
     href: "/office",
+    price: siteConfig.pricing.office,
   },
   {
     title: "Custom AI",
     body: "Tools built around your crew's paperwork, inside apps you already use.",
     href: "/custom-ai",
+    price: siteConfig.pricing.customAi,
   },
 ];
 

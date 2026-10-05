@@ -65,7 +65,7 @@ export function FeatureList({
   items,
   numbered = false,
 }: {
-  items: { title: string; body: string; href?: string }[];
+  items: { title: string; body: string; href?: string; price?: string }[];
   numbered?: boolean;
 }) {
   const Tag = numbered ? "ol" : "ul";
@@ -92,6 +92,7 @@ export function FeatureList({
             )}
           </h3>
           <p className="mt-2 text-[16px] leading-relaxed text-muted">{item.body}</p>
+          {item.price && <p className="mt-3 text-[15px] font-semibold text-ink">{item.price}</p>}
         </li>
       ))}
     </Tag>

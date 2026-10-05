@@ -7,6 +7,11 @@ export const siteConfig = {
   areaServed: "San Francisco Bay Area",
   portalUrl: "https://gudvector.com/portal",
   officeName: "Güd Office",
+  pricing: {
+    websites: "From $500",
+    office: "From $25/month",
+    customAi: "Quoted per project",
+  },
 } as const;
 
 export type NavLink = {

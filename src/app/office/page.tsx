@@ -36,6 +36,7 @@ export default function OfficePage() {
         eyebrow={siteConfig.officeName}
         h1="Meet Gus, your automated office manager."
         lede="Gus runs your schedule, sends quotes, books estimates and handles billing. Nothing goes out until you OK it."
+        price={siteConfig.pricing.office}
       />
 
       <Section className="border-t border-line">
