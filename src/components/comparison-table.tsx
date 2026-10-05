@@ -1,4 +1,5 @@
 export type Mark = "yes" | "maybe" | "no";
+export type Cell = Mark | { text: string };
 
 const markStyles: Record<Mark, { symbol: string; label: string; className: string }> = {
   yes: { symbol: "✓", label: "Yes", className: "font-semibold text-orange-ink" },
@@ -11,11 +12,12 @@ export function ComparisonTable({
   rows,
 }: {
   columns: readonly string[];
-  rows: { feature: string; marks: Mark[] }[];
+  rows: { feature: string; marks: Cell[] }[];
 }) {
+  const hasText = rows.some((row) => row.marks.some((mark) => typeof mark !== "string"));
   return (
     <div className="relative -mx-5 overflow-x-auto sm:mx-0">
-      <table className="w-full min-w-[600px] border-collapse text-left text-[15px]">
+      <table className={`w-full ${hasText ? "min-w-[760px]" : "min-w-[600px]"} border-collapse text-left text-[15px]`}>
         <thead>
           <tr className="border-b border-ink/80">
             <th scope="col" className="sticky left-0 z-10 bg-paper py-3 pl-5 pr-4 font-medium text-muted sm:static sm:pl-0">
@@ -39,6 +41,16 @@ export function ComparisonTable({
                 {row.feature}
               </th>
               {row.marks.map((mark, j) => {
+                if (typeof mark !== "string") {
+                  return (
+                    <td
+                      key={columns[j]}
+                      className={`px-4 py-4 align-top text-[14px] leading-snug ${j === 0 ? "bg-chip/50 font-medium text-ink" : "text-char"}`}
+                    >
+                      {mark.text}
+                    </td>
+                  );
+                }
                 const { symbol, label, className } = markStyles[mark];
                 return (
                   <td

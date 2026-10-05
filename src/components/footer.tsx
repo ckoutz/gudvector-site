@@ -9,7 +9,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 md:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div>
-            <LogoMarkImage className="h-10 w-auto" />
+            <LogoMarkImage className="h-16 w-auto" />
             <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-muted">
               Websites and automation for local service businesses.
             </p>

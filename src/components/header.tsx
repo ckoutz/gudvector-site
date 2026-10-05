@@ -18,8 +18,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-5 sm:h-[72px] sm:px-8">
-        <LogoMark className="h-9 w-auto shrink-0 sm:h-10" />
+      <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-6 px-5 sm:h-20 sm:px-8">
+        <LogoMark className="h-12 w-auto shrink-0 sm:h-14" />
 
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           {headerNav.map((link) => (

@@ -38,8 +38,7 @@ export default function HomePage() {
           Get found. Get booked. Skip the busywork.
         </h1>
         <p className="mt-7 max-w-xl text-[19px] leading-relaxed text-muted sm:text-[21px]">
-          Websites, booking and quoting, and custom AI for plumbers, HVAC, cleaners and
-          contractors.
+          Websites, an automated office manager and custom AI for local service businesses.
         </p>
         <div className="mt-10">
           <BookCallButton size="lg" />
