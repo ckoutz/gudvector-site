@@ -31,7 +31,6 @@ export const footerNav: {
       { label: "Websites", href: "/websites" },
       { label: siteConfig.officeName, href: "/office" },
       { label: "Custom AI", href: "/custom-ai" },
-      { label: "Compare", href: "/compare" },
     ],
   },
   {

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageHero } from "@/components/page-hero";
 import { FeatureList, Section, SectionHeading } from "@/components/section";
 import { Figure } from "@/components/screenshot";
@@ -83,15 +82,7 @@ export default function OfficePage() {
               },
               {
                 question: "Do I need to switch from Jobber or Housecall Pro?",
-                answer: (
-                  <>
-                    No. See the{" "}
-                    <Link href="/compare" className="text-ink underline underline-offset-4">
-                      side-by-side comparison
-                    </Link>
-                    .
-                  </>
-                ),
+                answer: "Not always. We'll look at what you use on the call and tell you honestly.",
               },
             ]}
           />

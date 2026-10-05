@@ -24,7 +24,7 @@ const points = [
   },
   {
     title: "Yours to keep",
-    body: "You own the domain and the site. No template lock-in, no monthly page builder.",
+    body: "Websites start at $500, and the site and domain are yours for life. No monthly page builder.",
   },
 ];
 
@@ -58,6 +58,11 @@ export default function WebsitesPage() {
                     and Gus handles booking, quotes and billing, now or later.
                   </>
                 ),
+              },
+              {
+                question: "I'm on Jobber or Housecall Pro. Why not use their site?",
+                answer:
+                  "Keep their software if you like it. A Jobber site stays online only while you subscribe. A site from us is yours for life.",
               },
               {
                 question: "I already have a site. Do I start over?",
