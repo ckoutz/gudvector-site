@@ -1,4 +1,10 @@
-import { getOwnerCustomers, getOwnerRequests, type OwnerCustomer, type OwnerServiceRequest } from "@/lib/owner";
+import {
+  getOwnerCustomers,
+  getOwnerRequests,
+  getOwnerTimeZone,
+  type OwnerCustomer,
+  type OwnerServiceRequest,
+} from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { Card, Empty, LoadError, Pill, formatDate, formatMoney } from "../ui";
 
@@ -6,6 +12,7 @@ export const dynamic = "force-dynamic";
 
 export default async function OwnerCustomersPage() {
   const token = await requireOwnerSessionToken();
+  const zone = await getOwnerTimeZone(token);
   const [customersResult, requestsResult] = await Promise.allSettled([
     getOwnerCustomers(token),
     getOwnerRequests(token),
@@ -59,7 +66,7 @@ export default async function OwnerCustomersPage() {
                       )}
                     </td>
                     <td className="px-5 py-3 tabular-nums text-ink">{customer.quoteCount}</td>
-                    <td className="px-5 py-3 text-muted">{formatDate(customer.lastQuoteAt)}</td>
+                    <td className="px-5 py-3 text-muted">{formatDate(customer.lastQuoteAt, zone)}</td>
                     <td className="px-5 py-3 text-right font-semibold tabular-nums text-ink">
                       {formatMoney(customer.paidCents)}
                     </td>
@@ -84,7 +91,7 @@ export default async function OwnerCustomersPage() {
                 <p className="mt-1 text-[12px] text-muted">
                   {[
                     request.customer.name ?? request.customer.email,
-                    formatDate(request.createdAt),
+                    formatDate(request.createdAt, zone),
                     request.preferredDates ? `Prefers: ${request.preferredDates}` : null,
                   ]
                     .filter(Boolean)

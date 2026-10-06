@@ -8,6 +8,16 @@ import { Card, Pill, buttonPrimary } from "../ui";
 const input =
   "mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[14px] text-ink placeholder:text-muted/60 focus:border-ink/40 focus:outline-none";
 
+const US_ZONES = [
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Phoenix",
+  "America/Los_Angeles",
+  "America/Anchorage",
+  "Pacific/Honolulu",
+];
+
 function Field({
   label,
   hint,
@@ -66,6 +76,21 @@ export function SettingsForm({ settings }: { settings: OwnerSettings }) {
           </Field>
           <Field label="Notification email" hint="Gets a copy of every booking request, payment and customer message.">
             <input name="notificationEmail" type="email" defaultValue={settings.notificationEmail ?? ""} className={input} />
+          </Field>
+          <Field label="Time zone" hint="Every time on the dashboard and in messages uses it. Filled in from Calendly.">
+            <input
+              name="timezone"
+              list="time-zones"
+              defaultValue={settings.timezone ?? ""}
+              placeholder="America/Los_Angeles"
+              maxLength={64}
+              className={input}
+            />
+            <datalist id="time-zones">
+              {US_ZONES.map((zone) => (
+                <option key={zone} value={zone} />
+              ))}
+            </datalist>
           </Field>
           <div className="px-5 py-4 text-[13px] text-muted">
             <p>

@@ -35,14 +35,22 @@ export function QuoteDecision({ quote, returnTo }: { quote: OwnerQuote; returnTo
   );
 }
 
-export function BookingDecision({ booking, returnTo }: { booking: OwnerBooking; returnTo: string }) {
+export function BookingDecision({
+  booking,
+  returnTo,
+  zone,
+}: {
+  booking: OwnerBooking;
+  returnTo: string;
+  zone: string;
+}) {
   return (
     <li className="px-5 py-4">
       <p className="font-semibold text-ink">
         Estimate request from {booking.customer.name ?? "a customer"}
       </p>
       <p className="mt-1 text-[13px] text-muted">
-        {formatDateTime(booking.requestedStart)}
+        {formatDateTime(booking.requestedStart, zone)}
         {booking.customer.address ? ` · ${booking.customer.address}` : ""}
         {booking.customer.phone ? ` · ${booking.customer.phone}` : ""}
       </p>
