@@ -189,7 +189,11 @@ function at(daysFromToday: number, hour: number, minute = 0): string {
 
 function mockOwnerState(): MockOwnerState {
   const g = globalThis as { __gvasMockOwner?: MockOwnerState };
-  if (g.__gvasMockOwner) return g.__gvasMockOwner;
+  if (g.__gvasMockOwner) {
+    // State kept across a hot reload may predate newer fields.
+    g.__gvasMockOwner.statusBeforePaid ??= new Map();
+    return g.__gvasMockOwner;
+  }
   const quote = (
     id: string,
     name: string,
