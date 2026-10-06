@@ -135,6 +135,8 @@ const notices: Record<string, string> = {
   "quote-stale": "That quote was already handled.",
   "quote-marked-paid": "Marked paid. The customer gets a short receipt by e-mail.",
   "quote-marked-unpaid": "Payment undone. The quote is accepted and unpaid again.",
+  "plan-payment-recorded": "Payment recorded. The paid-through date is updated.",
+  "plan-payment-undone": "Payment undone. The paid-through date moved back.",
   "booking-done": "Booking updated.",
   "booking-stale": "That booking was already handled.",
   failed: "That didn't go through. Try again in a minute.",

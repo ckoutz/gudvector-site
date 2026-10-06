@@ -78,6 +78,40 @@ export type OwnerSubscription = {
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   createdAt: string;
+  /** Recorded by the owner (check, cash), not billed by Stripe. */
+  manual?: boolean;
+  /** yyyy-mm-dd; manual plans only. */
+  paidFrom?: string | null;
+  paidThrough?: string | null;
+};
+
+export type OwnerPayment = {
+  id: string;
+  quoteId: string;
+  kind: "one_off" | "plan";
+  source: "stripe" | "manual";
+  method: "card" | ManualPaymentMethod;
+  amountCents: number;
+  currency: string;
+  paidOn: string | null;
+  monthsCovered: number | null;
+  recordedBy: string | null;
+  recordedAt: string | null;
+  note: string | null;
+  voidedAt: string | null;
+  voidedBy: string | null;
+  duplicate: boolean;
+  counts: boolean;
+};
+
+/** One check/cash payment on a manual plan. `key` makes a resubmit a no-op. */
+export type PlanPayment = {
+  key: string;
+  paidOn: string;
+  method: ManualPaymentMethod;
+  months: number;
+  amountCents: number;
+  note?: string;
 };
 
 export type OwnerBooking = {
@@ -172,6 +206,8 @@ type MockOwnerState = {
   settings: OwnerSettings;
   /** What each mock-paid quote was before, so undo puts it back. */
   statusBeforePaid: Map<string, OwnerCustomerStatus | null>;
+  plans: OwnerSubscription[];
+  payments: OwnerPayment[];
 };
 
 const MOCK_ZONE = "America/Los_Angeles";
@@ -192,6 +228,8 @@ function mockOwnerState(): MockOwnerState {
   if (g.__gvasMockOwner) {
     // State kept across a hot reload may predate newer fields.
     g.__gvasMockOwner.statusBeforePaid ??= new Map();
+    g.__gvasMockOwner.plans ??= [];
+    g.__gvasMockOwner.payments ??= [];
     return g.__gvasMockOwner;
   }
   const quote = (
@@ -226,6 +264,8 @@ function mockOwnerState(): MockOwnerState {
   });
   g.__gvasMockOwner = {
     statusBeforePaid: new Map(),
+    plans: [],
+    payments: [],
     sessions: new Set<string>(),
     quotes: [
       quote(
@@ -253,6 +293,20 @@ function mockOwnerState(): MockOwnerState {
         "paid",
         at(-20, 11, 0),
         { billing: "recurring", interval: "month" },
+      ),
+      quote(
+        "q_9d0e52",
+        "Ruth Park",
+        "",
+        [["Monthly water softener service", 6500]],
+        "delivered",
+        "sent",
+        at(-2, 10, 0),
+        {
+          billing: "recurring",
+          interval: "month",
+          customer: { name: "Ruth Park", email: null, phone: "+1 925 555 0188", serviceAddress: "Lafayette" },
+        },
       ),
       quote("q_2c4b71", "Lee Nguyen", "lee@example.com", [["Toilet rebuild", 24000]], "rejected", null, at(-6, 16, 20)),
     ],
@@ -377,6 +431,33 @@ function assertMockOwner(sessionToken: string): MockOwnerState {
     throw new GvasError("unauthorized", "Session expired or invalid.", 401);
   }
   return state;
+}
+
+/** The same day `months` later, clamped to the end of a short month (GVAS's rule). */
+function addMonths(day: string, months: number): string {
+  const [y, m, d] = day.split("-").map(Number);
+  const index = m - 1 + months;
+  const year = y + Math.floor(index / 12);
+  const month = (index % 12) + 1;
+  const last = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return `${year}-${String(month).padStart(2, "0")}-${String(Math.min(d, last)).padStart(2, "0")}`;
+}
+
+function mockPlanPayments(state: MockOwnerState, quoteId: string): OwnerPayment[] {
+  return state.payments.filter(
+    (p) => p.quoteId === quoteId && p.kind === "plan" && p.source === "manual" && !p.voidedAt,
+  );
+}
+
+function mockCover(state: MockOwnerState, plan: OwnerSubscription): void {
+  const months = mockPlanPayments(state, plan.quoteId).reduce((sum, p) => sum + (p.monthsCovered ?? 0), 0);
+  if (!months || !plan.paidFrom) {
+    Object.assign(plan, { status: "canceled", paidThrough: null });
+    return;
+  }
+  const end = new Date(`${addMonths(plan.paidFrom, months)}T00:00:00Z`);
+  end.setUTCDate(end.getUTCDate() - 1);
+  Object.assign(plan, { status: "active", paidThrough: end.toISOString().slice(0, 10) });
 }
 
 /** Mock only: mint an owner session for the dev sign-in link. */
@@ -514,7 +595,7 @@ export async function getOwnerCustomers(sessionToken: string): Promise<OwnerCust
 
 export async function getOwnerSubscriptions(sessionToken: string): Promise<OwnerSubscription[]> {
   if (gvasEnv.mock) {
-    assertMockOwner(sessionToken);
+    const state = assertMockOwner(sessionToken);
     return [
       {
         id: "sub_1",
@@ -526,7 +607,11 @@ export async function getOwnerSubscriptions(sessionToken: string): Promise<Owner
         currentPeriodEnd: at(10, 0),
         cancelAtPeriodEnd: false,
         createdAt: at(-20, 11),
+        manual: false,
+        paidFrom: null,
+        paidThrough: null,
       },
+      ...state.plans,
     ];
   }
   return (
@@ -666,6 +751,120 @@ export async function markOwnerQuoteUnpaid(sessionToken: string, quoteId: string
       method: "POST",
     })
   ).quote;
+}
+
+export async function getOwnerPayments(sessionToken: string): Promise<OwnerPayment[]> {
+  if (gvasEnv.mock) return assertMockOwner(sessionToken).payments;
+  return (await ownerRequest<{ payments: OwnerPayment[] }>("/v1/owner/payments", sessionToken)).payments;
+}
+
+export async function recordOwnerPlanPayment(
+  sessionToken: string,
+  quoteId: string,
+  payment: PlanPayment,
+): Promise<OwnerSubscription> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    const quote = state.quotes.find((item) => item.id === quoteId);
+    if (!quote) throw new GvasError("not_found", "not found", 404);
+    if (quote.billing !== "recurring" || !quote.interval) {
+      throw new GvasError("conflict", "Only recurring quotes have a plan.", 409);
+    }
+    let plan = state.plans.find((item) => item.quoteId === quoteId);
+    const id = `pay_${payment.key}`;
+    const known = state.payments.find((item) => item.id === id);
+    if (known) {
+      if (known.voidedAt || !plan) {
+        throw new GvasError("conflict", "This payment changed; refresh and try again.", 409);
+      }
+      return plan;
+    }
+    const now = new Date().toISOString();
+    if (!plan) {
+      plan = {
+        id: `plan_${quoteId}`,
+        quoteId,
+        status: "active",
+        interval: quote.interval,
+        amountCents: quote.totalCents,
+        currency: quote.currency ?? "USD",
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        createdAt: now,
+        manual: true,
+        paidFrom: null,
+        paidThrough: null,
+      };
+      state.plans.push(plan);
+    }
+    if (plan.status === "canceled" || mockPlanPayments(state, quoteId).length === 0) {
+      plan.paidFrom = payment.paidOn;
+    }
+    if (quote.customerStatus !== "paid") {
+      state.statusBeforePaid.set(quote.id, quote.customerStatus);
+      quote.customerStatus = "paid";
+    }
+    state.payments.push({
+      id,
+      quoteId,
+      kind: "plan",
+      source: "manual",
+      method: payment.method,
+      amountCents: payment.amountCents,
+      currency: plan.currency,
+      paidOn: new Date(`${payment.paidOn}T12:00:00Z`).toISOString(),
+      monthsCovered: payment.months,
+      recordedBy: state.settings.ownerEmail,
+      recordedAt: now,
+      note: payment.note ?? null,
+      voidedAt: null,
+      voidedBy: null,
+      duplicate: false,
+      counts: true,
+    });
+    mockCover(state, plan);
+    return plan;
+  }
+  return (
+    await ownerRequest<{ subscription: OwnerSubscription }>(
+      `/v1/owner/quotes/${enc(quoteId)}/plan-payments`,
+      sessionToken,
+      { method: "POST", body: JSON.stringify(payment) },
+    )
+  ).subscription;
+}
+
+export async function undoOwnerPlanPayment(
+  sessionToken: string,
+  quoteId: string,
+  paymentId: string,
+): Promise<OwnerSubscription> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    const plan = state.plans.find((item) => item.quoteId === quoteId);
+    const payment = state.payments.find(
+      (item) => item.id === paymentId && item.quoteId === quoteId && item.kind === "plan",
+    );
+    if (!plan || !payment) throw new GvasError("not_found", "not found", 404);
+    if (payment.voidedAt) {
+      throw new GvasError("conflict", "This payment changed; refresh and try again.", 409);
+    }
+    Object.assign(payment, { voidedAt: new Date().toISOString(), voidedBy: state.settings.ownerEmail, counts: false });
+    mockCover(state, plan);
+    const quote = state.quotes.find((item) => item.id === quoteId);
+    if (quote && plan.status === "canceled" && state.statusBeforePaid.has(quote.id)) {
+      quote.customerStatus = state.statusBeforePaid.get(quote.id) ?? null;
+      state.statusBeforePaid.delete(quote.id);
+    }
+    return plan;
+  }
+  return (
+    await ownerRequest<{ subscription: OwnerSubscription }>(
+      `/v1/owner/quotes/${enc(quoteId)}/plan-payments/${enc(paymentId)}/undo`,
+      sessionToken,
+      { method: "POST" },
+    )
+  ).subscription;
 }
 
 export async function updateOwnerSettings(
