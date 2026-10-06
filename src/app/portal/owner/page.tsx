@@ -67,7 +67,7 @@ function WeekStrip({ days, events, today, zone }: {
         return (
           <li key={key}>
             <Link
-              href={`/portal/owner/calendar#day-${key}`}
+              href={isToday ? "/portal/owner/calendar" : `/portal/owner/calendar#day-${key}`}
               aria-label={`${longDay(key)}: ${count === 0 ? "nothing" : `${count} on the calendar`}`}
               className={`flex min-h-16 flex-col items-center justify-center rounded-xl border text-center transition-colors ${
                 isToday ? "border-ink bg-ink text-paper" : "border-line text-ink hover:bg-ink/5"
