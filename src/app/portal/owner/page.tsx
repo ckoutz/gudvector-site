@@ -19,6 +19,7 @@ import {
   Notice,
   Pill,
   dayKey,
+  onDay,
   firstParam,
   formatDate,
   formatMoney,
@@ -62,7 +63,7 @@ function WeekStrip({ days, events, today, zone }: {
   return (
     <ol className="grid grid-cols-7 gap-1.5 p-3">
       {days.map((key) => {
-        const count = events.filter((event) => dayKey(event.start, zone) === key).length;
+        const count = events.filter((event) => onDay(event, key, zone)).length;
         const isToday = key === today;
         return (
           <li key={key}>
@@ -119,7 +120,7 @@ export default async function OwnerTodayPage({
   const calendar: OwnerCalendar | null = settled(calendarResult, "calendar");
   const paidThisMonth: number | null = settled(paidResult, "payments");
 
-  const todaysEvents = (calendar?.events ?? []).filter((event) => dayKey(event.start, zone) === today);
+  const todaysEvents = (calendar?.events ?? []).filter((event) => onDay(event, today, zone));
   const pendingQuotes = (quotes ?? []).filter((quote) => quote.needsApproval);
   const pendingBookings = (bookings ?? []).filter((booking) => booking.needsDecision);
   const waiting = pendingQuotes.length + pendingBookings.length;
@@ -248,7 +249,7 @@ export default async function OwnerTodayPage({
               {calendar === null ? (
                 <LoadError label="your calendar" />
               ) : (
-                <DayAgenda events={todaysEvents} problems={calendar.problems} empty="Nothing on the calendar today." zone={zone} />
+                <DayAgenda events={todaysEvents} problems={calendar.problems} empty="Nothing on the calendar today." zone={zone} day={today} />
               )}
             </Card>
           </div>

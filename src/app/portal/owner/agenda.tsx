@@ -1,5 +1,5 @@
 import type { CalendarSource, OwnerCalendarEvent } from "@/lib/owner";
-import { formatTime } from "./ui";
+import { dayKey, formatTime } from "./ui";
 
 const sourceStyle: Record<CalendarSource, { label: string; dot: string }> = {
   booking: { label: "Calendly booking", dot: "bg-orange" },
@@ -25,11 +25,14 @@ export function DayAgenda({
   problems = [],
   empty,
   zone,
+  day,
 }: {
   events: OwnerCalendarEvent[];
   problems?: string[];
   empty: string;
   zone: string;
+  /** The local day shown; a timed event that began earlier reads "Ongoing". */
+  day?: string;
 }) {
   return (
     <div>
@@ -45,7 +48,11 @@ export function DayAgenda({
           {events.map((event, index) => (
             <li key={`${event.start}-${index}`} className="flex gap-4 px-5 py-3">
               <span className="w-16 shrink-0 pt-0.5 text-[13px] tabular-nums text-muted">
-                {event.allDay ? "All day" : formatTime(event.start, zone)}
+                {event.allDay
+                  ? "All day"
+                  : day && dayKey(event.start, zone) < day
+                    ? "Ongoing"
+                    : formatTime(event.start, zone)}
               </span>
               <span
                 className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${sourceStyle[event.source].dot}`}

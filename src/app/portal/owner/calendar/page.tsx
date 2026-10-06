@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getOwnerCalendar, getOwnerTimeZone, type OwnerCalendar } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { CalendarLegend, DayAgenda } from "../agenda";
-import { Card, LoadError, buttonSecondary, dayKey, firstParam, zoneName } from "../ui";
+import { Card, LoadError, buttonSecondary, dayKey, firstParam, onDay, zoneName } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -88,11 +88,11 @@ export default async function OwnerCalendarPage({
             </div>
           )}
           {keys.map((key) => {
-            const events = calendar.events.filter((event) => dayKey(event.start, zone) === key);
+            const events = calendar.events.filter((event) => onDay(event, key, zone));
             return (
               <div key={key} id={`day-${key}`} className="scroll-mt-4">
                 <Card title={`${dayLabel(key)}${key === todayKey ? " · Today" : ""}`}>
-                  <DayAgenda events={events} empty="Nothing scheduled." zone={zone} />
+                  <DayAgenda events={events} empty="Nothing scheduled." zone={zone} day={key} />
                 </Card>
               </div>
             );
