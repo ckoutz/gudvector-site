@@ -22,7 +22,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
     console.error("OwnerLayout: /me failed", err);
   }
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-14">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-orange-ink">
@@ -42,7 +42,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
       <div className="mt-6 border-b border-line pb-3">
         <OwnerNav />
       </div>
-      <div className="mt-8">{children}</div>
+      <div className="mt-5 sm:mt-8">{children}</div>
     </div>
   );
 }

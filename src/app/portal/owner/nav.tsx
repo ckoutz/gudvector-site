@@ -14,7 +14,7 @@ const tabs = [
 export function OwnerNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Dashboard" className="-mx-1 flex gap-1 overflow-x-auto">
+    <nav aria-label="Dashboard" className="-mx-1 flex flex-wrap gap-1">
       {tabs.map((tab) => {
         const active = pathname === tab.href;
         return (
@@ -22,7 +22,7 @@ export function OwnerNav() {
             key={tab.href}
             href={tab.href}
             aria-current={active ? "page" : undefined}
-            className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-[14px] font-medium transition-colors ${
+            className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-3.5 py-1.5 text-[14px] font-medium transition-colors ${
               active ? "bg-ink text-paper" : "text-muted hover:bg-ink/5 hover:text-ink"
             }`}
           >

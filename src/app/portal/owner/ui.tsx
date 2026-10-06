@@ -1,9 +1,9 @@
 import { DEFAULT_TIME_ZONE, type OwnerCustomerStatus, type OwnerQuote } from "@/lib/owner";
 
 export const buttonPrimary =
-  "inline-flex items-center justify-center rounded-full bg-ink px-4 py-2 text-[14px] font-semibold text-paper transition-colors hover:bg-char focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-ink disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-4 py-2 text-[14px] font-semibold text-paper transition-colors hover:bg-char focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-ink disabled:opacity-50";
 export const buttonSecondary =
-  "inline-flex items-center justify-center rounded-full border border-ink/20 px-4 py-2 text-[14px] font-semibold text-ink transition-colors hover:border-ink/40 hover:bg-ink/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-ink";
+  "inline-flex min-h-11 items-center justify-center rounded-full border border-ink/20 px-4 py-2 text-[14px] font-semibold text-ink transition-colors hover:border-ink/40 hover:bg-ink/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-ink";
 
 export function formatMoney(cents: number, currency: string | null = "USD"): string {
   return new Intl.NumberFormat("en-US", {
