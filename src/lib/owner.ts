@@ -758,6 +758,32 @@ export async function getOwnerPayments(sessionToken: string): Promise<OwnerPayme
   return (await ownerRequest<{ payments: OwnerPayment[] }>("/v1/owner/payments", sessionToken)).payments;
 }
 
+/** Money that arrived this calendar month in `zone` (GVAS's ledger total: voided and duplicate payments don't count). */
+export async function getOwnerPaidThisMonth(sessionToken: string, zone: string): Promise<number> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    const month = (iso: string | null) =>
+      iso ? new Intl.DateTimeFormat("en-CA", { timeZone: zone }).format(new Date(iso)).slice(0, 7) : "";
+    const now = month(new Date().toISOString());
+    const ledger = state.payments.filter((p) => p.counts && month(p.paidOn) === now);
+    const unledgered = state.quotes.filter(
+      (q) =>
+        q.customerStatus === "paid" &&
+        !state.payments.some((p) => p.quoteId === q.id) &&
+        month(q.updatedAt) === now,
+    );
+    return (
+      ledger.reduce((sum, p) => sum + p.amountCents, 0) +
+      unledgered.reduce((sum, q) => sum + q.totalCents, 0)
+    );
+  }
+  const body = await ownerRequest<{ paidThisMonth: Record<string, number> }>(
+    "/v1/owner/payments",
+    sessionToken,
+  );
+  return Object.values(body.paidThisMonth).reduce((sum, cents) => sum + cents, 0);
+}
+
 export async function recordOwnerPlanPayment(
   sessionToken: string,
   quoteId: string,

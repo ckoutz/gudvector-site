@@ -211,6 +211,11 @@ export function ManualPlan({
       <p className={`text-[13px] ${lapsed ? "font-semibold text-red-700" : "text-muted"}`}>
         {lapsed ? "Ran out" : "Paid through"} {formatDay(plan.paidThrough)}
       </p>
+      {payments === null && (
+        <p className="text-[12px] text-red-700">
+          Couldn&apos;t load the payments, so Undo isn&apos;t available. Refresh to try again.
+        </p>
+      )}
       {active.length > 0 && (
         <ul className="space-y-1 text-[12px] text-muted">
           {active.map((payment) => (
