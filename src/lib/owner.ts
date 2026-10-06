@@ -40,8 +40,21 @@ export type OwnerQuote = {
   note: string | null;
   createdAt: string;
   approvedAt: string | null;
+  sentAt?: string | null;
+  paidOn?: string | null;
+  paidBy?: OwnerQuotePaidBy | null;
   updatedAt: string;
 };
+
+export type ManualPaymentMethod = "check" | "cash" | "other";
+
+export type OwnerQuotePaidBy = {
+  source: "stripe" | "manual";
+  method: "card" | ManualPaymentMethod;
+  note: string | null;
+};
+
+export type ManualPayment = { paidOn: string; method: ManualPaymentMethod; note?: string };
 
 export type OwnerCustomer = {
   email: string;
@@ -589,6 +602,51 @@ export async function getOwnerSettings(sessionToken: string): Promise<OwnerSetti
   if (gvasEnv.mock) return assertMockOwner(sessionToken).settings;
   return (await ownerRequest<{ settings: OwnerSettings }>("/v1/owner/settings", sessionToken))
     .settings;
+}
+
+export async function markOwnerQuotePaid(
+  sessionToken: string,
+  quoteId: string,
+  payment: ManualPayment,
+): Promise<OwnerQuote> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    const quote = state.quotes.find((item) => item.id === quoteId);
+    if (!quote) throw new GvasError("not_found", "not found", 404);
+    if (quote.billing !== "one_time" || quote.customerStatus !== "accepted") {
+      throw new GvasError("conflict", "Only accepted quotes can be marked paid.", 409);
+    }
+    Object.assign(quote, {
+      customerStatus: "paid",
+      paidOn: new Date(`${payment.paidOn}T12:00:00Z`).toISOString(),
+      paidBy: { source: "manual", method: payment.method, note: payment.note ?? null },
+    });
+    return quote;
+  }
+  return (
+    await ownerRequest<{ quote: OwnerQuote }>(`/v1/owner/quotes/${enc(quoteId)}/mark-paid`, sessionToken, {
+      method: "POST",
+      body: JSON.stringify(payment),
+    })
+  ).quote;
+}
+
+export async function markOwnerQuoteUnpaid(sessionToken: string, quoteId: string): Promise<OwnerQuote> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    const quote = state.quotes.find((item) => item.id === quoteId);
+    if (!quote) throw new GvasError("not_found", "not found", 404);
+    if (quote.paidBy?.source !== "manual") {
+      throw new GvasError("conflict", "This quote has no payment to undo.", 409);
+    }
+    Object.assign(quote, { customerStatus: "accepted", paidOn: null, paidBy: null });
+    return quote;
+  }
+  return (
+    await ownerRequest<{ quote: OwnerQuote }>(`/v1/owner/quotes/${enc(quoteId)}/mark-unpaid`, sessionToken, {
+      method: "POST",
+    })
+  ).quote;
 }
 
 export async function updateOwnerSettings(

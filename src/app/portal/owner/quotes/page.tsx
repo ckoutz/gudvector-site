@@ -9,6 +9,7 @@ import {
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { BookingDecision, QuoteDecision } from "../decisions";
+import { MarkPaid, PaidBy, canMarkPaid } from "../payments";
 import {
   Card,
   Empty,
@@ -60,6 +61,7 @@ export default async function OwnerQuotesPage({
   const bookings: OwnerBooking[] | null = value(b, "bookings");
   const pending = (quotes ?? []).filter((quote) => quote.needsApproval);
   const pendingBookings = (bookings ?? []).filter((booking) => booking.needsDecision);
+  const awaitingPayment = (quotes ?? []).filter(canMarkPaid);
 
   return (
     <div className="space-y-6">
@@ -72,6 +74,16 @@ export default async function OwnerQuotesPage({
             ))}
             {pending.map((quote) => (
               <QuoteDecision key={quote.id} quote={quote} returnTo={RETURN} />
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {awaitingPayment.length > 0 && (
+        <Card title="Accepted, waiting for payment">
+          <ul className="divide-y divide-line">
+            {awaitingPayment.map((quote) => (
+              <MarkPaid key={quote.id} quote={quote} returnTo={RETURN} zone={zone} />
             ))}
           </ul>
         </Card>
@@ -107,6 +119,7 @@ export default async function OwnerQuotesPage({
                       </td>
                       <td className="px-5 py-3">
                         <Pill tone={tone}>{label}</Pill>
+                        <PaidBy quote={quote} returnTo={RETURN} zone={zone} />
                       </td>
                       <td className="px-5 py-3 text-muted">{formatDate(quote.createdAt, zone)}</td>
                       <td className="px-5 py-3 text-right font-semibold tabular-nums text-ink">

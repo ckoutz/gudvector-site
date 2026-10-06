@@ -8,6 +8,9 @@ import {
   decideOwnerBooking,
   decideOwnerQuote,
   deleteOwnerSession,
+  markOwnerQuotePaid,
+  markOwnerQuoteUnpaid,
+  type ManualPaymentMethod,
   updateOwnerSettings,
   type OwnerSettingsUpdate,
 } from "@/lib/owner";
@@ -50,6 +53,58 @@ export async function decideQuoteAction(formData: FormData): Promise<void> {
     code = stale ? "quote-stale" : "failed";
   }
   back(path, { notice: code });
+}
+
+const METHODS = new Set<ManualPaymentMethod>(["check", "cash", "other"]);
+
+export async function markPaidAction(formData: FormData): Promise<void> {
+  const token = await requireOwnerSessionToken();
+  const path = returnPath(formData);
+  const id = String(formData.get("quoteId") ?? "");
+  const paidOn = String(formData.get("paidOn") ?? "");
+  const method = String(formData.get("method") ?? "") as ManualPaymentMethod;
+  const note = String(formData.get("note") ?? "").trim().slice(0, 500);
+  let query: Record<string, string>;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(paidOn) || !METHODS.has(method)) {
+    back(path, { message: "Pick the date it was paid and how." });
+  }
+  try {
+    await markOwnerQuotePaid(token, id, { paidOn, method, ...(note ? { note } : {}) });
+    query = { notice: "quote-marked-paid" };
+  } catch (err) {
+    redirectOwnerOnUnauthorized(err);
+    if (isGvasError(err) && (err.kind === "conflict" || err.status === 422)) {
+      query = { message: err.message };
+    } else if (isGvasError(err) && err.kind === "not_found") {
+      query = { notice: "quote-stale" };
+    } else {
+      console.error("markPaidAction failed", err);
+      query = { notice: "failed" };
+    }
+  }
+  back(path, query);
+}
+
+export async function markUnpaidAction(formData: FormData): Promise<void> {
+  const token = await requireOwnerSessionToken();
+  const path = returnPath(formData);
+  const id = String(formData.get("quoteId") ?? "");
+  let query: Record<string, string>;
+  try {
+    await markOwnerQuoteUnpaid(token, id);
+    query = { notice: "quote-marked-unpaid" };
+  } catch (err) {
+    redirectOwnerOnUnauthorized(err);
+    if (isGvasError(err) && err.kind === "conflict") {
+      query = { message: err.message };
+    } else if (isGvasError(err) && err.kind === "not_found") {
+      query = { notice: "quote-stale" };
+    } else {
+      console.error("markUnpaidAction failed", err);
+      query = { notice: "failed" };
+    }
+  }
+  back(path, query);
 }
 
 export async function decideBookingAction(formData: FormData): Promise<void> {

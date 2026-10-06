@@ -133,6 +133,8 @@ const notices: Record<string, string> = {
   "quote-approved": "Quote approved. Gus is sending it to the customer.",
   "quote-rejected": "Quote rejected. Nothing was sent.",
   "quote-stale": "That quote was already handled.",
+  "quote-marked-paid": "Marked paid. The customer gets a short receipt by e-mail.",
+  "quote-marked-unpaid": "Payment undone. The quote is accepted and unpaid again.",
   "booking-done": "Booking updated.",
   "booking-stale": "That booking was already handled.",
   failed: "That didn't go through. Try again in a minute.",
