@@ -80,7 +80,7 @@ export default async function OwnerQuotesPage({
       )}
 
       {awaitingPayment.length > 0 && (
-        <Card title="Accepted, waiting for payment">
+        <Card title="Waiting for payment">
           <ul className="divide-y divide-line">
             {awaitingPayment.map((quote) => (
               <MarkPaid key={quote.id} quote={quote} returnTo={RETURN} zone={zone} />

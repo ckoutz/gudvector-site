@@ -170,6 +170,8 @@ type MockOwnerState = {
   quotes: OwnerQuote[];
   bookings: OwnerBooking[];
   settings: OwnerSettings;
+  /** What each mock-paid quote was before, so undo puts it back. */
+  statusBeforePaid: Map<string, OwnerCustomerStatus | null>;
 };
 
 const MOCK_ZONE = "America/Los_Angeles";
@@ -187,7 +189,11 @@ function at(daysFromToday: number, hour: number, minute = 0): string {
 
 function mockOwnerState(): MockOwnerState {
   const g = globalThis as { __gvasMockOwner?: MockOwnerState };
-  if (g.__gvasMockOwner) return g.__gvasMockOwner;
+  if (g.__gvasMockOwner) {
+    // State kept across a hot reload may predate newer fields.
+    g.__gvasMockOwner.statusBeforePaid ??= new Map();
+    return g.__gvasMockOwner;
+  }
   const quote = (
     id: string,
     name: string,
@@ -219,6 +225,7 @@ function mockOwnerState(): MockOwnerState {
     ...extra,
   });
   g.__gvasMockOwner = {
+    statusBeforePaid: new Map(),
     sessions: new Set<string>(),
     quotes: [
       quote(
@@ -613,9 +620,15 @@ export async function markOwnerQuotePaid(
     const state = assertMockOwner(sessionToken);
     const quote = state.quotes.find((item) => item.id === quoteId);
     if (!quote) throw new GvasError("not_found", "not found", 404);
-    if (quote.billing !== "one_time" || quote.customerStatus !== "accepted") {
-      throw new GvasError("conflict", "Only accepted quotes can be marked paid.", 409);
+    const sent =
+      quote.customerStatus === "viewed" ||
+      quote.customerStatus === "accepted" ||
+      quote.status === "delivery_pending" ||
+      quote.status === "delivered";
+    if (quote.billing !== "one_time" || !sent || quote.customerStatus === "paid" || quote.customerStatus === "declined") {
+      throw new GvasError("conflict", "Only quotes sent to the customer can be marked paid.", 409);
     }
+    state.statusBeforePaid.set(quote.id, quote.customerStatus);
     Object.assign(quote, {
       customerStatus: "paid",
       paidOn: new Date(`${payment.paidOn}T12:00:00Z`).toISOString(),
@@ -639,7 +652,13 @@ export async function markOwnerQuoteUnpaid(sessionToken: string, quoteId: string
     if (quote.paidBy?.source !== "manual") {
       throw new GvasError("conflict", "This quote has no payment to undo.", 409);
     }
-    Object.assign(quote, { customerStatus: "accepted", paidOn: null, paidBy: null });
+    const before = state.statusBeforePaid.get(quote.id);
+    state.statusBeforePaid.delete(quote.id);
+    Object.assign(quote, {
+      customerStatus: before === undefined ? "accepted" : before,
+      paidOn: null,
+      paidBy: null,
+    });
     return quote;
   }
   return (

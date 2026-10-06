@@ -18,7 +18,11 @@ function today(zone: string): string {
 }
 
 export function canMarkPaid(quote: OwnerQuote): boolean {
-  return quote.billing === "one_time" && quote.customerStatus === "accepted";
+  if (quote.billing !== "one_time") return false;
+  if (quote.customerStatus === "viewed" || quote.customerStatus === "accepted") return true;
+  // Sent: GVAS handed it to the e-mail/text provider (delivery confirmation may never come).
+  if (quote.customerStatus !== null && quote.customerStatus !== "sent") return false;
+  return quote.status === "delivery_pending" || quote.status === "delivered";
 }
 
 export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnTo: string; zone: string }) {
@@ -33,7 +37,8 @@ export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnT
               <span className="tabular-nums">{formatMoney(quote.totalCents, quote.currency)}</span>
             </span>
             <span className="block text-[13px] text-muted">
-              {quote.lineItems.map((item) => item.description).join(", ") || "Accepted quote"}
+              {quote.lineItems.map((item) => item.description).join(", ") || "Quote"}
+              {quote.customerStatus !== "accepted" && " · not accepted yet"}
             </span>
           </span>
           <span className={`${buttonSecondary} min-h-11 group-open:hidden`}>Mark paid</span>
