@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { getOwnerCalendar, type OwnerCalendar } from "@/lib/owner";
+import { getOwnerCalendar, getOwnerTimeZone, type OwnerCalendar } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { CalendarLegend, DayAgenda } from "../agenda";
-import { Card, LoadError, TIME_ZONE, buttonSecondary, dayKey, firstParam } from "../ui";
+import { Card, LoadError, buttonSecondary, dayKey, firstParam, zoneName } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -25,8 +25,9 @@ export default async function OwnerCalendarPage({
   const params = await searchParams;
   const week = Math.max(-8, Math.min(8, Number.parseInt(firstParam(params.week) ?? "0", 10) || 0));
   const token = await requireOwnerSessionToken();
+  const zone = await getOwnerTimeZone(token);
 
-  const todayKey = dayKey(new Date());
+  const todayKey = dayKey(new Date(), zone);
   const first = new Date(`${todayKey}T12:00:00Z`);
   first.setUTCDate(first.getUTCDate() + week * DAYS);
   const keys = Array.from({ length: DAYS }, (_, index) => {
@@ -55,7 +56,7 @@ export default async function OwnerCalendarPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-[17px] font-semibold text-ink">{rangeLabel}</h2>
-          <p className="mt-0.5 text-[12px] text-muted">Times shown in Pacific time ({TIME_ZONE}).</p>
+          <p className="mt-0.5 text-[12px] text-muted">Times shown in {zoneName(zone)} ({zone}).</p>
         </div>
         <div className="flex gap-2">
           <Link href={`/portal/owner/calendar?week=${week - 1}`} className={buttonSecondary}>
@@ -87,10 +88,10 @@ export default async function OwnerCalendarPage({
             </div>
           )}
           {keys.map((key) => {
-            const events = calendar.events.filter((event) => dayKey(event.start) === key);
+            const events = calendar.events.filter((event) => dayKey(event.start, zone) === key);
             return (
               <Card key={key} title={`${dayLabel(key)}${key === todayKey ? " · Today" : ""}`}>
-                <DayAgenda events={events} empty="Nothing scheduled." />
+                <DayAgenda events={events} empty="Nothing scheduled." zone={zone} />
               </Card>
             );
           })}

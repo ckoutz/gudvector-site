@@ -3,6 +3,7 @@ import {
   getOwnerBookings,
   getOwnerCalendar,
   getOwnerQuotes,
+  getOwnerTimeZone,
   type OwnerBooking,
   type OwnerCalendar,
   type OwnerQuote,
@@ -39,6 +40,7 @@ export default async function OwnerTodayPage({
 }) {
   const params = await searchParams;
   const token = await requireOwnerSessionToken();
+  const zone = await getOwnerTimeZone(token);
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   start.setTime(start.getTime() - 12 * 3600 * 1000);
@@ -52,14 +54,14 @@ export default async function OwnerTodayPage({
   const bookings: OwnerBooking[] | null = settled(bookingsResult, "bookings");
   const calendar: OwnerCalendar | null = settled(calendarResult, "calendar");
 
-  const today = dayKey(new Date());
-  const todaysEvents = (calendar?.events ?? []).filter((event) => dayKey(event.start) === today);
+  const today = dayKey(new Date(), zone);
+  const todaysEvents = (calendar?.events ?? []).filter((event) => dayKey(event.start, zone) === today);
   const pendingQuotes = (quotes ?? []).filter((quote) => quote.needsApproval);
   const pendingBookings = (bookings ?? []).filter((booking) => booking.needsDecision);
   const unpaid = (quotes ?? []).filter((quote) => quote.customerStatus === "accepted");
   const monthKey = today.slice(0, 7);
   const paidThisMonth = (quotes ?? [])
-    .filter((quote) => quote.customerStatus === "paid" && dayKey(quote.updatedAt).startsWith(monthKey))
+    .filter((quote) => quote.customerStatus === "paid" && dayKey(quote.updatedAt, zone).startsWith(monthKey))
     .reduce((sum, quote) => sum + quote.totalCents, 0);
   const waiting = pendingQuotes.length + pendingBookings.length;
 
@@ -96,7 +98,7 @@ export default async function OwnerTodayPage({
           ) : (
             <ul className="divide-y divide-line">
               {pendingBookings.map((booking) => (
-                <BookingDecision key={booking.reference} booking={booking} returnTo="/portal/owner" />
+                <BookingDecision key={booking.reference} booking={booking} returnTo="/portal/owner" zone={zone} />
               ))}
               {pendingQuotes.map((quote) => (
                 <QuoteDecision key={quote.id} quote={quote} returnTo="/portal/owner" />
@@ -116,7 +118,7 @@ export default async function OwnerTodayPage({
           {calendar === null ? (
             <LoadError label="your calendar" />
           ) : (
-            <DayAgenda events={todaysEvents} problems={calendar.problems} empty="Nothing on the calendar today." />
+            <DayAgenda events={todaysEvents} problems={calendar.problems} empty="Nothing on the calendar today." zone={zone} />
           )}
         </Card>
       </div>
@@ -144,7 +146,7 @@ export default async function OwnerTodayPage({
                       <p className="truncate text-[14px] font-medium text-ink">
                         {quote.customer.name ?? quote.customer.email ?? "Customer"}
                       </p>
-                      <p className="text-[12px] text-muted">{formatDate(quote.createdAt)}</p>
+                      <p className="text-[12px] text-muted">{formatDate(quote.createdAt, zone)}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Pill tone={tone}>{label}</Pill>

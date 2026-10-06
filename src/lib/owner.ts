@@ -1,3 +1,4 @@
+import { cache } from "react";
 // Owner dashboard client. The owner signs in on the customer portal login
 // page; GVAS answers the session exchange with role "owner" and an owner
 // session token that only /v1/owner/* accepts. Field names match the GVAS
@@ -117,6 +118,8 @@ export type OwnerSettings = {
   intakeOpening: string | null;
   notificationEmail: string | null;
   ownerEmail: string | null;
+  /** IANA zone the business works in; null until Calendly fills it in. */
+  timezone: string | null;
   calendarFeed: { connected: boolean; host: string | null };
   connections: { website: boolean };
 };
@@ -128,13 +131,19 @@ export type OwnerSettingsUpdate = Partial<{
   intakeQuestions: string;
   intakeOpening: string;
   notificationEmail: string;
+  timezone: string;
   calendarFeedUrl: string;
 }>;
 
 export type OwnerMe = {
   role: "owner";
   owner: { email: string };
-  business: { displayName: string; siteUrl: string | null; calendlyUrl: string | null };
+  business: {
+    displayName: string;
+    siteUrl: string | null;
+    calendlyUrl: string | null;
+    timezone: string | null;
+  };
 };
 
 export type BookingDecisionResult = { applied: boolean; message: string };
@@ -268,6 +277,7 @@ function mockOwnerState(): MockOwnerState {
       intakeOpening: "Hi! What can we help you fix?",
       notificationEmail: "office@bayareaservices.example.com",
       ownerEmail: "owner@bayareaservices.example.com",
+      timezone: MOCK_ZONE,
       calendarFeed: { connected: true, host: "calendar.google.com" },
       connections: { website: true },
     },
@@ -416,11 +426,24 @@ export async function getOwnerMe(sessionToken: string): Promise<OwnerMe> {
         displayName: state.settings.displayName,
         siteUrl: state.settings.siteUrl,
         calendlyUrl: state.settings.calendlyUrl,
+        timezone: state.settings.timezone,
       },
     };
   }
   return ownerRequest<OwnerMe>("/v1/owner/me", sessionToken);
 }
+
+/** Used until the business has a zone of its own. */
+export const DEFAULT_TIME_ZONE = "America/Los_Angeles";
+
+/** The zone every dashboard time renders in; one /me call per request. */
+export const getOwnerTimeZone = cache(async (sessionToken: string): Promise<string> => {
+  try {
+    return (await getOwnerMe(sessionToken)).business.timezone || DEFAULT_TIME_ZONE;
+  } catch {
+    return DEFAULT_TIME_ZONE;
+  }
+});
 
 export async function deleteOwnerSession(sessionToken: string): Promise<void> {
   if (gvasEnv.mock) {

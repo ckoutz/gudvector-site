@@ -76,6 +76,7 @@ const TEXT_FIELDS = [
   "displayName",
   "calendlyUrl",
   "notificationEmail",
+  "timezone",
   "intakeBrief",
   "intakeQuestions",
   "intakeOpening",

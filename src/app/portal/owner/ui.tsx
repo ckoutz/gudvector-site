@@ -1,6 +1,4 @@
-import type { OwnerCustomerStatus, OwnerQuote } from "@/lib/owner";
-
-export const TIME_ZONE = "America/Los_Angeles";
+import { DEFAULT_TIME_ZONE, type OwnerCustomerStatus, type OwnerQuote } from "@/lib/owner";
 
 export const buttonPrimary =
   "inline-flex items-center justify-center rounded-full bg-ink px-4 py-2 text-[14px] font-semibold text-paper transition-colors hover:bg-char focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-ink disabled:opacity-50";
@@ -15,24 +13,24 @@ export function formatMoney(cents: number, currency: string | null = "USD"): str
   }).format(cents / 100);
 }
 
-export function formatDate(iso: string | null): string {
+export function formatDate(iso: string | null, zone: string = DEFAULT_TIME_ZONE): string {
   if (!iso) return "—";
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
-    timeZone: TIME_ZONE,
+    timeZone: zone,
   }).format(new Date(iso));
 }
 
-export function formatTime(iso: string): string {
+export function formatTime(iso: string, zone: string = DEFAULT_TIME_ZONE): string {
   return new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
-    timeZone: TIME_ZONE,
+    timeZone: zone,
   }).format(new Date(iso));
 }
 
-export function formatDateTime(iso: string | null): string {
+export function formatDateTime(iso: string | null, zone: string = DEFAULT_TIME_ZONE): string {
   if (!iso) return "—";
   return new Intl.DateTimeFormat("en-US", {
     weekday: "short",
@@ -40,17 +38,25 @@ export function formatDateTime(iso: string | null): string {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-    timeZone: TIME_ZONE,
+    timeZone: zone,
   }).format(new Date(iso));
 }
 
+/** "Pacific Time" for America/Los_Angeles; the IANA name when Intl has no generic name. */
+export function zoneName(zone: string): string {
+  const name = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "longGeneric" })
+    .formatToParts(new Date())
+    .find((part) => part.type === "timeZoneName")?.value;
+  return name && !name.startsWith("GMT") ? name : zone;
+}
+
 /** yyyy-mm-dd in the business's time zone. */
-export function dayKey(value: Date | string): string {
+export function dayKey(value: Date | string, zone: string = DEFAULT_TIME_ZONE): string {
   const parts = new Intl.DateTimeFormat("en-CA", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-    timeZone: TIME_ZONE,
+    timeZone: zone,
   }).format(new Date(value));
   return parts;
 }

@@ -24,10 +24,12 @@ export function DayAgenda({
   events,
   problems = [],
   empty,
+  zone,
 }: {
   events: OwnerCalendarEvent[];
   problems?: string[];
   empty: string;
+  zone: string;
 }) {
   return (
     <div>
@@ -43,7 +45,7 @@ export function DayAgenda({
           {events.map((event, index) => (
             <li key={`${event.start}-${index}`} className="flex gap-4 px-5 py-3">
               <span className="w-16 shrink-0 pt-0.5 text-[13px] tabular-nums text-muted">
-                {event.allDay ? "All day" : formatTime(event.start)}
+                {event.allDay ? "All day" : formatTime(event.start, zone)}
               </span>
               <span
                 className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${sourceStyle[event.source].dot}`}

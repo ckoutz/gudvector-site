@@ -2,6 +2,7 @@ import {
   getOwnerBookings,
   getOwnerQuotes,
   getOwnerSubscriptions,
+  getOwnerTimeZone,
   type OwnerBooking,
   type OwnerQuote,
   type OwnerSubscription,
@@ -48,6 +49,7 @@ export default async function OwnerQuotesPage({
 }) {
   const params = await searchParams;
   const token = await requireOwnerSessionToken();
+  const zone = await getOwnerTimeZone(token);
   const [q, s, b] = await Promise.allSettled([
     getOwnerQuotes(token),
     getOwnerSubscriptions(token),
@@ -66,7 +68,7 @@ export default async function OwnerQuotesPage({
         <Card title="Needs your OK">
           <ul className="divide-y divide-line">
             {pendingBookings.map((booking) => (
-              <BookingDecision key={booking.reference} booking={booking} returnTo={RETURN} />
+              <BookingDecision key={booking.reference} booking={booking} returnTo={RETURN} zone={zone} />
             ))}
             {pending.map((quote) => (
               <QuoteDecision key={quote.id} quote={quote} returnTo={RETURN} />
@@ -106,7 +108,7 @@ export default async function OwnerQuotesPage({
                       <td className="px-5 py-3">
                         <Pill tone={tone}>{label}</Pill>
                       </td>
-                      <td className="px-5 py-3 text-muted">{formatDate(quote.createdAt)}</td>
+                      <td className="px-5 py-3 text-muted">{formatDate(quote.createdAt, zone)}</td>
                       <td className="px-5 py-3 text-right font-semibold tabular-nums text-ink">
                         {formatMoney(quote.totalCents, quote.currency)}
                         {quote.billing === "recurring" && quote.interval && (
@@ -136,7 +138,7 @@ export default async function OwnerQuotesPage({
                     {formatMoney(plan.amountCents, plan.currency)} / {plan.interval}
                   </p>
                   <p className="text-[12px] text-muted">
-                    {plan.cancelAtPeriodEnd ? "Cancels" : "Renews"} {formatDate(plan.currentPeriodEnd)}
+                    {plan.cancelAtPeriodEnd ? "Cancels" : "Renews"} {formatDate(plan.currentPeriodEnd, zone)}
                   </p>
                 </div>
                 <Pill tone={plan.status === "active" ? "green" : plan.status === "past_due" ? "red" : "muted"}>
@@ -162,7 +164,7 @@ export default async function OwnerQuotesPage({
                     {booking.customer.name ?? booking.customer.email ?? "Visitor"}
                   </p>
                   <p className="text-[12px] text-muted">
-                    {formatDateTime(booking.requestedStart)}
+                    {formatDateTime(booking.requestedStart, zone)}
                     {booking.details ? ` · ${booking.details}` : ""}
                   </p>
                 </div>
