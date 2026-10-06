@@ -90,9 +90,11 @@ export default async function OwnerCalendarPage({
           {keys.map((key) => {
             const events = calendar.events.filter((event) => dayKey(event.start, zone) === key);
             return (
-              <Card key={key} title={`${dayLabel(key)}${key === todayKey ? " · Today" : ""}`}>
-                <DayAgenda events={events} empty="Nothing scheduled." zone={zone} />
-              </Card>
+              <div key={key} id={`day-${key}`} className="scroll-mt-4">
+                <Card title={`${dayLabel(key)}${key === todayKey ? " · Today" : ""}`}>
+                  <DayAgenda events={events} empty="Nothing scheduled." zone={zone} />
+                </Card>
+              </div>
             );
           })}
           <p className="text-[13px] text-muted">
