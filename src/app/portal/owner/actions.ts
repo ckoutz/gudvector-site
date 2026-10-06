@@ -10,6 +10,8 @@ import {
   deleteOwnerSession,
   markOwnerQuotePaid,
   markOwnerQuoteUnpaid,
+  recordOwnerPlanPayment,
+  undoOwnerPlanPayment,
   type ManualPaymentMethod,
   updateOwnerSettings,
   type OwnerSettingsUpdate,
@@ -101,6 +103,78 @@ export async function markUnpaidAction(formData: FormData): Promise<void> {
       query = { notice: "quote-stale" };
     } else {
       console.error("markUnpaidAction failed", err);
+      query = { notice: "failed" };
+    }
+  }
+  back(path, query);
+}
+
+const PAYMENT_KEY = /^[A-Za-z0-9_-]{8,64}$/;
+
+export async function recordPlanPaymentAction(formData: FormData): Promise<void> {
+  const token = await requireOwnerSessionToken();
+  const path = returnPath(formData);
+  const id = String(formData.get("quoteId") ?? "");
+  const key = String(formData.get("key") ?? "");
+  const paidOn = String(formData.get("paidOn") ?? "");
+  const method = String(formData.get("method") ?? "") as ManualPaymentMethod;
+  const months = Number(formData.get("months"));
+  const amount = String(formData.get("amount") ?? "").trim().replace(/^\$/, "");
+  const note = String(formData.get("note") ?? "").trim().slice(0, 500);
+  if (
+    !PAYMENT_KEY.test(key) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(paidOn) ||
+    !METHODS.has(method) ||
+    !Number.isInteger(months) ||
+    months < 1 ||
+    months > 24 ||
+    !/^\d+(\.\d{1,2})?$/.test(amount)
+  ) {
+    back(path, { message: "Fill in the date, how, the months covered and the amount." });
+  }
+  const amountCents = Math.round(Number(amount) * 100);
+  let query: Record<string, string>;
+  try {
+    await recordOwnerPlanPayment(token, id, {
+      key,
+      paidOn,
+      method,
+      months,
+      amountCents,
+      ...(note ? { note } : {}),
+    });
+    query = { notice: "plan-payment-recorded" };
+  } catch (err) {
+    redirectOwnerOnUnauthorized(err);
+    if (isGvasError(err) && (err.kind === "conflict" || err.status === 422)) {
+      query = { message: err.message };
+    } else if (isGvasError(err) && err.kind === "not_found") {
+      query = { notice: "quote-stale" };
+    } else {
+      console.error("recordPlanPaymentAction failed", err);
+      query = { notice: "failed" };
+    }
+  }
+  back(path, query);
+}
+
+export async function undoPlanPaymentAction(formData: FormData): Promise<void> {
+  const token = await requireOwnerSessionToken();
+  const path = returnPath(formData);
+  const id = String(formData.get("quoteId") ?? "");
+  const paymentId = String(formData.get("paymentId") ?? "");
+  let query: Record<string, string>;
+  try {
+    await undoOwnerPlanPayment(token, id, paymentId);
+    query = { notice: "plan-payment-undone" };
+  } catch (err) {
+    redirectOwnerOnUnauthorized(err);
+    if (isGvasError(err) && err.kind === "conflict") {
+      query = { message: err.message };
+    } else if (isGvasError(err) && err.kind === "not_found") {
+      query = { notice: "quote-stale" };
+    } else {
+      console.error("undoPlanPaymentAction failed", err);
       query = { notice: "failed" };
     }
   }

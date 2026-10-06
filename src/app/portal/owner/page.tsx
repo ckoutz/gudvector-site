@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   getOwnerBookings,
   getOwnerCalendar,
+  getOwnerPaidThisMonth,
   getOwnerQuotes,
   getOwnerTimeZone,
   type OwnerBooking,
@@ -45,10 +46,11 @@ export default async function OwnerTodayPage({
   start.setHours(0, 0, 0, 0);
   start.setTime(start.getTime() - 12 * 3600 * 1000);
   const end = new Date(start.getTime() + 48 * 3600 * 1000);
-  const [quotesResult, bookingsResult, calendarResult] = await Promise.allSettled([
+  const [quotesResult, bookingsResult, calendarResult, paidResult] = await Promise.allSettled([
     getOwnerQuotes(token),
     getOwnerBookings(token),
     getOwnerCalendar(token, start, end),
+    getOwnerPaidThisMonth(token, zone),
   ]);
   const quotes: OwnerQuote[] | null = settled(quotesResult, "quotes");
   const bookings: OwnerBooking[] | null = settled(bookingsResult, "bookings");
@@ -59,10 +61,7 @@ export default async function OwnerTodayPage({
   const pendingQuotes = (quotes ?? []).filter((quote) => quote.needsApproval);
   const pendingBookings = (bookings ?? []).filter((booking) => booking.needsDecision);
   const unpaid = (quotes ?? []).filter((quote) => quote.customerStatus === "accepted");
-  const monthKey = today.slice(0, 7);
-  const paidThisMonth = (quotes ?? [])
-    .filter((quote) => quote.customerStatus === "paid" && dayKey(quote.updatedAt, zone).startsWith(monthKey))
-    .reduce((sum, quote) => sum + quote.totalCents, 0);
+  const paidThisMonth: number | null = settled(paidResult, "payments");
   const waiting = pendingQuotes.length + pendingBookings.length;
 
   const stats = [
@@ -72,7 +71,7 @@ export default async function OwnerTodayPage({
       label: "Accepted, unpaid",
       value: formatMoney(unpaid.reduce((sum, quote) => sum + quote.totalCents, 0)),
     },
-    { label: "Paid this month", value: formatMoney(paidThisMonth) },
+    { label: "Paid this month", value: paidThisMonth === null ? "—" : formatMoney(paidThisMonth) },
   ];
 
   return (

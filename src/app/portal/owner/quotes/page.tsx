@@ -1,15 +1,25 @@
 import {
   getOwnerBookings,
+  getOwnerPayments,
   getOwnerQuotes,
   getOwnerSubscriptions,
   getOwnerTimeZone,
   type OwnerBooking,
+  type OwnerPayment,
   type OwnerQuote,
   type OwnerSubscription,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { BookingDecision, QuoteDecision } from "../decisions";
-import { MarkPaid, PaidBy, canMarkPaid } from "../payments";
+import {
+  ManualPlan,
+  MarkPaid,
+  PaidBy,
+  StartPlan,
+  canMarkPaid,
+  canRecordPlanPayment,
+  isLiveManualPlan,
+} from "../payments";
 import {
   Card,
   Empty,
@@ -51,17 +61,27 @@ export default async function OwnerQuotesPage({
   const params = await searchParams;
   const token = await requireOwnerSessionToken();
   const zone = await getOwnerTimeZone(token);
-  const [q, s, b] = await Promise.allSettled([
+  const [q, s, b, p] = await Promise.allSettled([
     getOwnerQuotes(token),
     getOwnerSubscriptions(token),
     getOwnerBookings(token),
+    getOwnerPayments(token),
   ]);
   const quotes: OwnerQuote[] | null = value(q, "quotes");
   const subscriptions: OwnerSubscription[] | null = value(s, "subscriptions");
   const bookings: OwnerBooking[] | null = value(b, "bookings");
+  const payments: OwnerPayment[] | null = value(p, "payments");
   const pending = (quotes ?? []).filter((quote) => quote.needsApproval);
   const pendingBookings = (bookings ?? []).filter((booking) => booking.needsDecision);
   const awaitingPayment = (quotes ?? []).filter(canMarkPaid);
+  // Without the plan list we can't tell a card plan from none, so no plan forms.
+  const plannable = (quote: OwnerQuote) =>
+    subscriptions !== null && canRecordPlanPayment(quote, subscriptions);
+  const startPlans = (quotes ?? []).filter(
+    (quote) => plannable(quote) && !(subscriptions ?? []).some((plan) => plan.quoteId === quote.id && isLiveManualPlan(plan)),
+  );
+  const shownPlans = (subscriptions ?? []).filter((plan) => !plan.manual || isLiveManualPlan(plan));
+  const quoteFor = (id: string) => (quotes ?? []).find((quote) => quote.id === id);
 
   return (
     <div className="space-y-6">
@@ -79,11 +99,14 @@ export default async function OwnerQuotesPage({
         </Card>
       )}
 
-      {awaitingPayment.length > 0 && (
+      {(awaitingPayment.length > 0 || startPlans.length > 0) && (
         <Card title="Waiting for payment">
           <ul className="divide-y divide-line">
             {awaitingPayment.map((quote) => (
               <MarkPaid key={quote.id} quote={quote} returnTo={RETURN} zone={zone} />
+            ))}
+            {startPlans.map((quote) => (
+              <StartPlan key={quote.id} quote={quote} returnTo={RETURN} zone={zone} />
             ))}
           </ul>
         </Card>
@@ -140,25 +163,44 @@ export default async function OwnerQuotesPage({
       <Card title="Monthly plans">
         {subscriptions === null ? (
           <LoadError label="plans" />
-        ) : subscriptions.length === 0 ? (
+        ) : shownPlans.length === 0 ? (
           <Empty>No recurring plans yet.</Empty>
         ) : (
           <ul className="divide-y divide-line">
-            {subscriptions.map((plan) => (
-              <li key={plan.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
-                <div>
-                  <p className="text-[14px] font-semibold tabular-nums text-ink">
-                    {formatMoney(plan.amountCents, plan.currency)} / {plan.interval}
-                  </p>
-                  <p className="text-[12px] text-muted">
-                    {plan.cancelAtPeriodEnd ? "Cancels" : "Renews"} {formatDate(plan.currentPeriodEnd, zone)}
-                  </p>
-                </div>
-                <Pill tone={plan.status === "active" ? "green" : plan.status === "past_due" ? "red" : "muted"}>
-                  {plan.status.replace(/_/g, " ")}
-                </Pill>
-              </li>
-            ))}
+            {shownPlans.map((plan) => {
+              const quote = quoteFor(plan.quoteId);
+              return (
+                <li key={plan.id} className="px-5 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[14px] font-semibold text-ink">
+                        {quote ? `${quote.customer.name ?? quote.customer.email ?? "Customer"} · ` : ""}
+                        <span className="tabular-nums">
+                          {formatMoney(plan.amountCents, plan.currency)} / {plan.interval}
+                        </span>
+                      </p>
+                      {!plan.manual && (
+                        <p className="text-[12px] text-muted">
+                          Card · {plan.cancelAtPeriodEnd ? "Cancels" : "Renews"} {formatDate(plan.currentPeriodEnd, zone)}
+                        </p>
+                      )}
+                    </div>
+                    <Pill tone={plan.status === "active" ? "green" : plan.status === "past_due" ? "red" : "muted"}>
+                      {plan.manual ? "check / cash" : plan.status.replace(/_/g, " ")}
+                    </Pill>
+                  </div>
+                  {plan.manual && (
+                    <ManualPlan
+                      plan={plan}
+                      quote={quote && plannable(quote) ? quote : undefined}
+                      payments={payments}
+                      returnTo={RETURN}
+                      zone={zone}
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </Card>
