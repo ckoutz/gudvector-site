@@ -170,6 +170,8 @@ type MockOwnerState = {
   quotes: OwnerQuote[];
   bookings: OwnerBooking[];
   settings: OwnerSettings;
+  /** What each mock-paid quote was before, so undo puts it back. */
+  statusBeforePaid: Map<string, OwnerCustomerStatus | null>;
 };
 
 const MOCK_ZONE = "America/Los_Angeles";
@@ -219,6 +221,7 @@ function mockOwnerState(): MockOwnerState {
     ...extra,
   });
   g.__gvasMockOwner = {
+    statusBeforePaid: new Map(),
     sessions: new Set<string>(),
     quotes: [
       quote(
@@ -604,8 +607,6 @@ export async function getOwnerSettings(sessionToken: string): Promise<OwnerSetti
     .settings;
 }
 
-const mockStatusBeforePaid = new WeakMap<OwnerQuote, OwnerCustomerStatus | null>();
-
 export async function markOwnerQuotePaid(
   sessionToken: string,
   quoteId: string,
@@ -623,7 +624,7 @@ export async function markOwnerQuotePaid(
     if (quote.billing !== "one_time" || !sent || quote.customerStatus === "paid" || quote.customerStatus === "declined") {
       throw new GvasError("conflict", "Only quotes sent to the customer can be marked paid.", 409);
     }
-    mockStatusBeforePaid.set(quote, quote.customerStatus);
+    state.statusBeforePaid.set(quote.id, quote.customerStatus);
     Object.assign(quote, {
       customerStatus: "paid",
       paidOn: new Date(`${payment.paidOn}T12:00:00Z`).toISOString(),
@@ -647,7 +648,8 @@ export async function markOwnerQuoteUnpaid(sessionToken: string, quoteId: string
     if (quote.paidBy?.source !== "manual") {
       throw new GvasError("conflict", "This quote has no payment to undo.", 409);
     }
-    const before = mockStatusBeforePaid.get(quote);
+    const before = state.statusBeforePaid.get(quote.id);
+    state.statusBeforePaid.delete(quote.id);
     Object.assign(quote, {
       customerStatus: before === undefined ? "accepted" : before,
       paidOn: null,
