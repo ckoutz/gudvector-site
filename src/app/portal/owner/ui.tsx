@@ -61,6 +61,27 @@ export function dayKey(value: Date | string, zone: string = DEFAULT_TIME_ZONE): 
   return parts;
 }
 
+/** The last instant before an exclusive `end`, so an event ending at midnight stays on the day before. */
+function lastMoment(end: string): Date {
+  return new Date(new Date(end).getTime() - 1);
+}
+
+/**
+ * Whether `event` is on local day `key`. All-day events keep their own dates (GVAS sends them
+ * anchored at UTC midnight, end exclusive); timed events count on every local day they overlap.
+ */
+export function onDay(
+  event: { start: string; end?: string | null; allDay: boolean },
+  key: string,
+  zone: string = DEFAULT_TIME_ZONE,
+): boolean {
+  const day = (value: Date | string) =>
+    event.allDay ? new Date(value).toISOString().slice(0, 10) : dayKey(value, zone);
+  const first = day(event.start);
+  const last = event.end ? day(lastMoment(event.end)) : first;
+  return first <= key && key <= (last < first ? first : last);
+}
+
 type Tone = "orange" | "green" | "muted" | "red";
 
 const toneClass: Record<Tone, string> = {

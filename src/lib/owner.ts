@@ -223,6 +223,12 @@ function at(daysFromToday: number, hour: number, minute = 0): string {
   return new Date(local.getTime() - offsetMs).toISOString();
 }
 
+/** An all-day date as GVAS sends it: the sample business's local date, anchored at UTC midnight. */
+function allDayAt(daysFromToday: number): string {
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: MOCK_ZONE }).format(new Date(at(daysFromToday, 12)));
+  return `${date}T00:00:00.000Z`;
+}
+
 function mockOwnerState(): MockOwnerState {
   const g = globalThis as { __gvasMockOwner?: MockOwnerState };
   if (g.__gvasMockOwner) {
@@ -399,7 +405,8 @@ function mockCalendar(state: MockOwnerState, start: Date, end: Date): OwnerCalen
     { source: "calendar", title: "Supply house pickup", start: at(0, 7, 30), end: at(0, 8), allDay: false, location: null, inviteeName: null, inviteeEmail: null, reference: null },
     { source: "calendar", title: "Kids' soccer", start: at(0, 17, 30), end: at(0, 19), allDay: false, location: null, inviteeName: null, inviteeEmail: null, reference: null },
     { source: "booking", title: "Faucet estimate", start: at(1, 11), end: at(1, 12), allDay: false, location: "Concord", inviteeName: "Priya Shah", inviteeEmail: "priya@example.com", reference: null },
-    { source: "calendar", title: "Truck service", start: at(3, 0), end: at(4, 0), allDay: true, location: null, inviteeName: null, inviteeEmail: null, reference: null },
+    { source: "calendar", title: "Truck service", start: allDayAt(3), end: allDayAt(4), allDay: true, location: null, inviteeName: null, inviteeEmail: null, reference: null },
+    { source: "calendar", title: "Family trip", start: allDayAt(5), end: allDayAt(7), allDay: true, location: null, inviteeName: null, inviteeEmail: null, reference: null },
     { source: "booking", title: "Drain maintenance", start: at(5, 14), end: at(5, 15), allDay: false, location: "Pleasant Hill", inviteeName: "Sam Ortiz", inviteeEmail: "sam@example.com", reference: null },
   ];
   for (const booking of state.bookings) {
