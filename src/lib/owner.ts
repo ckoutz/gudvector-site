@@ -604,6 +604,8 @@ export async function getOwnerSettings(sessionToken: string): Promise<OwnerSetti
     .settings;
 }
 
+const mockStatusBeforePaid = new WeakMap<OwnerQuote, OwnerCustomerStatus | null>();
+
 export async function markOwnerQuotePaid(
   sessionToken: string,
   quoteId: string,
@@ -613,9 +615,15 @@ export async function markOwnerQuotePaid(
     const state = assertMockOwner(sessionToken);
     const quote = state.quotes.find((item) => item.id === quoteId);
     if (!quote) throw new GvasError("not_found", "not found", 404);
-    if (quote.billing !== "one_time" || quote.customerStatus !== "accepted") {
-      throw new GvasError("conflict", "Only accepted quotes can be marked paid.", 409);
+    const sent =
+      quote.customerStatus === "viewed" ||
+      quote.customerStatus === "accepted" ||
+      quote.status === "delivery_pending" ||
+      quote.status === "delivered";
+    if (quote.billing !== "one_time" || !sent || quote.customerStatus === "paid" || quote.customerStatus === "declined") {
+      throw new GvasError("conflict", "Only quotes sent to the customer can be marked paid.", 409);
     }
+    mockStatusBeforePaid.set(quote, quote.customerStatus);
     Object.assign(quote, {
       customerStatus: "paid",
       paidOn: new Date(`${payment.paidOn}T12:00:00Z`).toISOString(),
@@ -639,7 +647,12 @@ export async function markOwnerQuoteUnpaid(sessionToken: string, quoteId: string
     if (quote.paidBy?.source !== "manual") {
       throw new GvasError("conflict", "This quote has no payment to undo.", 409);
     }
-    Object.assign(quote, { customerStatus: "accepted", paidOn: null, paidBy: null });
+    const before = mockStatusBeforePaid.get(quote);
+    Object.assign(quote, {
+      customerStatus: before === undefined ? "accepted" : before,
+      paidOn: null,
+      paidBy: null,
+    });
     return quote;
   }
   return (

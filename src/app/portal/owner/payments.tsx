@@ -18,8 +18,11 @@ function today(zone: string): string {
 }
 
 export function canMarkPaid(quote: OwnerQuote): boolean {
-  if (quote.billing !== "one_time" || quote.status !== "delivered") return false;
-  return quote.customerStatus !== "paid" && quote.customerStatus !== "declined";
+  if (quote.billing !== "one_time") return false;
+  if (quote.customerStatus === "viewed" || quote.customerStatus === "accepted") return true;
+  // Sent: GVAS handed it to the e-mail/text provider (delivery confirmation may never come).
+  if (quote.customerStatus !== null && quote.customerStatus !== "sent") return false;
+  return quote.status === "delivery_pending" || quote.status === "delivered";
 }
 
 export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnTo: string; zone: string }) {
