@@ -56,7 +56,7 @@ export default async function OwnerCalendarPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-[17px] font-semibold text-ink">{rangeLabel}</h2>
-          <p className="mt-0.5 text-[12px] text-muted">Times shown in {zoneName(zone)} ({zone}).</p>
+          <p className="mt-0.5 text-[12px] text-muted">Times shown in {zoneName(zone)}.</p>
         </div>
         <div className="flex gap-2">
           <Link href={`/portal/owner/calendar?week=${week - 1}`} className={buttonSecondary}>
