@@ -14,16 +14,20 @@ const tabs = [
 export function OwnerNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Dashboard" className="-mx-1 flex flex-wrap gap-1">
-      {tabs.map((tab) => {
+    // Phone: two full-width rows (3 + 2 tabs), so the row sits centred under the
+    // heading. Wider screens: one left-aligned row of pills.
+    <nav aria-label="Dashboard" className="grid grid-cols-6 gap-1 sm:-mx-1 sm:flex sm:flex-wrap">
+      {tabs.map((tab, index) => {
         const active = pathname === tab.href;
         return (
           <Link
             key={tab.href}
             href={tab.href}
             aria-current={active ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-full px-3.5 py-1.5 text-[14px] font-medium transition-colors ${
-              active ? "bg-ink text-paper" : "text-muted hover:bg-ink/5 hover:text-ink"
+            className={`inline-flex min-h-11 items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-[14px] font-medium transition-colors sm:px-3.5 ${
+              index < 3 ? "col-span-2" : "col-span-3"
+            } ${
+              active ? "bg-action text-paper" : "text-muted hover:bg-ink/5 hover:text-ink"
             }`}
           >
             {tab.label}

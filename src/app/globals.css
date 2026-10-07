@@ -16,6 +16,29 @@
   --color-muted: #57534e;
   --color-line: #e7e5e4;
   --color-paper: #ffffff;
+  --color-action: #0c0a09;
+  --color-action-deep: #292524;
+  --brand-font-display: var(--font-figtree);
+  --brand-font-sans: var(--font-figtree);
+}
+
+/* Larkspur Lawn & Garden, the fictional demo business (NEXT_PUBLIC_BRAND=larkspur). */
+[data-brand="larkspur"] {
+  --color-orange: #2f6b3f;
+  --color-orange-deep: #244a31;
+  --color-orange-ink: #244a31;
+  --color-peach: #e9f0e4;
+  --color-peach-2: #f7f8f4;
+  --color-chip: #e4eedd;
+  --color-ink: #1e2a22;
+  --color-char: #2f5c3d;
+  --color-muted: #44514a;
+  --color-line: #e3e8de;
+  --color-paper: #ffffff;
+  --color-action: #2f6b3f;
+  --color-action-deep: #244a31;
+  --brand-font-display: var(--font-bricolage);
+  --brand-font-sans: var(--font-dm-sans);
 }
 
 @theme inline {
@@ -30,9 +53,11 @@
   --color-muted: var(--color-muted);
   --color-line: var(--color-line);
   --color-paper: var(--color-paper);
+  --color-action: var(--color-action);
+  --color-action-deep: var(--color-action-deep);
 
-  --font-display: var(--font-figtree);
-  --font-sans: var(--font-figtree);
+  --font-display: var(--brand-font-display);
+  --font-sans: var(--brand-font-sans);
 }
 
 body {
