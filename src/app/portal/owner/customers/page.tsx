@@ -1,21 +1,26 @@
+import Link from "next/link";
 import {
+  getOwnerBookings,
   getOwnerCustomers,
   getOwnerRequests,
   getOwnerTimeZone,
+  type OwnerBooking,
   type OwnerCustomer,
   type OwnerServiceRequest,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { Card, Empty, LoadError, Pill, formatDate, formatMoney, formatPhone } from "../ui";
+import { customerKey, withBookingOnly } from "./profile";
 
 export const dynamic = "force-dynamic";
 
 export default async function OwnerCustomersPage() {
   const token = await requireOwnerSessionToken();
   const zone = await getOwnerTimeZone(token);
-  const [customersResult, requestsResult] = await Promise.allSettled([
+  const [customersResult, requestsResult, bookingsResult] = await Promise.allSettled([
     getOwnerCustomers(token),
     getOwnerRequests(token),
+    getOwnerBookings(token),
   ]);
   let customers: OwnerCustomer[] | null = null;
   let requests: OwnerServiceRequest[] | null = null;
@@ -29,6 +34,13 @@ export default async function OwnerCustomersPage() {
     redirectOwnerOnUnauthorized(requestsResult.reason);
     console.error("OwnerCustomers: requests failed", requestsResult.reason);
   }
+  let bookings: OwnerBooking[] = [];
+  if (bookingsResult.status === "fulfilled") bookings = bookingsResult.value;
+  else {
+    redirectOwnerOnUnauthorized(bookingsResult.reason);
+    console.error("OwnerCustomers: bookings failed", bookingsResult.reason);
+  }
+  if (customers !== null) customers = withBookingOnly(customers, bookings);
 
   return (
     <div className="space-y-6">
@@ -36,7 +48,7 @@ export default async function OwnerCustomersPage() {
         {customers === null ? (
           <LoadError label="customers" />
         ) : customers.length === 0 ? (
-          <Empty>Customers show up here once you approve their first quote.</Empty>
+          <Empty>Customers show up here once they book a visit or you approve their first quote.</Empty>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-[14px]">
@@ -54,7 +66,12 @@ export default async function OwnerCustomersPage() {
                 {customers.map((customer) => (
                   <tr key={customer.email}>
                     <td className="px-5 py-3">
-                      <p className="font-medium text-ink">{customer.name ?? customer.email}</p>
+                      <Link
+                        href={`/portal/owner/customers/${customerKey(customer.email)}`}
+                        className="font-medium text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink"
+                      >
+                        {customer.name ?? customer.email}
+                      </Link>
                       {customer.name && <p className="text-[12px] text-muted">{customer.email}</p>}
                     </td>
                     <td className="px-5 py-3 text-muted">{customer.phone ? formatPhone(customer.phone) : "—"}</td>
@@ -65,7 +82,9 @@ export default async function OwnerCustomersPage() {
                         <Pill tone="muted">Email only</Pill>
                       )}
                     </td>
-                    <td className="px-5 py-3 tabular-nums text-ink">{customer.quoteCount}</td>
+                    <td className="px-5 py-3 tabular-nums text-ink">
+                      {customer.quoteCount || <span className="text-muted">No quote yet</span>}
+                    </td>
                     <td className="px-5 py-3 text-muted">{formatDate(customer.lastQuoteAt, zone)}</td>
                     <td className="px-5 py-3 text-right font-semibold tabular-nums text-ink">
                       {formatMoney(customer.paidCents)}

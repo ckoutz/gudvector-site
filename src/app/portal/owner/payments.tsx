@@ -139,6 +139,10 @@ export function isLiveManualPlan(plan: OwnerSubscription): boolean {
   return plan.manual === true && !ENDED.has(plan.status);
 }
 
+export function planEnded(plan: OwnerSubscription): boolean {
+  return ENDED.has(plan.status);
+}
+
 function per(interval: "month" | "year" | null): string {
   return interval === "year" ? "/yr" : "/mo";
 }
