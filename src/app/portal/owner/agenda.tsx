@@ -2,7 +2,7 @@ import type { CalendarSource, OwnerCalendarEvent } from "@/lib/owner";
 import { dayKey, formatTime } from "./ui";
 
 const sourceStyle: Record<CalendarSource, { label: string; dot: string }> = {
-  booking: { label: "Calendly booking", dot: "bg-orange" },
+  booking: { label: "Booked", dot: "bg-orange" },
   request: { label: "Waiting for your OK", dot: "border-2 border-orange bg-paper" },
   calendar: { label: "Your calendar", dot: "bg-ink/30" },
 };
