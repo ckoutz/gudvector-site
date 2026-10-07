@@ -1,3 +1,4 @@
+import { type BrandId, configuredBrandId } from "@/lib/brand-ids";
 import { siteConfig } from "@/lib/site-config";
 
 /**
@@ -6,7 +7,7 @@ import { siteConfig } from "@/lib/site-config";
  * brand serves only the portal, owner dashboard and quote pages, in the
  * business's colors, with a small "Powered by Güd Office" footer line.
  */
-export type BrandId = "gudvector" | "larkspur";
+export type { BrandId };
 
 export type Brand = {
   id: BrandId;
@@ -39,12 +40,6 @@ const brands: Record<BrandId, Brand> = {
   },
 };
 
-function isBrandId(value: string | undefined): value is BrandId {
-  return value !== undefined && Object.hasOwn(brands, value);
-}
-
-const configured = process.env.NEXT_PUBLIC_BRAND;
-
-export const brand: Brand = isBrandId(configured) ? brands[configured] : brands.gudvector;
+export const brand: Brand = brands[configuredBrandId()];
 
 export const isGudVector = brand.id === "gudvector";
