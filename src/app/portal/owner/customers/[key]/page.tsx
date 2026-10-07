@@ -156,8 +156,10 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
   const visits = visitsFor(customer, bookings, calendar);
   const upcoming = visits.filter((visit) => new Date(visit.start) >= now && visit.status[0] !== "Declined");
   const pastVisits = visits.filter((visit) => !upcoming.includes(visit)).reverse();
-  const openQuotes = theirQuotes.filter(isOpenQuote);
-  const closedQuotes = theirQuotes.filter((quote) => !isOpenQuote(quote));
+  // A quote that became a plan is listed as the plan.
+  const listed = theirQuotes.filter((quote) => !plans.some((plan) => plan.quoteId === quote.id));
+  const openQuotes = listed.filter(isOpenQuote);
+  const closedQuotes = listed.filter((quote) => !isOpenQuote(quote));
   const livePlans = plans.filter((plan) => !planEnded(plan));
   const endedPlans = plans.filter(planEnded);
   const unpaid = theirQuotes.filter((quote) => quote.customerStatus === "accepted" && quote.billing === "one_time");
