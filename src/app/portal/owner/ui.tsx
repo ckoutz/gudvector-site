@@ -18,7 +18,7 @@ export function formatPhone(phone: string): string {
   const trimmed = phone.trim();
   const digits = trimmed.replace(/\D/g, "");
   const local = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
-  if (local.length !== 10 || (trimmed.startsWith("+") && !trimmed.startsWith("+1"))) return phone;
+  if (!/^[2-9]\d{2}[2-9]\d{6}$/.test(local) || (trimmed.startsWith("+") && !trimmed.startsWith("+1"))) return phone;
   return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
 }
 
