@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isGudVector } from "@/lib/brand";
 import Link from "next/link";
 import { Eyebrow } from "@/components/section";
 import {
@@ -268,13 +269,15 @@ export default async function PortalDashboardPage() {
         </div>
       </section>
 
-      <p className="mt-12 text-[13px] text-muted">
-        Portal provided by{" "}
-        <Link href="/" className="font-medium text-orange-ink hover:text-orange-deep">
-          Güd Vector
-        </Link>{" "}
-        on behalf of {businessName}.
-      </p>
+      {isGudVector && (
+        <p className="mt-12 text-[13px] text-muted">
+          Portal provided by{" "}
+          <Link href="/" className="font-medium text-orange-ink hover:text-orange-deep">
+            Güd Vector
+          </Link>{" "}
+          on behalf of {businessName}.
+        </p>
+      )}
     </div>
   );
 }

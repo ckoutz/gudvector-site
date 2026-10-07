@@ -4,6 +4,8 @@ import { useActionState } from "react";
 import type { OwnerSettings } from "@/lib/owner";
 import { saveSettingsAction, type SettingsState } from "../actions";
 import { Card, Pill, buttonPrimary } from "../ui";
+import { isGudVector } from "@/lib/brand";
+import { siteConfig } from "@/lib/site-config";
 
 const input =
   "mt-1.5 w-full rounded-xl border border-line bg-paper px-3.5 py-2.5 text-[14px] text-ink placeholder:text-muted/60 focus:border-ink/40 focus:outline-none";
@@ -101,7 +103,7 @@ export function SettingsForm({ settings }: { settings: OwnerSettings }) {
                 </>
               )}
             </p>
-            <p className="mt-1">Contact Güd Vector to change these.</p>
+            <p className="mt-1">Contact {isGudVector ? "Güd Vector" : siteConfig.officeName} to change these.</p>
           </div>
         </div>
       </Card>

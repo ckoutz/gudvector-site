@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { isGudVector } from "@/lib/brand";
 import { getOwnerMe, type OwnerMe } from "@/lib/owner";
+import { siteConfig } from "@/lib/site-config";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { signOutOwner } from "./actions";
 import { OwnerNav } from "./nav";
@@ -26,7 +28,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-orange-ink">
-            Güd Office
+            {isGudVector ? siteConfig.officeName : "Owner dashboard"}
           </p>
           <h1 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
             {me?.business.displayName ?? "Owner dashboard"}

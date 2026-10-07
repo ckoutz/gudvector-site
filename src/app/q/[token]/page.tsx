@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { brand, isGudVector } from "@/lib/brand";
 import Link from "next/link";
 import { Eyebrow } from "@/components/section";
 import { CtaButton } from "@/components/cta-button";
@@ -54,8 +55,8 @@ function NotFoundState() {
         is more than a few weeks old, ask the business to send it again.
       </p>
       <div className="mt-8">
-        <CtaButton href="/" variant="ghost">
-          Back to gudvector.com
+        <CtaButton href={brand.homeUrl} variant="ghost">
+          Back to {brand.homeLabel}
         </CtaButton>
       </div>
     </Shell>
@@ -211,13 +212,15 @@ export default async function QuotePage({ params, searchParams }: PageProps<"/q/
         )}
       </div>
 
-      <p className="mt-12 text-[13px] text-muted">
-        Quote delivered by{" "}
-        <Link href="/" className="font-medium text-orange-ink hover:text-orange-deep">
-          Güd Vector
-        </Link>{" "}
-        on behalf of {business.displayName}.
-      </p>
+      {isGudVector && (
+        <p className="mt-12 text-[13px] text-muted">
+          Quote delivered by{" "}
+          <Link href="/" className="font-medium text-orange-ink hover:text-orange-deep">
+            Güd Vector
+          </Link>{" "}
+          on behalf of {business.displayName}.
+        </p>
+      )}
     </Shell>
   );
 }

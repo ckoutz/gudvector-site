@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { isGudVector } from "@/lib/brand";
 import { siteConfig } from "@/lib/site-config";
 
 const disallow = ["/portal", "/portal/", "/api/", "/q/"];
@@ -19,6 +20,9 @@ const searchAndRetrievalBots = [
 const trainingBots = ["GPTBot", "ClaudeBot", "Google-Extended"];
 
 export default function robots(): MetadataRoute.Robots {
+  if (!isGudVector) {
+    return { rules: [{ userAgent: "*", disallow: "/" }] };
+  }
   return {
     rules: [
       { userAgent: "*", allow: "/", disallow },
