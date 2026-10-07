@@ -91,7 +91,8 @@ export function PaidBy({
     <div className="mt-1 text-[12px] text-muted">
       Paid by {methodLabel[paid.method] ?? paid.method}, {formatDate(quote.paidOn, zone)}
       {paid.note ? ` · ${paid.note}` : ""}
-      {paid.source === "manual" && (
+      {/* A plan payment is undone from its plan, not from the quote. */}
+      {paid.source === "manual" && quote.billing !== "recurring" && (
         <details className="mt-1">
           <summary className="inline-flex min-h-11 cursor-pointer items-center underline underline-offset-2">
             Mark unpaid
