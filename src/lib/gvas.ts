@@ -723,8 +723,8 @@ function mockIntakeReply(
         reference: conv.booking?.reference ?? "mock01",
       };
       reply = rescheduling
-        ? "Done — I've updated your request to that time. The team will confirm by email or text shortly."
-        : "Great — I've sent that time to the team for approval. You'll get a confirmation by email or text shortly.";
+        ? "Done — I've updated your request to that time. The team will confirm by email shortly."
+        : "Great — I've sent that time to the team for approval. You'll get a confirmation by email shortly.";
       break;
     }
     case "done": {
@@ -747,7 +747,7 @@ function mockIntakeReply(
       break;
     }
     default:
-      reply = "This request is with the team now — you'll hear back by email or text.";
+      reply = "This request is with the team now — you'll hear back by email.";
   }
 
   conv.summary = summary;

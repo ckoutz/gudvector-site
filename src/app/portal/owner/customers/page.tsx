@@ -6,7 +6,7 @@ import {
   type OwnerServiceRequest,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
-import { Card, Empty, LoadError, Pill, formatDate, formatMoney } from "../ui";
+import { Card, Empty, LoadError, Pill, formatDate, formatMoney, formatPhone } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +57,7 @@ export default async function OwnerCustomersPage() {
                       <p className="font-medium text-ink">{customer.name ?? customer.email}</p>
                       {customer.name && <p className="text-[12px] text-muted">{customer.email}</p>}
                     </td>
-                    <td className="px-5 py-3 text-muted">{customer.phone ?? "—"}</td>
+                    <td className="px-5 py-3 text-muted">{customer.phone ? formatPhone(customer.phone) : "—"}</td>
                     <td className="px-5 py-3">
                       {customer.smsConsent ? (
                         <Pill tone="green">OK to text</Pill>

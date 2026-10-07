@@ -13,6 +13,15 @@ export function formatMoney(cents: number, currency: string | null = "USD"): str
   }).format(cents / 100);
 }
 
+/** US numbers as "(510) 555-0163", however they were typed; anything else as stored. */
+export function formatPhone(phone: string): string {
+  const trimmed = phone.trim();
+  const digits = trimmed.replace(/\D/g, "");
+  const local = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  if (local.length !== 10 || (trimmed.startsWith("+") && !trimmed.startsWith("+1"))) return phone;
+  return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
+}
+
 export function formatDate(iso: string | null, zone: string = DEFAULT_TIME_ZONE): string {
   if (!iso) return "—";
   return new Intl.DateTimeFormat("en-US", {

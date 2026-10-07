@@ -1,6 +1,6 @@
 import type { OwnerBooking, OwnerQuote } from "@/lib/owner";
 import { decideBookingAction, decideQuoteAction } from "./actions";
-import { buttonPrimary, buttonSecondary, formatDateTime, formatMoney } from "./ui";
+import { buttonPrimary, buttonSecondary, formatDateTime, formatMoney, formatPhone } from "./ui";
 
 export function QuoteDecision({ quote, returnTo }: { quote: OwnerQuote; returnTo: string }) {
   return (
@@ -52,7 +52,7 @@ export function BookingDecision({
       <p className="mt-1 text-[13px] text-muted">
         {formatDateTime(booking.requestedStart, zone)}
         {booking.customer.address ? ` · ${booking.customer.address}` : ""}
-        {booking.customer.phone ? ` · ${booking.customer.phone}` : ""}
+        {booking.customer.phone ? ` · ${formatPhone(booking.customer.phone)}` : ""}
       </p>
       {booking.details && <p className="mt-1 text-[14px] text-ink">{booking.details}</p>}
       <form action={decideBookingAction} className="mt-3 flex flex-wrap items-center gap-2">

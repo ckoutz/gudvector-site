@@ -31,8 +31,8 @@ export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnT
   return (
     <li className="px-5 py-4">
       <details className="group">
-        <summary className="flex min-h-11 cursor-pointer list-none flex-wrap items-center justify-between gap-3">
-          <span className="min-w-0">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3">
+          <span className="min-w-0 flex-1">
             <span className="block font-semibold text-ink">
               {quote.customer.name ?? quote.customer.email ?? "Customer"} ·{" "}
               <span className="tabular-nums">{formatMoney(quote.totalCents, quote.currency)}</span>
@@ -42,7 +42,7 @@ export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnT
               {quote.customerStatus !== "accepted" && " · not accepted yet"}
             </span>
           </span>
-          <span className={`${buttonSecondary} min-h-11 group-open:hidden`}>Mark paid</span>
+          <span className={`${buttonSecondary} min-h-11 shrink-0 group-open:hidden`}>Mark paid</span>
         </summary>
         <form action={markPaidAction} className="mt-4 grid gap-3 sm:grid-cols-[auto_auto_1fr_auto] sm:items-end">
           <input type="hidden" name="quoteId" value={quote.id} />
@@ -75,6 +75,8 @@ export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnT
 export function PaidBy({ quote, returnTo, zone }: { quote: OwnerQuote; returnTo: string; zone: string }) {
   const paid = quote.paidBy;
   if (!paid || !quote.paidOn) return null;
+  // A check/cash plan payment is listed, with its Undo, under Monthly plans.
+  if (quote.billing === "recurring" && paid.source === "manual") return null;
   return (
     <div className="mt-1 text-[12px] text-muted">
       Paid by {methodLabel[paid.method] ?? paid.method}, {formatDate(quote.paidOn, zone)}
