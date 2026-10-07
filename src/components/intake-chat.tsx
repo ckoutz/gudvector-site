@@ -32,7 +32,7 @@ const OWNER_POLL_MS = 15_000;
 const TERMINAL_COPY: Partial<Record<IntakeState, { title: string; body: string }>> = {
   declined: {
     title: "That time didn't work out.",
-    body: "That slot didn&apos;t work for Güd Vector. Reply to the confirmation email or text to find another time.",
+    body: "That slot didn&apos;t work for Güd Vector. Reply to the confirmation email to find another time.",
   },
   closed: {
     title: "This conversation is closed.",

@@ -142,7 +142,12 @@ export default async function OwnerQuotesPage({
                       </td>
                       <td className="px-5 py-3">
                         <Pill tone={tone}>{label}</Pill>
-                        <PaidBy quote={quote} returnTo={RETURN} zone={zone} />
+                        <PaidBy
+                          quote={quote}
+                          returnTo={RETURN}
+                          zone={zone}
+                          planListed={shownPlans.some((plan) => plan.quoteId === quote.id && plan.manual)}
+                        />
                       </td>
                       <td className="px-5 py-3 text-muted">{formatDate(quote.createdAt, zone)}</td>
                       <td className="px-5 py-3 text-right font-semibold tabular-nums text-ink">
