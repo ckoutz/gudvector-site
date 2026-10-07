@@ -39,7 +39,12 @@ export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnT
             </span>
             <span className="block text-[13px] text-muted">
               {quote.lineItems.map((item) => item.description).join(", ") || "Quote"}
-              {quote.customerStatus !== "accepted" && " · not accepted yet"}
+              {quote.customerStatus !== "accepted" && (
+                <>
+                  {" · "}
+                  <span className="whitespace-nowrap">not accepted yet</span>
+                </>
+              )}
             </span>
           </span>
           <span className={`${buttonSecondary} min-h-11 shrink-0 group-open:hidden`}>Mark paid</span>
@@ -193,7 +198,12 @@ export function StartPlan({ quote, returnTo, zone }: { quote: OwnerQuote; return
         </span>
         <span className="block text-[13px] text-muted">
           {quote.lineItems.map((item) => item.description).join(", ") || "Plan"}
-          {quote.customerStatus !== "accepted" && quote.customerStatus !== "paid" && " · not accepted yet"}
+          {quote.customerStatus !== "accepted" && quote.customerStatus !== "paid" && (
+            <>
+              {" · "}
+              <span className="whitespace-nowrap">not accepted yet</span>
+            </>
+          )}
         </span>
       </p>
       <RecordPlanPayment quote={quote} returnTo={returnTo} zone={zone} />
