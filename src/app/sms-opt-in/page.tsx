@@ -6,12 +6,12 @@ import { SMS_CONSENT_COPY } from "@/lib/sms";
 export const metadata: Metadata = {
   title: "SMS Notifications",
   description:
-    "How customers and business owners opt in to SMS notifications from Güd Vector at +1 (877) 541-1550, what messages to expect, how often, and how to opt out.",
+    "How customers and business owners opt in to SMS notifications from Güd Vector at +1 (925) 594-6915, what messages to expect, how often, and how to opt out.",
   alternates: { canonical: "/sms-opt-in" },
 };
 
-const smsNumber = "+1 (877) 541-1550";
-const supportEmail = "cameron@gudvector.com";
+const smsNumber = "+1 (925) 594-6915";
+const supportEmail = "info@gudvector.com";
 
 const linkClass = "font-medium text-orange-ink underline underline-offset-2";
 
@@ -43,7 +43,7 @@ export default function SmsOptInPage() {
       <div className="prose-legal mt-8 space-y-8 text-[16px] leading-relaxed text-char">
         <p>
           {siteConfig.legalName} sends transactional text messages from{" "}
-          <a href="tel:+18775411550" className="font-medium text-orange-ink">
+          <a href="tel:+19255946915" className="font-medium text-orange-ink">
             {smsNumber}
           </a>{" "}
           to two groups of people who have opted in: <strong>customers</strong> who book a

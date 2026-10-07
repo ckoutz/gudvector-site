@@ -54,7 +54,7 @@ export default function TermsPage() {
           <h2 className="font-display text-xl font-semibold text-ink">Payment and SMS</h2>
           <p className="mt-2">
             Payment is processed by Stripe. Text messages are sent through Telnyx from
-            +1 (877) 541-1550, only to people who opt in. Message frequency varies. Message
+            +1 (925) 594-6915, only to people who opt in. Message frequency varies. Message
             and data rates may apply. Reply STOP to opt out or HELP for help. Details are on
             the{" "}
             <Link
