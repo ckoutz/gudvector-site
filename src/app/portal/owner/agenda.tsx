@@ -1,5 +1,5 @@
 import type { CalendarSource, OwnerBooking, OwnerCalendarEvent } from "@/lib/owner";
-import { dayKey, formatPhone, formatTime } from "./ui";
+import { dayKey, formatDate, formatDateTime, formatPhone, formatTime } from "./ui";
 
 const sourceStyle: Record<CalendarSource, { label: string; dot: string }> = {
   booking: { label: "Booked", dot: "bg-orange" },
@@ -99,6 +99,21 @@ function mapsLink(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
+/** Times for a one-day event; dates too when it spans days. All-day ends are exclusive, at UTC midnight. */
+function describeWhen(event: OwnerCalendarEvent, zone: string): string {
+  if (event.allDay) {
+    const first = event.start.slice(0, 10);
+    const last = event.end ? new Date(new Date(event.end).getTime() - 1).toISOString().slice(0, 10) : first;
+    const date = (key: string) => formatDate(`${key}T12:00:00Z`, "UTC");
+    return last > first ? `All day, ${date(first)} – ${date(last)}` : "All day";
+  }
+  if (!event.end) return formatTime(event.start, zone);
+  if (dayKey(event.start, zone) === dayKey(new Date(new Date(event.end).getTime() - 1), zone)) {
+    return `${formatTime(event.start, zone)} – ${formatTime(event.end, zone)}`;
+  }
+  return `${formatDateTime(event.start, zone)} – ${formatDateTime(event.end, zone)}`;
+}
+
 function EventDetails({
   event,
   booking,
@@ -112,9 +127,7 @@ function EventDetails({
   const name = booking?.customer.name ?? event.inviteeName;
   const email = booking?.customer.email ?? event.inviteeEmail;
   const phone = booking?.customer.phone;
-  const when = event.allDay
-    ? "All day"
-    : `${formatTime(event.start, zone)}${event.end ? ` – ${formatTime(event.end, zone)}` : ""}`;
+  const when = describeWhen(event, zone);
   const rows: [string, React.ReactNode][] = [["When", when]];
   if (name) rows.push(["Customer", name]);
   if (phone) {
