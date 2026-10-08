@@ -120,6 +120,8 @@ export type OwnerBooking = {
   needsDecision: boolean;
   customer: { name: string | null; email: string | null; phone: string | null; address: string | null };
   details: string | null;
+  /** Gus's notes from the chat; absent on older backends. */
+  notes?: string | null;
   urgency: string | null;
   requestedStart: string | null;
   requestedEnd: string | null;
