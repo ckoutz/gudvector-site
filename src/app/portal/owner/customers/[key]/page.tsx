@@ -125,7 +125,7 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
   const theirQuotes = (quotes ?? [])
     .filter((quote) => linked.has(quote.id) || sameEmail(quote.customer.email, customer.email))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  const ids = new Set(theirQuotes.map((quote) => quote.id));
+  const ids = new Set([...linked, ...theirQuotes.map((quote) => quote.id)]);
   const quoteFor = (id: string) => theirQuotes.find((quote) => quote.id === id);
   const plans = (plansAll ?? []).filter((plan) => ids.has(plan.quoteId));
   const ledger = (payments ?? []).filter((payment) => ids.has(payment.quoteId) && payment.counts);
