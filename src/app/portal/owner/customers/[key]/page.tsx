@@ -16,7 +16,7 @@ import {
   type OwnerSubscription,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
-import { formatDay, planEnded } from "../../payments";
+import { formatDay, planEnded, planLapsed } from "../../payments";
 import { Card, Empty, LoadError, Pill, formatDate, formatDateTime, formatMoney, formatPhone, quoteStatus } from "../../ui";
 import { customerKey, sameEmail, withBookingOnly } from "../profile";
 
@@ -120,10 +120,12 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
   const payments: OwnerPayment[] | null = value(p, "payments");
   const calendar: OwnerCalendar | null = value(cal, "calendar");
 
-  const ids = new Set(customer.quoteIds);
+  // GVAS links a quote to the customer once it's approved; pending ones match by e-mail.
+  const linked = new Set(customer.quoteIds);
   const theirQuotes = (quotes ?? [])
-    .filter((quote) => ids.has(quote.id))
+    .filter((quote) => linked.has(quote.id) || sameEmail(quote.customer.email, customer.email))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const ids = new Set(theirQuotes.map((quote) => quote.id));
   const quoteFor = (id: string) => theirQuotes.find((quote) => quote.id === id);
   const plans = (plansAll ?? []).filter((plan) => ids.has(plan.quoteId));
   const ledger = (payments ?? []).filter((payment) => ids.has(payment.quoteId) && payment.counts);
@@ -176,8 +178,9 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
 
   const planLine = (plan: OwnerSubscription) => {
     const quote = quoteFor(plan.quoteId);
+    const lapsed = planLapsed(plan, zone);
     const when = plan.manual
-      ? `Check / cash · paid through ${formatDay(plan.paidThrough)}`
+      ? `Check / cash · ${lapsed ? "ran out" : "paid through"} ${formatDay(plan.paidThrough)}`
       : `Card · ${plan.cancelAtPeriodEnd ? "cancels" : "renews"} ${formatDate(plan.currentPeriodEnd, zone)}`;
     return (
       <li key={plan.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
@@ -191,8 +194,12 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
           </p>
           <p className="text-[12px] text-muted">{when}</p>
         </div>
-        <Pill tone={plan.status === "active" ? "green" : plan.status === "past_due" ? "red" : "muted"}>
-          {plan.status === "past_due" ? "Past due" : planEnded(plan) ? "Ended" : "Active"}
+        <Pill
+          tone={
+            planEnded(plan) ? "muted" : lapsed || plan.status === "past_due" ? "red" : plan.status === "active" ? "green" : "muted"
+          }
+        >
+          {planEnded(plan) ? "Ended" : lapsed ? "Ran out" : plan.status === "past_due" ? "Past due" : "Active"}
         </Pill>
       </li>
     );
