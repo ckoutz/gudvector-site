@@ -18,7 +18,7 @@ export function OwnerNav() {
     // heading. Wider screens: one left-aligned row of pills.
     <nav aria-label="Dashboard" className="grid grid-cols-6 gap-1 sm:-mx-1 sm:flex sm:flex-wrap">
       {tabs.map((tab, index) => {
-        const active = pathname === tab.href;
+        const active = pathname === tab.href || (tab.href !== "/portal/owner" && pathname.startsWith(`${tab.href}/`));
         return (
           <Link
             key={tab.href}

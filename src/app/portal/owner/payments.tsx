@@ -18,6 +18,11 @@ function today(zone: string): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: zone }).format(new Date());
 }
 
+/** A check/cash plan whose paid-through date has passed. */
+export function planLapsed(plan: OwnerSubscription, zone: string): boolean {
+  return plan.manual === true && !!plan.paidThrough && plan.paidThrough < today(zone);
+}
+
 export function canMarkPaid(quote: OwnerQuote): boolean {
   if (quote.billing !== "one_time") return false;
   if (quote.customerStatus === "viewed" || quote.customerStatus === "accepted") return true;
@@ -139,6 +144,10 @@ export function isLiveManualPlan(plan: OwnerSubscription): boolean {
   return plan.manual === true && !ENDED.has(plan.status);
 }
 
+export function planEnded(plan: OwnerSubscription): boolean {
+  return ENDED.has(plan.status);
+}
+
 function per(interval: "month" | "year" | null): string {
   return interval === "year" ? "/yr" : "/mo";
 }
@@ -228,7 +237,7 @@ export function ManualPlan({
   const active = (payments ?? [])
     .filter((p) => p.quoteId === plan.quoteId && p.kind === "plan" && p.source === "manual" && !p.voidedAt)
     .sort((a, b) => (b.paidOn ?? "").localeCompare(a.paidOn ?? ""));
-  const lapsed = !!plan.paidThrough && plan.paidThrough < today(zone);
+  const lapsed = planLapsed(plan, zone);
   return (
     <div className="mt-2 space-y-2">
       <p className={`text-[13px] ${lapsed ? "font-semibold text-red-700" : "text-muted"}`}>
