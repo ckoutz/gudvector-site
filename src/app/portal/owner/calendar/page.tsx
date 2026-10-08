@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { getOwnerCalendar, getOwnerTimeZone, type OwnerCalendar } from "@/lib/owner";
+import {
+  getOwnerBookings,
+  getOwnerCalendar,
+  getOwnerTimeZone,
+  type OwnerBooking,
+  type OwnerCalendar,
+} from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { CalendarLegend, DayAgenda } from "../agenda";
 import { Card, LoadError, buttonSecondary, dayKey, firstParam, onDay, zoneName } from "../ui";
@@ -42,11 +48,21 @@ export default async function OwnerCalendarPage({
   end.setUTCDate(end.getUTCDate() + 2);
 
   let calendar: OwnerCalendar | null = null;
-  try {
-    calendar = await getOwnerCalendar(token, start, end);
-  } catch (err) {
-    redirectOwnerOnUnauthorized(err);
-    console.error("OwnerCalendar: load failed", err);
+  let bookings: OwnerBooking[] = [];
+  const [calendarResult, bookingsResult] = await Promise.allSettled([
+    getOwnerCalendar(token, start, end),
+    getOwnerBookings(token),
+  ]);
+  if (calendarResult.status === "fulfilled") {
+    calendar = calendarResult.value;
+  } else {
+    redirectOwnerOnUnauthorized(calendarResult.reason);
+    console.error("OwnerCalendar: load failed", calendarResult.reason);
+  }
+  if (bookingsResult.status === "fulfilled") {
+    bookings = bookingsResult.value;
+  } else {
+    console.error("OwnerCalendar: bookings load failed", bookingsResult.reason);
   }
 
   const rangeLabel = `${dayLabel(keys[0])} – ${dayLabel(keys[DAYS - 1])}`;
@@ -92,7 +108,7 @@ export default async function OwnerCalendarPage({
             return (
               <div key={key} id={`day-${key}`} className="scroll-mt-4">
                 <Card title={`${dayLabel(key)}${key === todayKey ? " · Today" : ""}`}>
-                  <DayAgenda events={events} empty="Nothing scheduled." zone={zone} day={key} />
+                  <DayAgenda events={events} bookings={bookings} empty="Nothing scheduled." zone={zone} day={key} />
                 </Card>
               </div>
             );

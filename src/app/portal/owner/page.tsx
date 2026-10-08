@@ -249,7 +249,7 @@ export default async function OwnerTodayPage({
               {calendar === null ? (
                 <LoadError label="your calendar" />
               ) : (
-                <DayAgenda events={todaysEvents} problems={calendar.problems} empty="Nothing on the calendar today." zone={zone} day={today} />
+                <DayAgenda events={todaysEvents} bookings={bookings ?? []} problems={calendar.problems} empty="Nothing on the calendar today." zone={zone} day={today} />
               )}
             </Card>
           </div>
