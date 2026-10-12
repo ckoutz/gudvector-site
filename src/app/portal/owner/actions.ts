@@ -11,6 +11,7 @@ import {
   markOwnerQuotePaid,
   markOwnerQuoteUnpaid,
   recordOwnerPlanPayment,
+  sendOwnerInvoice,
   undoOwnerPlanPayment,
   type ManualPaymentMethod,
   updateOwnerSettings,
@@ -27,6 +28,7 @@ const PAGES = new Set([
   "/portal/owner/calendar",
   "/portal/owner/customers",
   "/portal/owner/quotes",
+  "/portal/owner/invoices",
 ]);
 
 function returnPath(formData: FormData): string {
@@ -81,6 +83,28 @@ export async function markPaidAction(formData: FormData): Promise<void> {
       query = { notice: "quote-stale" };
     } else {
       console.error("markPaidAction failed", err);
+      query = { notice: "failed" };
+    }
+  }
+  back(path, query);
+}
+
+export async function sendInvoiceAction(formData: FormData): Promise<void> {
+  const token = await requireOwnerSessionToken();
+  const path = returnPath(formData);
+  const id = String(formData.get("quoteId") ?? "");
+  let query: Record<string, string>;
+  try {
+    const invoice = await sendOwnerInvoice(token, id);
+    query = { notice: "invoice-sent", invoice: invoice.number };
+  } catch (err) {
+    redirectOwnerOnUnauthorized(err);
+    if (isGvasError(err) && err.kind === "conflict") {
+      query = { message: err.message };
+    } else if (isGvasError(err) && err.kind === "not_found") {
+      query = { notice: "quote-stale" };
+    } else {
+      console.error("sendInvoiceAction failed", err);
       query = { notice: "failed" };
     }
   }

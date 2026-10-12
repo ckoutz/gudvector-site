@@ -192,8 +192,34 @@ export type OwnerMe = {
     siteUrl: string | null;
     calendlyUrl: string | null;
     timezone: string | null;
+    /** Invoices are switched on for this business (the demo, for now). */
+    invoices?: boolean;
   };
 };
+
+export type OwnerInvoiceStatus = "sent" | "paid" | "overdue";
+
+export type OwnerInvoice = {
+  number: string;
+  quoteId: string;
+  status: OwnerInvoiceStatus;
+  customer: {
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+    serviceAddress: string | null;
+  };
+  lineItems: { description: string; quantity: number; unitPriceCents: number }[];
+  totalCents: number;
+  currency: string;
+  sentAt: string;
+  /** yyyy-mm-dd in the business's zone. */
+  dueOn: string;
+  paidOn: string | null;
+  paidBy: OwnerQuotePaidBy | null;
+};
+
+export type OwnerInvoices = { enabled: boolean; invoices: OwnerInvoice[] };
 
 export type BookingDecisionResult = { applied: boolean; message: string };
 
@@ -210,7 +236,11 @@ type MockOwnerState = {
   statusBeforePaid: Map<string, OwnerCustomerStatus | null>;
   plans: OwnerSubscription[];
   payments: OwnerPayment[];
+  invoices: OwnerInvoice[];
 };
+
+/** Mock mode shows invoices only when asked, like a production business without them. */
+const mockInvoicesOn = () => process.env.GVAS_MOCK_INVOICES === "1";
 
 const MOCK_ZONE = "America/Los_Angeles";
 
@@ -274,6 +304,7 @@ function mockOwnerState(): MockOwnerState {
     statusBeforePaid: new Map(),
     plans: [],
     payments: [],
+    invoices: [],
     sessions: new Set<string>(),
     quotes: [
       quote(
@@ -537,6 +568,7 @@ export async function getOwnerMe(sessionToken: string): Promise<OwnerMe> {
         siteUrl: state.settings.siteUrl,
         calendlyUrl: state.settings.calendlyUrl,
         timezone: state.settings.timezone,
+        invoices: mockInvoicesOn(),
       },
     };
   }
@@ -760,6 +792,64 @@ export async function markOwnerQuoteUnpaid(sessionToken: string, quoteId: string
       method: "POST",
     })
   ).quote;
+}
+
+function mockInvoiceView(state: MockOwnerState, invoice: OwnerInvoice): OwnerInvoice {
+  const quote = state.quotes.find((item) => item.id === invoice.quoteId);
+  const paid = quote?.customerStatus === "paid";
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: MOCK_ZONE });
+  return {
+    ...invoice,
+    status: paid ? "paid" : today > invoice.dueOn ? "overdue" : "sent",
+    paidOn: paid ? (quote?.paidOn ?? null) : null,
+    paidBy: paid ? (quote?.paidBy ?? null) : null,
+  };
+}
+
+export async function getOwnerInvoices(sessionToken: string): Promise<OwnerInvoices> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    if (!mockInvoicesOn()) return { enabled: false, invoices: [] };
+    return { enabled: true, invoices: state.invoices.map((invoice) => mockInvoiceView(state, invoice)) };
+  }
+  return ownerRequest<OwnerInvoices>("/v1/owner/invoices", sessionToken);
+}
+
+/** Invoice an accepted one-off quote: an exact copy, due in 14 days. GVAS records it; nothing is e-mailed yet. */
+export async function sendOwnerInvoice(sessionToken: string, quoteId: string): Promise<OwnerInvoice> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    const quote = state.quotes.find((item) => item.id === quoteId);
+    if (!mockInvoicesOn() || !quote) throw new GvasError("not_found", "not found", 404);
+    if (quote.billing !== "one_time" || (quote.customerStatus !== "accepted" && quote.customerStatus !== "paid")) {
+      throw new GvasError("conflict", "Only accepted quotes can be invoiced.", 409);
+    }
+    if (state.invoices.some((item) => item.quoteId === quoteId)) {
+      throw new GvasError("conflict", "This quote already has an invoice.", 409);
+    }
+    const due = new Date();
+    due.setDate(due.getDate() + 14);
+    const invoice: OwnerInvoice = {
+      number: `INV-${1001 + state.invoices.length}`,
+      quoteId,
+      status: "sent",
+      customer: { ...quote.customer },
+      lineItems: quote.lineItems.map((item) => ({ ...item })),
+      totalCents: quote.totalCents,
+      currency: quote.currency ?? "USD",
+      sentAt: new Date().toISOString(),
+      dueOn: due.toLocaleDateString("en-CA", { timeZone: MOCK_ZONE }),
+      paidOn: null,
+      paidBy: null,
+    };
+    state.invoices.push(invoice);
+    return mockInvoiceView(state, invoice);
+  }
+  return (
+    await ownerRequest<{ invoice: OwnerInvoice }>(`/v1/owner/quotes/${enc(quoteId)}/send-invoice`, sessionToken, {
+      method: "POST",
+    })
+  ).invoice;
 }
 
 export async function getOwnerPayments(sessionToken: string): Promise<OwnerPayment[]> {
