@@ -137,6 +137,7 @@ export default async function OwnerTodayPage({
       label: "Paid this month",
       value: paidThisMonth === null ? "—" : formatMoney(paidThisMonth),
       detail: paidThisMonth === null ? "Couldn't load payments" : monthName,
+      href: "/portal/owner/quotes",
     },
     openInvoices
       ? {
@@ -145,11 +146,13 @@ export default async function OwnerTodayPage({
           detail: `${openInvoices.length} ${openInvoices.length === 1 ? "invoice" : "invoices"} due${
             overdueCount > 0 ? `, ${overdueCount} overdue` : ""
           }`,
+          href: "/portal/owner/invoices",
         }
       : {
           label: "Outstanding",
           value: quotes === null ? "—" : formatMoney(unpaid.reduce((sum, quote) => sum + quote.totalCents, 0)),
           detail: quotes === null ? "Couldn't load quotes" : `${unpaid.length} accepted, not paid yet`,
+          href: "/portal/owner/quotes",
         },
   ];
 
@@ -237,7 +240,7 @@ export default async function OwnerTodayPage({
             {money.map((stat) => (
               <Link
                 key={stat.label}
-                href={openInvoices ? "/portal/owner/invoices" : "/portal/owner/quotes"}
+                href={stat.href}
                 className="block min-h-11 rounded-2xl border border-line bg-paper px-4 py-3.5 transition-colors hover:border-ink/30"
               >
                 <dt className="text-[12px] font-medium text-muted">{stat.label}</dt>
