@@ -237,7 +237,7 @@ export default async function OwnerTodayPage({
             {money.map((stat) => (
               <Link
                 key={stat.label}
-                href="/portal/owner/quotes"
+                href={openInvoices ? "/portal/owner/invoices" : "/portal/owner/quotes"}
                 className="block min-h-11 rounded-2xl border border-line bg-paper px-4 py-3.5 transition-colors hover:border-ink/30"
               >
                 <dt className="text-[12px] font-medium text-muted">{stat.label}</dt>

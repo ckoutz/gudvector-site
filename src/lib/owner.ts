@@ -812,7 +812,13 @@ export async function getOwnerInvoices(sessionToken: string): Promise<OwnerInvoi
     if (!mockInvoicesOn()) return { enabled: false, invoices: [] };
     return { enabled: true, invoices: state.invoices.map((invoice) => mockInvoiceView(state, invoice)) };
   }
-  return ownerRequest<OwnerInvoices>("/v1/owner/invoices", sessionToken);
+  try {
+    return await ownerRequest<OwnerInvoices>("/v1/owner/invoices", sessionToken);
+  } catch (err) {
+    // A backend without invoices has no such route: treat it as invoices off.
+    if (err instanceof GvasError && err.status === 404) return { enabled: false, invoices: [] };
+    throw err;
+  }
 }
 
 /** Invoice an accepted one-off quote: an exact copy, due in 14 days. GVAS records it; nothing is e-mailed yet. */
