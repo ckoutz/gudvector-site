@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getOwnerInvoices,
@@ -118,7 +119,12 @@ export default async function OwnerInvoicesPage({
           <dd className="mt-1 font-display text-2xl font-semibold tabular-nums text-ink">
             {paidThisMonth === null ? "—" : formatMoney(paidThisMonth)}
           </dd>
-          <dd className="text-[13px] text-muted">All payments, plans included</dd>
+          <dd className="text-[13px] text-muted">
+            All payments,{" "}
+            <Link href="/portal/owner/quotes" className="underline underline-offset-2 hover:text-ink">
+              plans included
+            </Link>
+          </dd>
         </div>
       </dl>
 

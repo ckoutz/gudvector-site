@@ -137,7 +137,7 @@ export default async function OwnerTodayPage({
       label: "Paid this month",
       value: paidThisMonth === null ? "—" : formatMoney(paidThisMonth),
       detail: paidThisMonth === null ? "Couldn't load payments" : monthName,
-      href: "/portal/owner/quotes",
+      href: openInvoices ? "/portal/owner/invoices" : "/portal/owner/quotes",
     },
     openInvoices
       ? {
