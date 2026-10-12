@@ -19,14 +19,20 @@ const cookieOptions = {
 
 export const dynamic = "force-dynamic";
 
+// A relative Location keeps the browser on the address it came in on: the
+// Larkspur site serves this dashboard under its own address through a proxy,
+// where request.url is this deployment's own host.
+function redirectTo(path: string) {
+  return new NextResponse(null, { status: 307, headers: { location: path } });
+}
+
+function loginWithError(error: "link" | "unavailable") {
+  return redirectTo(`/portal/login?error=${error}`);
+}
+
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
-  const loginUrl = new URL("/portal/login", request.url);
-
-  if (!token) {
-    loginUrl.searchParams.set("error", "link");
-    return NextResponse.redirect(loginUrl);
-  }
+  if (!token) return loginWithError("link");
 
   try {
     // The business owner signs in on the same page; GVAS says which role the
@@ -36,9 +42,7 @@ export async function GET(request: NextRequest) {
         ? { sessionToken: createMockOwnerSession(), role: "owner" as const }
         : await createPortalSession(token);
     const isOwner = session.role === "owner";
-    const res = NextResponse.redirect(
-      new URL(isOwner ? "/portal/owner" : "/portal", request.url),
-    );
+    const res = redirectTo(isOwner ? "/portal/owner" : "/portal");
     res.cookies.set(
       isOwner ? OWNER_SESSION_COOKIE : PORTAL_SESSION_COOKIE,
       session.sessionToken,
@@ -50,10 +54,6 @@ export async function GET(request: NextRequest) {
     if (!isGvasError(err) || err.kind !== "unauthorized") {
       console.error("portal session exchange failed", err);
     }
-    loginUrl.searchParams.set(
-      "error",
-      isGvasError(err) && err.kind === "unauthorized" ? "link" : "unavailable",
-    );
-    return NextResponse.redirect(loginUrl);
+    return loginWithError(isGvasError(err) && err.kind === "unauthorized" ? "link" : "unavailable");
   }
 }
