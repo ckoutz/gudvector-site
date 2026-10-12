@@ -164,6 +164,7 @@ const notices: Record<string, string> = {
   "quote-rejected": "Quote rejected. Nothing was sent.",
   "quote-stale": "That quote was already handled.",
   "quote-marked-paid": "Marked paid. The customer gets a short receipt by e-mail.",
+  "invoice-sent": "Invoice recorded. In the demo nothing is e-mailed.",
   "quote-marked-unpaid": "Payment undone. The quote is accepted and unpaid again.",
   "plan-payment-recorded": "Payment recorded. The paid-through date is updated.",
   "plan-payment-undone": "Payment undone. The paid-through date moved back.",

@@ -4,6 +4,7 @@ import {
   getOwnerBookings,
   getOwnerCalendar,
   getOwnerCustomers,
+  getOwnerInvoices,
   getOwnerPayments,
   getOwnerQuotes,
   getOwnerSubscriptions,
@@ -95,14 +96,16 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
   const token = await requireOwnerSessionToken();
   const zone = await getOwnerTimeZone(token);
   const now = new Date();
-  const [c, q, s, b, p, cal] = await Promise.allSettled([
+  const [c, q, s, b, p, cal, inv] = await Promise.allSettled([
     getOwnerCustomers(token),
     getOwnerQuotes(token),
     getOwnerSubscriptions(token),
     getOwnerBookings(token),
     getOwnerPayments(token),
     getOwnerCalendar(token, new Date(now.getTime() - 30 * DAY_MS), new Date(now.getTime() + 31 * DAY_MS)),
+    getOwnerInvoices(token),
   ]);
+  const invoiceList = value(inv, "invoices");
   const customers = value(c, "customers");
   const bookings: OwnerBooking[] = value(b, "bookings") ?? [];
   if (customers === null) {
@@ -164,7 +167,15 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
   const closedQuotes = listed.filter((quote) => !isOpenQuote(quote));
   const livePlans = plans.filter((plan) => !planEnded(plan));
   const endedPlans = plans.filter(planEnded);
-  const unpaid = theirQuotes.filter((quote) => quote.customerStatus === "accepted" && quote.billing === "one_time");
+  // With invoices on, what they owe is their unpaid invoices; otherwise accepted one-off quotes.
+  const openInvoices = invoiceList?.enabled
+    ? invoiceList.invoices.filter(
+        (invoice) => invoice.status !== "paid" && theirQuotes.some((quote) => quote.id === invoice.quoteId),
+      )
+    : null;
+  const unpaid: { totalCents: number }[] =
+    openInvoices ??
+    theirQuotes.filter((quote) => quote.customerStatus === "accepted" && quote.billing === "one_time");
   const paidCents =
     payments === null ? customer.paidCents : theirPayments.reduce((sum, payment) => sum + payment.amountCents, 0);
   const outstandingCents = unpaid.reduce((sum, quote) => sum + quote.totalCents, 0);
@@ -297,7 +308,13 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
             <p className="text-[20px] font-semibold tabular-nums text-ink">
               {quotes === null ? "—" : formatMoney(outstandingCents)}
             </p>
-            {unpaid.length > 0 && <p className="text-[12px] text-muted">{unpaid.length} accepted, not paid yet</p>}
+            {unpaid.length > 0 && (
+              <p className="text-[12px] text-muted">
+                {openInvoices
+                  ? `${unpaid.length} ${unpaid.length === 1 ? "invoice" : "invoices"} due`
+                  : `${unpaid.length} accepted, not paid yet`}
+              </p>
+            )}
           </div>
         </div>
         {payments === null ? (

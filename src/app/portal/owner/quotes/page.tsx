@@ -1,5 +1,6 @@
 import {
   getOwnerBookings,
+  getOwnerInvoices,
   getOwnerPayments,
   getOwnerQuotes,
   getOwnerSubscriptions,
@@ -10,6 +11,7 @@ import {
   type OwnerSubscription,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
+import { sendInvoiceAction } from "../actions";
 import { BookingDecision, QuoteDecision } from "../decisions";
 import {
   ManualPlan,
@@ -21,6 +23,7 @@ import {
   isLiveManualPlan,
 } from "../payments";
 import {
+  buttonSecondary,
   Card,
   Empty,
   LoadError,
@@ -61,19 +64,31 @@ export default async function OwnerQuotesPage({
   const params = await searchParams;
   const token = await requireOwnerSessionToken();
   const zone = await getOwnerTimeZone(token);
-  const [q, s, b, p] = await Promise.allSettled([
+  const [q, s, b, p, i] = await Promise.allSettled([
     getOwnerQuotes(token),
     getOwnerSubscriptions(token),
     getOwnerBookings(token),
     getOwnerPayments(token),
+    getOwnerInvoices(token),
   ]);
   const quotes: OwnerQuote[] | null = value(q, "quotes");
   const subscriptions: OwnerSubscription[] | null = value(s, "subscriptions");
   const bookings: OwnerBooking[] | null = value(b, "bookings");
   const payments: OwnerPayment[] | null = value(p, "payments");
+  const invoices = value(i, "invoices");
+  // With invoices on, quotes are estimates: accepted one-off work is invoiced, and paid on Invoices.
+  const invoiceMode = invoices?.enabled === true;
   const pending = (quotes ?? []).filter((quote) => quote.needsApproval);
   const pendingBookings = (bookings ?? []).filter((booking) => booking.needsDecision);
-  const awaitingPayment = (quotes ?? []).filter(canMarkPaid);
+  const awaitingPayment = invoiceMode ? [] : (quotes ?? []).filter(canMarkPaid);
+  const readyToInvoice = invoiceMode
+    ? (quotes ?? []).filter(
+        (quote) =>
+          quote.billing === "one_time" &&
+          quote.customerStatus === "accepted" &&
+          !(invoices?.invoices ?? []).some((invoice) => invoice.quoteId === quote.id),
+      )
+    : [];
   // Without the plan list we can't tell a card plan from none, so no plan forms.
   const plannable = (quote: OwnerQuote) =>
     subscriptions !== null && canRecordPlanPayment(quote, subscriptions);
@@ -94,6 +109,33 @@ export default async function OwnerQuotesPage({
             ))}
             {pending.map((quote) => (
               <QuoteDecision key={quote.id} quote={quote} returnTo={RETURN} />
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {readyToInvoice.length > 0 && (
+        <Card title="Accepted, ready to invoice">
+          <ul className="divide-y divide-line">
+            {readyToInvoice.map((quote) => (
+              <li key={quote.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
+                  <span className="block font-semibold text-ink">
+                    {quote.customer.name ?? quote.customer.email ?? "Customer"} ·{" "}
+                    <span className="tabular-nums">{formatMoney(quote.totalCents, quote.currency)}</span>
+                  </span>
+                  <span className="block text-[13px] text-muted">
+                    {quote.lineItems.map((item) => item.description).join(", ") || "Quote"} · due 14 days after sending
+                  </span>
+                </span>
+                <form action={sendInvoiceAction}>
+                  <input type="hidden" name="quoteId" value={quote.id} />
+                  <input type="hidden" name="returnTo" value={RETURN} />
+                  <button type="submit" className={`${buttonSecondary} min-h-11`}>
+                    Send invoice
+                  </button>
+                </form>
+              </li>
             ))}
           </ul>
         </Card>

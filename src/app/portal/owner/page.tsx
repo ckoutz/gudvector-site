@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   getOwnerBookings,
   getOwnerCalendar,
+  getOwnerInvoices,
   getOwnerPaidThisMonth,
   getOwnerQuotes,
   getOwnerTimeZone,
@@ -109,16 +110,20 @@ export default async function OwnerTodayPage({
   start.setUTCDate(start.getUTCDate() - 1);
   const end = new Date(`${days[DAYS - 1]}T00:00:00Z`);
   end.setUTCDate(end.getUTCDate() + 2);
-  const [quotesResult, bookingsResult, calendarResult, paidResult] = await Promise.allSettled([
+  const [quotesResult, bookingsResult, calendarResult, paidResult, invoicesResult] = await Promise.allSettled([
     getOwnerQuotes(token),
     getOwnerBookings(token),
     getOwnerCalendar(token, start, end),
     getOwnerPaidThisMonth(token, zone),
+    getOwnerInvoices(token),
   ]);
   const quotes: OwnerQuote[] | null = settled(quotesResult, "quotes");
   const bookings: OwnerBooking[] | null = settled(bookingsResult, "bookings");
   const calendar: OwnerCalendar | null = settled(calendarResult, "calendar");
   const paidThisMonth: number | null = settled(paidResult, "payments");
+  const invoiceList = settled(invoicesResult, "invoices");
+  const openInvoices = invoiceList?.enabled ? invoiceList.invoices.filter((invoice) => invoice.status !== "paid") : null;
+  const overdueCount = (openInvoices ?? []).filter((invoice) => invoice.status === "overdue").length;
 
   const todaysEvents = (calendar?.events ?? []).filter((event) => onDay(event, today, zone));
   const pendingQuotes = (quotes ?? []).filter((quote) => quote.needsApproval);
@@ -132,15 +137,23 @@ export default async function OwnerTodayPage({
       label: "Paid this month",
       value: paidThisMonth === null ? "—" : formatMoney(paidThisMonth),
       detail: paidThisMonth === null ? "Couldn't load payments" : monthName,
+      href: openInvoices ? "/portal/owner/invoices" : "/portal/owner/quotes",
     },
-    {
-      label: "Outstanding",
-      value: quotes === null ? "—" : formatMoney(unpaid.reduce((sum, quote) => sum + quote.totalCents, 0)),
-      detail:
-        quotes === null
-          ? "Couldn't load quotes"
-          : `${unpaid.length} accepted, not paid yet`,
-    },
+    openInvoices
+      ? {
+          label: "Outstanding",
+          value: formatMoney(openInvoices.reduce((sum, invoice) => sum + invoice.totalCents, 0)),
+          detail: `${openInvoices.length} ${openInvoices.length === 1 ? "invoice" : "invoices"} due${
+            overdueCount > 0 ? `, ${overdueCount} overdue` : ""
+          }`,
+          href: "/portal/owner/invoices",
+        }
+      : {
+          label: "Outstanding",
+          value: quotes === null ? "—" : formatMoney(unpaid.reduce((sum, quote) => sum + quote.totalCents, 0)),
+          detail: quotes === null ? "Couldn't load quotes" : `${unpaid.length} accepted, not paid yet`,
+          href: "/portal/owner/quotes",
+        },
   ];
 
   // Phone: one column in the order an owner checks it (Needs you, Today, This week, money).
@@ -227,7 +240,7 @@ export default async function OwnerTodayPage({
             {money.map((stat) => (
               <Link
                 key={stat.label}
-                href="/portal/owner/quotes"
+                href={stat.href}
                 className="block min-h-11 rounded-2xl border border-line bg-paper px-4 py-3.5 transition-colors hover:border-ink/30"
               >
                 <dt className="text-[12px] font-medium text-muted">{stat.label}</dt>

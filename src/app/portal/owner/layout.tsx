@@ -42,7 +42,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
         </form>
       </div>
       <div className="mt-6 border-b border-line pb-3">
-        <OwnerNav />
+        <OwnerNav invoices={me?.business.invoices === true} />
       </div>
       <div className="mt-5 sm:mt-8">{children}</div>
     </div>

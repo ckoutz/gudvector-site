@@ -32,6 +32,47 @@ export function canMarkPaid(quote: OwnerQuote): boolean {
 }
 
 export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnTo: string; zone: string }) {
+  return (
+    <MarkPaidRow
+      quoteId={quote.id}
+      title={quote.customer.name ?? quote.customer.email ?? "Customer"}
+      detail={
+        <>
+          {quote.lineItems.map((item) => item.description).join(", ") || "Quote"}
+          {quote.customerStatus !== "accepted" && (
+            <>
+              {" · "}
+              <span className="whitespace-nowrap">not accepted yet</span>
+            </>
+          )}
+        </>
+      }
+      totalCents={quote.totalCents}
+      currency={quote.currency}
+      returnTo={returnTo}
+      zone={zone}
+    />
+  );
+}
+
+/** Mark paid for one-off work. An invoice is paid through the quote it copies, so the ledger has one row either way. */
+export function MarkPaidRow({
+  quoteId,
+  title,
+  detail,
+  totalCents,
+  currency,
+  returnTo,
+  zone,
+}: {
+  quoteId: string;
+  title: React.ReactNode;
+  detail: React.ReactNode;
+  totalCents: number;
+  currency: string | null;
+  returnTo: string;
+  zone: string;
+}) {
   const max = today(zone);
   return (
     <li className="px-5 py-4">
@@ -39,23 +80,14 @@ export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnT
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3">
           <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
             <span className="block font-semibold text-ink">
-              {quote.customer.name ?? quote.customer.email ?? "Customer"} ·{" "}
-              <span className="tabular-nums">{formatMoney(quote.totalCents, quote.currency)}</span>
+              {title} · <span className="tabular-nums">{formatMoney(totalCents, currency)}</span>
             </span>
-            <span className="block text-[13px] text-muted">
-              {quote.lineItems.map((item) => item.description).join(", ") || "Quote"}
-              {quote.customerStatus !== "accepted" && (
-                <>
-                  {" · "}
-                  <span className="whitespace-nowrap">not accepted yet</span>
-                </>
-              )}
-            </span>
+            <span className="block text-[13px] text-muted">{detail}</span>
           </span>
           <span className={`${buttonSecondary} min-h-11 shrink-0 group-open:hidden`}>Mark paid</span>
         </summary>
         <form action={markPaidAction} className="mt-4 grid gap-3 sm:grid-cols-[auto_auto_1fr_auto] sm:items-end">
-          <input type="hidden" name="quoteId" value={quote.id} />
+          <input type="hidden" name="quoteId" value={quoteId} />
           <input type="hidden" name="returnTo" value={returnTo} />
           <label className="grid gap-1 text-[13px] text-muted">
             Paid on
@@ -74,7 +106,7 @@ export function MarkPaid({ quote, returnTo, zone }: { quote: OwnerQuote; returnT
             <input name="note" maxLength={500} placeholder="e.g. check #1042" className={field} />
           </label>
           <button type="submit" className={`${buttonPrimary} min-h-11`}>
-            Mark {formatMoney(quote.totalCents, quote.currency)} paid
+            Mark {formatMoney(totalCents, currency)} paid
           </button>
         </form>
       </details>
