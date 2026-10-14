@@ -223,6 +223,20 @@ export type OwnerInvoices = { enabled: boolean; invoices: OwnerInvoice[] };
 
 export type BookingDecisionResult = { applied: boolean; message: string };
 
+export type OwnerCommandState = "proposed" | "applying" | "done" | "failed" | "cancelled" | "expired";
+
+/** One change asked for by text: Gus's exact proposal and what came of it. */
+export type OwnerCommand = {
+  id: string;
+  tool: string;
+  summary: string;
+  requestedText: string;
+  state: OwnerCommandState;
+  outcome: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+};
+
 // ---------------------------------------------------------------------------
 // Mock data (GVAS_MOCK=1 only)
 // ---------------------------------------------------------------------------
@@ -719,6 +733,35 @@ export async function getOwnerRequests(sessionToken: string): Promise<OwnerServi
   }
   return (await ownerRequest<{ requests: OwnerServiceRequest[] }>("/v1/owner/requests", sessionToken))
     .requests;
+}
+
+export async function getOwnerCommands(sessionToken: string): Promise<OwnerCommand[]> {
+  if (gvasEnv.mock) {
+    assertMockOwner(sessionToken);
+    return [
+      {
+        id: "cmd_2",
+        tool: "change_send_invoice",
+        summary: "I will send Priya Shah an invoice for $310, due in 14 days.",
+        requestedText: "send Priya her invoice",
+        state: "cancelled",
+        outcome: null,
+        createdAt: at(0, 9, 5),
+        decidedAt: at(0, 9, 6),
+      },
+      {
+        id: "cmd_1",
+        tool: "change_mark_paid",
+        summary: "I will mark invoice LL-1036 (Daniel Ortiz, $290) paid by check, today.",
+        requestedText: "Mark LL-1036 paid by check",
+        state: "done",
+        outcome: "Done: invoice LL-1036 (Daniel Ortiz, $290) is marked paid.",
+        createdAt: at(-1, 16, 40),
+        decidedAt: at(-1, 16, 41),
+      },
+    ];
+  }
+  return (await ownerRequest<{ commands: OwnerCommand[] }>("/v1/owner/commands", sessionToken)).commands;
 }
 
 export async function getOwnerCalendar(
