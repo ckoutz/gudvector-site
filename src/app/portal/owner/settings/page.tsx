@@ -1,6 +1,7 @@
-import { getOwnerSettings, type OwnerSettings } from "@/lib/owner";
+import { getOwnerCommands, getOwnerSettings, type OwnerCommand, type OwnerSettings } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { Card, LoadError } from "../ui";
+import { CommandLog } from "./command-log";
 import { SettingsForm } from "./settings-form";
 
 export const dynamic = "force-dynamic";
@@ -8,8 +9,16 @@ export const dynamic = "force-dynamic";
 export default async function OwnerSettingsPage() {
   const token = await requireOwnerSessionToken();
   let settings: OwnerSettings | null = null;
+  let commands: OwnerCommand[] | null = null;
   try {
-    settings = await getOwnerSettings(token);
+    [settings, commands] = await Promise.all([
+      getOwnerSettings(token),
+      getOwnerCommands(token).catch((err: unknown) => {
+        redirectOwnerOnUnauthorized(err);
+        console.error("OwnerSettings: command log load failed", err);
+        return null;
+      }),
+    ]);
   } catch (err) {
     redirectOwnerOnUnauthorized(err);
     console.error("OwnerSettings: load failed", err);
@@ -21,5 +30,10 @@ export default async function OwnerSettingsPage() {
       </Card>
     );
   }
-  return <SettingsForm settings={settings} />;
+  return (
+    <div className="space-y-6">
+      <SettingsForm settings={settings} />
+      <CommandLog commands={commands} zone={settings.timezone || undefined} />
+    </div>
+  );
 }
