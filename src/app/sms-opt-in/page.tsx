@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
-import { SMS_CONSENT_COPY } from "@/lib/sms";
+import { SmsConsentText } from "@/components/sms-consent-text";
 
 export const metadata: Metadata = {
   title: "SMS Notifications",
@@ -65,7 +65,7 @@ export default function SmsOptInPage() {
             , you can tick an optional checkbox that reads:
           </p>
           <ConsentExample note="Unchecked by default. Booking a call or getting a quote does not require it.">
-            {SMS_CONSENT_COPY}
+            <SmsConsentText />
           </ConsentExample>
           <p className="mt-3">
             We only text the phone number you give us, and only if that box is checked.
@@ -92,14 +92,11 @@ export default function SmsOptInPage() {
 
           <h3 className="mt-4 text-[17px] font-semibold text-ink">How you opt in</h3>
           <p className="mt-2">
-            Text the number above from your registered phone, or check this box when you
-            enroll your number with {siteConfig.name}:
+            Owners and staff opt in by texting the number above from the phone number they
+            registered with {siteConfig.name}. Texting it is your agreement to receive the
+            business update messages below at that number. Gus answers only registered
+            numbers, and consent is not a condition of using {siteConfig.name}.
           </p>
-          <ConsentExample note="Unchecked by default. Consent is not a condition of using Güd Vector.">
-            I agree to receive business update SMS messages from {siteConfig.name} (quote
-            drafts for approval, quote approval and delivery confirmations, and appointment
-            updates) at the number I provided.
-          </ConsentExample>
 
           <h3 className="mt-6 text-[17px] font-semibold text-ink">What you&apos;ll receive</h3>
           <ul className="mt-2 list-disc space-y-1.5 pl-6">

@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { OpenChatButton } from "@/components/chat-bubble";
-import { SMS_CONSENT_COPY } from "@/lib/sms";
+import { SmsConsentText } from "@/components/sms-consent-text";
 import { siteConfig } from "@/lib/site-config";
 import { submitContact, type ContactState } from "./actions";
 
@@ -138,7 +138,9 @@ export function ContactForm() {
             value="yes"
             className="mt-0.5 h-4 w-4 shrink-0 accent-orange"
           />
-          <span>{SMS_CONSENT_COPY}</span>
+          <span>
+            <SmsConsentText />
+          </span>
         </label>
       </div>
 
