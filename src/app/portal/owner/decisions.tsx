@@ -63,7 +63,7 @@ export function BookingDecision({
         </button>
         <input
           name="reason"
-          maxLength={500}
+          maxLength={200}
           placeholder="Reason, if declining (optional)"
           aria-label="Reason for declining"
           className="order-first w-full min-w-0 rounded-full sm:order-none sm:w-auto sm:flex-1 border border-line px-4 py-2 text-[14px] text-ink placeholder:text-muted/70 focus:border-ink/40 focus:outline-none"
