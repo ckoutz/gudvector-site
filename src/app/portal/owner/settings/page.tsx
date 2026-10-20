@@ -1,3 +1,4 @@
+import { isGvasError } from "@/lib/gvas";
 import { getOwnerCommands, getOwnerSettings, type OwnerCommand, type OwnerSettings } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { Card, LoadError } from "../ui";
@@ -14,7 +15,8 @@ export default async function OwnerSettingsPage() {
     [settings, commands] = await Promise.all([
       getOwnerSettings(token),
       getOwnerCommands(token).catch((err: unknown) => {
-        redirectOwnerOnUnauthorized(err);
+        // Rethrown so the outer catch sends the owner to sign-in.
+        if (isGvasError(err) && err.kind === "unauthorized") throw err;
         console.error("OwnerSettings: command log load failed", err);
         return null;
       }),
