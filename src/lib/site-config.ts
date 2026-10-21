@@ -38,6 +38,7 @@ export const footerNav: {
       { label: "Websites", href: "/websites" },
       { label: siteConfig.officeName, href: "/office" },
       { label: "Custom AI", href: "/custom-ai" },
+      { label: "Owner-approved quoting", href: "/owner-approved-quoting" },
       { label: "For landscapers", href: "/landscapers" },
     ],
   },
