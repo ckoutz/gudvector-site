@@ -19,6 +19,12 @@ export function Footer() {
             >
               {siteConfig.email}
             </a>
+            <p className="mt-2 text-[15px] text-muted">
+              Texting line:{" "}
+              <Link href="/sms-opt-in" className="font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-orange">
+                {siteConfig.textingLine.display}
+              </Link>
+            </p>
           </div>
 
           {footerNav.map((group) => (
