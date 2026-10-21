@@ -11,7 +11,7 @@ import type {
   IntakeState,
 } from "@/lib/gvas";
 import { INTAKE_SLOT_PREFIX } from "@/lib/gvas";
-import { SMS_CONSENT_COPY } from "@/lib/sms";
+import { SmsConsentText } from "@/components/sms-consent-text";
 
 type ChatMessage = {
   id: string;
@@ -614,7 +614,7 @@ export function IntakeChat({
           className="mt-0.5 h-4 w-4 shrink-0 accent-orange"
         />
         <label htmlFor={consentId} className="text-[12px] leading-snug text-muted">
-          {SMS_CONSENT_COPY}
+          <SmsConsentText />
         </label>
       </div>
     </div>
