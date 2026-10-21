@@ -103,12 +103,12 @@ export default function ConcordPage() {
             <p className="mt-6 text-[16px] leading-relaxed text-muted">
               And the rest of Contra Costa and the San Francisco Bay Area. Customer texts come from our
               local texting line,{" "}
-              <a
-                href={`sms:${siteConfig.textingLine.e164}`}
+              <Link
+                href="/sms-opt-in"
                 className="whitespace-nowrap font-medium text-orange-ink underline underline-offset-2"
               >
                 {siteConfig.textingLine.display}
-              </a>
+              </Link>
               .
             </p>
           </div>
