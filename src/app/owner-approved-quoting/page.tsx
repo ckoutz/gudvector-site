@@ -59,7 +59,7 @@ export default function OwnerApprovedQuotingPage() {
         <SectionHeading
           eyebrow="Try it"
           title="See it on a demo we built."
-          lede="Larkspur Lawn & Garden is a fictional landscaping company. We made it up to show how this works, so its reviews and details aren't real. Ask for an estimate as a customer, then see the owner side."
+          lede="Larkspur is a made-up landscaping company. Gus works the same way for any trade. Its reviews and details aren't real. Ask for an estimate as a customer, then see the owner side."
         />
         <a
           href={siteConfig.demoUrl}

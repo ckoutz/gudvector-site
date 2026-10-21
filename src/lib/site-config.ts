@@ -40,7 +40,6 @@ export const footerNav: {
       { label: "Custom AI", href: "/custom-ai" },
       { label: "Owner-approved quoting", href: "/owner-approved-quoting" },
       { label: "Run it by text", href: "/dont-want-to-learn-software" },
-      { label: "For landscapers", href: "/landscapers" },
     ],
   },
   {
