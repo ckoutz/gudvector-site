@@ -4,6 +4,8 @@ export const siteConfig = {
   url: "https://gudvector.com",
   motto: "sending your company in the right direction",
   email: "info@gudvector.com",
+  textingLine: { display: "+1 (925) 594-6915", e164: "+19255946915" },
+  demoUrl: "https://demo.gudvector.com",
   areaServed: "San Francisco Bay Area",
   portalUrl: "https://gudvector.com/portal",
   officeName: "Güd Office",
@@ -36,6 +38,7 @@ export const footerNav: {
       { label: "Websites", href: "/websites" },
       { label: siteConfig.officeName, href: "/office" },
       { label: "Custom AI", href: "/custom-ai" },
+      { label: "For landscapers", href: "/landscapers" },
     ],
   },
   {
