@@ -18,7 +18,7 @@ export type Trade = {
 const priceQuestion = {
   question: "Does Gus quote my price?",
   answer:
-    "Gus never names a price in the website chat. Every quote waits for your OK by default. If you'd like Gus to send quotes automatically from prices you set, we'll set that up for you, and you can keep approval on any time..",
+    "Gus never names a price in the website chat. Every quote waits for your OK by default. If you'd like Gus to send quotes automatically from prices you set, we'll set that up for you, and you can keep approval on any time.",
 };
 
 const softwareQuestion = {
