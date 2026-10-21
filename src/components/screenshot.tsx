@@ -21,6 +21,12 @@ export const screenshots = {
     height: 1200,
     alt: "A customer portal listing quotes and an active monthly subscription",
   },
+  fieldNotes: {
+    src: "/screenshots/field-notes-ipad-pro.png",
+    width: 2400,
+    height: 1740,
+    alt: "Illustrative example on an iPad: a technician's voice note in a #field-notes channel becomes a finished form for Area 1, floor tile and mastic, rooms 104 and 114, two samples, at an invented Example Building",
+  },
 } as const;
 
 export type ScreenshotName = keyof typeof screenshots;
@@ -29,18 +35,21 @@ export function Screenshot({
   name,
   sizes,
   preload = false,
+  bare = false,
   className = "",
 }: {
   name: ScreenshotName;
   sizes: string;
   preload?: boolean;
+  bare?: boolean;
   className?: string;
 }) {
   const shot = screenshots[name];
+  const frame = bare
+    ? ""
+    : "overflow-hidden rounded-2xl border border-line bg-paper shadow-[0_1px_2px_rgba(12,10,9,0.04),0_24px_48px_-24px_rgba(12,10,9,0.18)]";
   return (
-    <div
-      className={`overflow-hidden rounded-2xl border border-line bg-paper shadow-[0_1px_2px_rgba(12,10,9,0.04),0_24px_48px_-24px_rgba(12,10,9,0.18)] ${className}`}
-    >
+    <div className={`${frame} ${className}`}>
       <Image
         src={shot.src}
         alt={shot.alt}
@@ -59,17 +68,19 @@ export function Figure({
   caption,
   sizes,
   preload,
+  bare,
   className = "",
 }: {
   name: ScreenshotName;
   caption: { title: string; body: string };
   sizes: string;
   preload?: boolean;
+  bare?: boolean;
   className?: string;
 }) {
   return (
     <figure className={className}>
-      <Screenshot name={name} sizes={sizes} preload={preload} />
+      <Screenshot name={name} sizes={sizes} preload={preload} bare={bare} />
       <figcaption className="mt-5">
         <span className="font-semibold text-ink">{caption.title}.</span>{" "}
         <span className="text-muted">{caption.body}</span>

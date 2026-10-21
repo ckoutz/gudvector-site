@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/page-hero";
 import { FeatureList, Section, SectionHeading } from "@/components/section";
 import { CtaBand } from "@/components/cta-band";
+import { Figure } from "@/components/screenshot";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -10,16 +11,6 @@ export const metadata: Metadata = {
     "When off-the-shelf software doesn't fit, we build the AI tool that does, inside the apps your team already uses.",
   alternates: { canonical: "/custom-ai" },
 };
-
-const exchange = [
-  {
-    from: "Technician",
-    text: "Area 1, floor tile and mastic, twelve-by-twelve tan tile, rooms 104 and 114, intact, samples 01-1 and 01-2.",
-  },
-  { from: "Assistant", text: "Got it. Is the tile friable or non-friable?" },
-  { from: "Technician", text: "Non-friable. Done." },
-  { from: "Assistant", text: "Area 1 complete. Your finished form is posted to the channel." },
-];
 
 const points = [
   {
@@ -47,28 +38,21 @@ export default function CustomAiPage() {
       />
 
       <Section className="border-t border-line">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <SectionHeading
-            eyebrow="Example"
-            title="Voice field notes for a survey crew."
-            lede="Built for an environmental survey firm. A voice memo becomes their finished field form, in their own layout."
-          />
-          <ol className="flex flex-col gap-3" aria-label="Example conversation">
-            {exchange.map((line, i) => (
-              <li
-                key={i}
-                className={`max-w-[90%] rounded-2xl px-5 py-4 text-[16px] leading-relaxed ${
-                  line.from === "Technician"
-                    ? "self-end bg-ink text-paper"
-                    : "self-start border border-line bg-peach-2 text-char"
-                }`}
-              >
-                <span className="sr-only">{line.from}: </span>
-                {line.text}
-              </li>
-            ))}
-          </ol>
-        </div>
+        <SectionHeading
+          eyebrow="Example"
+          title="Voice field notes for a survey crew."
+          lede="Built for an environmental survey firm. A voice memo becomes their finished field form, in their own layout."
+        />
+        <Figure
+          name="fieldNotes"
+          bare
+          caption={{
+            title: "Illustrative example",
+            body: "The building, names and values are invented. Not a real project or client.",
+          }}
+          sizes="(min-width: 1152px) 1088px, 100vw"
+          className="mt-10 sm:mt-14"
+        />
         <FeatureList items={points} />
       </Section>
 
