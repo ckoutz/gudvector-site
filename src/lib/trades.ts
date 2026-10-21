@@ -17,7 +17,8 @@ export type Trade = {
 
 const priceQuestion = {
   question: "Does Gus quote my price?",
-  answer: "No. Gus never names a price in chat. You approve every quote before it goes out.",
+  answer:
+    "Gus never names a price in the website chat. Every quote waits for your OK by default. If you'd like Gus to send quotes automatically from prices you set, we'll set that up for you, and you can keep approval on any time. We recommend reviewing every quote before it goes out.",
 };
 
 const softwareQuestion = {
@@ -36,7 +37,7 @@ export const trades = {
     texts: [
       "What's my week look like?",
       "Block off Thursday afternoon. Dentist.",
-      "Who still owes me for last month?",
+      "Who still owes me money?",
       "Daniel paid invoice LL-1036 by check today.",
     ],
     quote: [
@@ -58,7 +59,8 @@ export const trades = {
       priceQuestion,
       {
         question: "What if a client wants to skip a week?",
-        answer: "They message; you handle it. Automatic rescheduling is not built yet.",
+        answer:
+          "They can cancel or ask for a new time in the chat; a new time waits for your OK. Automatic rescheduling is not built yet.",
       },
       softwareQuestion,
     ],
@@ -85,7 +87,7 @@ export const trades = {
     differentTitle: "What's different about handyman work",
     different: [
       "One visit often covers several unrelated small jobs, so the quote is a list of line items and not a single price.",
-      'Customers often add "can you also..." later. Each request arrives as its own text, so nothing gets lost between jobs.',
+      'Customers often add "can you also..." later. Each addition reaches you by text, so nothing gets lost between jobs.',
     ],
     faq: [
       {
@@ -112,7 +114,7 @@ export const trades = {
       "What needs my OK?",
       "Approve the Patel request for tomorrow morning.",
       "Block off Friday. Taking the day off.",
-      "Marked invoice 1042 paid, check.",
+      "Invoice LL-1042 paid, check.",
     ],
     quote: [
       { item: "Diagnose slow kitchen drain", amount: "$95" },
@@ -134,7 +136,7 @@ export const trades = {
       priceQuestion,
       {
         question: "What if the job changes once I'm on site?",
-        answer: "You control the quote. Nothing is sent without your OK.",
+        answer: "You control the quote. By default, nothing is sent without your OK.",
       },
       softwareQuestion,
     ],
@@ -210,7 +212,7 @@ export const trades = {
       priceQuestion,
       {
         question: "Can Gus set up yearly maintenance visits?",
-        answer: "Customers send requests and you approve them. Automatic recurring plans are not built yet.",
+        answer: "Customers send requests and you approve them. Automatic repeat visits are not built yet.",
       },
       softwareQuestion,
     ],

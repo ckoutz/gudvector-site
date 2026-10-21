@@ -76,7 +76,8 @@ export default function OwnerApprovedQuotingPage() {
             items={[
               {
                 question: "Can a quote go out without me?",
-                answer: "No. Automatic sending is switched off. Every quote waits until you approve it.",
+                answer:
+                  "No. Automatic sending is switched off. Every quote waits until you approve it. If you'd like Gus to send quotes automatically from prices you set, we'll set that up for you, and you can keep approval on any time. We recommend reviewing every quote before it goes out.",
               },
               {
                 question: "What if a customer asks Gus for a price?",
