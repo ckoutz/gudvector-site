@@ -39,16 +39,6 @@ export default function OfficePage() {
         price={siteConfig.pricing.office}
       />
 
-      <Section className="border-t border-line">
-        <SectionHeading title="Your customer books. You get a text." />
-        <GusPhones className="mt-12 sm:mt-16" />
-      </Section>
-
-      <Section className="border-t border-line">
-        <SectionHeading title="Less phone tag. More booked work." />
-        <FeatureList items={points} />
-      </Section>
-
       <Section tone="muted">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-10">
           <Figure
@@ -70,6 +60,16 @@ export default function OfficePage() {
             />
           </div>
         </div>
+      </Section>
+
+      <Section className="border-t border-line">
+        <SectionHeading title="Less phone tag. More booked work." />
+        <FeatureList items={points} />
+      </Section>
+
+      <Section className="border-t border-line">
+        <SectionHeading title="Your customer books. You get a text." />
+        <GusPhones className="mt-12 sm:mt-16" />
       </Section>
 
       <Section>
