@@ -197,7 +197,7 @@ export type OwnerMe = {
   };
 };
 
-export type OwnerInvoiceStatus = "sent" | "paid" | "overdue";
+export type OwnerInvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "void";
 
 export type OwnerInvoice = {
   number: string;
@@ -212,9 +212,13 @@ export type OwnerInvoice = {
   lineItems: { description: string; quantity: number; unitPriceCents: number }[];
   totalCents: number;
   currency: string;
-  sentAt: string;
+  /** Null while the invoice is a draft (made by text, not sent yet). */
+  sentAt: string | null;
   /** yyyy-mm-dd in the business's zone. */
   dueOn: string;
+  voidedAt?: string | null;
+  /** The number of the voided invoice this one replaces. */
+  replaces?: string | null;
   paidOn: string | null;
   paidBy: OwnerQuotePaidBy | null;
 };

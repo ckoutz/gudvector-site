@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -5,7 +6,6 @@ import {
   getOwnerPaidThisMonth,
   getOwnerTimeZone,
   type OwnerInvoice,
-  type OwnerInvoiceStatus,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { markUnpaidAction } from "../actions";
@@ -16,10 +16,9 @@ export const dynamic = "force-dynamic";
 
 const RETURN = "/portal/owner/invoices";
 
-const statusLabel: Record<OwnerInvoiceStatus, [string, "red" | "orange" | "green"]> = {
+const statusLabel: Record<"sent" | "overdue", [string, "red" | "orange" | "green"]> = {
   overdue: ["Overdue", "red"],
   sent: ["Sent", "orange"],
-  paid: ["Paid", "green"],
 };
 
 const methodLabel: Record<string, string> = { card: "card", check: "check", cash: "cash", other: "other" };
@@ -76,6 +75,25 @@ function PaidInvoice({ invoice, zone }: { invoice: OwnerInvoice; zone: string })
   );
 }
 
+function OtherInvoice({ invoice, children }: { invoice: OwnerInvoice; children: ReactNode }) {
+  return (
+    <li className="px-5 py-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 [overflow-wrap:anywhere]">
+          <p className="font-semibold text-ink">
+            {invoice.number} · {who(invoice)}
+          </p>
+          <p className="text-[13px] text-muted">{work(invoice)}</p>
+          <p className="mt-1 text-[12px] text-muted">{children}</p>
+        </div>
+        <span className="shrink-0 font-semibold tabular-nums text-ink">
+          {formatMoney(invoice.totalCents, invoice.currency)}
+        </span>
+      </div>
+    </li>
+  );
+}
+
 export default async function OwnerInvoicesPage({
   searchParams,
 }: {
@@ -93,6 +111,8 @@ export default async function OwnerInvoicesPage({
   const overdue = (invoices ?? []).filter((invoice) => invoice.status === "overdue");
   const sent = (invoices ?? []).filter((invoice) => invoice.status === "sent");
   const paid = (invoices ?? []).filter((invoice) => invoice.status === "paid");
+  const drafts = (invoices ?? []).filter((invoice) => invoice.status === "draft");
+  const voided = (invoices ?? []).filter((invoice) => invoice.status === "void");
   const open = [...overdue, ...sent];
 
   if (invoices === null) {
@@ -134,7 +154,7 @@ export default async function OwnerInvoicesPage({
         ) : (
           <ul className="divide-y divide-line">
             {open.map((invoice) => {
-              const [label, tone] = statusLabel[invoice.status];
+              const [label, tone] = statusLabel[invoice.status as "sent" | "overdue"];
               return (
                 <MarkPaidRow
                   key={invoice.number}
@@ -146,8 +166,10 @@ export default async function OwnerInvoicesPage({
                   }
                   detail={
                     <>
-                      <Pill tone={tone}>{label}</Pill> {work(invoice)} · sent {formatDate(invoice.sentAt, zone)} · due{" "}
+                      <Pill tone={tone}>{label}</Pill> {work(invoice)}
+                      {invoice.sentAt ? ` · sent ${formatDate(invoice.sentAt, zone)}` : ""} · due{" "}
                       <span className="whitespace-nowrap">{formatDay(invoice.dueOn)}</span>
+                      {invoice.replaces ? ` · replaces ${invoice.replaces}` : ""}
                     </>
                   }
                   totalCents={invoice.totalCents}
@@ -161,6 +183,20 @@ export default async function OwnerInvoicesPage({
         )}
       </Card>
 
+      {drafts.length > 0 && (
+        <Card title="Drafts">
+          <ul className="divide-y divide-line">
+            {drafts.map((invoice) => (
+              <OtherInvoice key={invoice.number} invoice={invoice}>
+                <Pill tone="orange">Draft</Pill> Not sent yet. Text Gus &ldquo;send invoice {invoice.number}&rdquo; to
+                send it.
+                {invoice.replaces ? ` Replaces ${invoice.replaces}.` : ""}
+              </OtherInvoice>
+            ))}
+          </ul>
+        </Card>
+      )}
+
       <Card title="Paid">
         {paid.length === 0 ? (
           <Empty>No paid invoices yet.</Empty>
@@ -172,6 +208,18 @@ export default async function OwnerInvoicesPage({
           </ul>
         )}
       </Card>
+
+      {voided.length > 0 && (
+        <Card title="Void">
+          <ul className="divide-y divide-line">
+            {voided.map((invoice) => (
+              <OtherInvoice key={invoice.number} invoice={invoice}>
+                <Pill tone="red">Void</Pill> Not owed. A new invoice replaced it.
+              </OtherInvoice>
+            ))}
+          </ul>
+        </Card>
+      )}
     </div>
   );
 }

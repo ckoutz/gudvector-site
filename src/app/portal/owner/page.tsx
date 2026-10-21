@@ -122,7 +122,7 @@ export default async function OwnerTodayPage({
   const calendar: OwnerCalendar | null = settled(calendarResult, "calendar");
   const paidThisMonth: number | null = settled(paidResult, "payments");
   const invoiceList = settled(invoicesResult, "invoices");
-  const openInvoices = invoiceList?.enabled ? invoiceList.invoices.filter((invoice) => invoice.status !== "paid") : null;
+  const openInvoices = invoiceList?.enabled ? invoiceList.invoices.filter((invoice) => invoice.status === "sent" || invoice.status === "overdue") : null;
   const overdueCount = (openInvoices ?? []).filter((invoice) => invoice.status === "overdue").length;
 
   const todaysEvents = (calendar?.events ?? []).filter((event) => onDay(event, today, zone));
