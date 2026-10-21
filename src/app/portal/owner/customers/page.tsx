@@ -64,22 +64,24 @@ export default async function OwnerCustomersPage() {
               </thead>
               <tbody className="divide-y divide-line">
                 {customers.map((customer) => (
-                  <tr key={customer.email}>
+                  <tr key={customerKey(customer)}>
                     <td className="px-5 py-3">
                       <Link
-                        href={`/portal/owner/customers/${customerKey(customer.email)}`}
+                        href={`/portal/owner/customers/${customerKey(customer)}`}
                         className="font-medium text-ink underline decoration-ink/30 underline-offset-2 hover:decoration-ink"
                       >
-                        {customer.name ?? customer.email}
+                        {customer.name ?? customer.email ?? customer.phone}
                       </Link>
-                      {customer.name && <p className="text-[12px] text-muted">{customer.email}</p>}
+                      {customer.name && (
+                        <p className="text-[12px] text-muted">{customer.email ?? "No e-mail"}</p>
+                      )}
                     </td>
                     <td className="px-5 py-3 text-muted">{customer.phone ? formatPhone(customer.phone) : "—"}</td>
                     <td className="px-5 py-3">
                       {customer.smsConsent ? (
                         <Pill tone="green">OK to text</Pill>
                       ) : (
-                        <Pill tone="muted">Email only</Pill>
+                        <Pill tone="muted">{customer.email ? "Email only" : "Not OK to text"}</Pill>
                       )}
                     </td>
                     <td className="px-5 py-3 tabular-nums text-ink">

@@ -115,7 +115,7 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
       </Card>
     );
   }
-  const customer = withBookingOnly(customers, bookings).find((row) => customerKey(row.email) === key);
+  const customer = withBookingOnly(customers, bookings).find((row) => customerKey(row) === key);
   if (!customer) notFound();
 
   const quotes: OwnerQuote[] | null = value(q, "quotes");
@@ -255,17 +255,21 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
         ← Customers
       </Link>
 
-      <Card title={customer.name ?? customer.email}>
+      <Card title={customer.name ?? customer.email ?? customer.phone ?? "Customer"}>
         <dl className="grid gap-x-6 gap-y-3 px-5 py-4 text-[14px] sm:grid-cols-2">
           <div>
             <dt className="text-[12px] text-muted">E-mail</dt>
-            <dd className="break-words text-ink">{customer.email}</dd>
+            <dd className="break-words text-ink">{customer.email ?? "None yet, so no portal sign-in"}</dd>
           </div>
           <div>
             <dt className="text-[12px] text-muted">Phone</dt>
             <dd className="text-ink">
               {phone ? formatPhone(phone) : "—"}{" "}
-              {customer.smsConsent ? <Pill tone="green">OK to text</Pill> : <Pill tone="muted">Email only</Pill>}
+              {customer.smsConsent ? (
+                <Pill tone="green">OK to text</Pill>
+              ) : (
+                <Pill tone="muted">{customer.email ? "Email only" : "Not OK to text"}</Pill>
+              )}
             </dd>
           </div>
           <div>
