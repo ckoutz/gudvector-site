@@ -170,7 +170,7 @@ export default async function OwnerCustomerPage({ params }: { params: Promise<{ 
   // With invoices on, what they owe is their unpaid invoices; otherwise accepted one-off quotes.
   const openInvoices = invoiceList?.enabled
     ? invoiceList.invoices.filter(
-        (invoice) => invoice.status !== "paid" && theirQuotes.some((quote) => quote.id === invoice.quoteId),
+        (invoice) => (invoice.status === "sent" || invoice.status === "overdue") && theirQuotes.some((quote) => quote.id === invoice.quoteId),
       )
     : null;
   const unpaid: { totalCents: number }[] =
