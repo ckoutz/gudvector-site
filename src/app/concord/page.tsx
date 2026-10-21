@@ -9,7 +9,7 @@ import { siteConfig } from "@/lib/site-config";
 export const metadata: Metadata = {
   title: "Websites and an Office Manager for Concord & Contra Costa Service Businesses",
   description:
-    "Güd Vector Consulting Services is a Bay Area firm that builds websites, owner-approved quoting and Gus, an office manager you run by text, for service businesses in Concord and across Contra Costa.",
+    "Güd Vector Consulting Services is a Bay Area firm based in Concord, California, that builds websites, owner-approved quoting and Gus, an office manager you run by text, for service businesses in Concord and across Contra Costa.",
   alternates: { canonical: "/concord" },
 };
 
@@ -76,7 +76,7 @@ export default function ConcordPage() {
       <PageHero
         eyebrow="Concord & Contra Costa"
         h1="Websites and an office manager for Concord service businesses."
-        lede="Güd Vector Consulting Services is a Bay Area firm that builds websites, owner-approved quoting and Gus, an office manager you run by text, for owner-run service businesses in Concord and across Contra Costa."
+        lede="Güd Vector Consulting Services is a Bay Area firm based in Concord, California, that builds websites, owner-approved quoting and Gus, an office manager you run by text, for owner-run service businesses in Concord and across Contra Costa."
       />
 
       <Section className="border-t border-line">
