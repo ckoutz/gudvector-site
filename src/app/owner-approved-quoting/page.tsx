@@ -49,7 +49,7 @@ export default function OwnerApprovedQuotingPage() {
         />
         <Figure
           name="quote"
-          caption={{ title: "Quote page", body: "Line items, total and your note."}}
+          caption={{ title: "Quote page", body: "Line items, total and your note." }}
           sizes="(min-width: 1024px) 896px, 100vw"
           className="mt-10 max-w-4xl"
         />
