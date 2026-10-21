@@ -4,19 +4,19 @@ import Image from "next/image";
 // Width/height are the PNGs' pixel size (2x captures).
 export const screenshots = {
   chat: {
-    src: "/screenshots/chat-v2.png",
+    src: "/screenshots/booking-chat.png",
     width: 760,
     height: 1200,
     alt: "Bay Area Services booking chat offering a customer times for an estimate",
   },
   quote: {
-    src: "/screenshots/quote.png",
+    src: "/screenshots/quote-page.png",
     width: 1536,
     height: 1200,
     alt: "A quote page with line items, total, and Accept and Decline buttons",
   },
   portal: {
-    src: "/screenshots/portal.png",
+    src: "/screenshots/customer-portal.png",
     width: 1536,
     height: 1200,
     alt: "A customer portal listing quotes and an active monthly subscription",

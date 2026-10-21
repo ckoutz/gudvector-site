@@ -31,7 +31,7 @@ export const trades = {
     path: "/house-cleaning",
     label: "House cleaning",
     eyebrow: "For house cleaners",
-    title: "For House Cleaning Businesses: Run It From Your Phone",
+    title: "For House Cleaners: Run It From Your Phone",
     h1: "Run your cleaning business from your phone, not a spreadsheet.",
     lede: "Most of your day is on a client's floor, not at a computer. Gus takes new cleaning requests from your website, texts you the details, and waits for your OK before anything is booked. Then you manage the week by text.",
     texts: [
@@ -67,9 +67,9 @@ export const trades = {
   },
   handyman: {
     path: "/handyman",
-    label: "Handyman",
+    label: "Handyman services",
     eyebrow: "For handymen",
-    title: "For Handyman Businesses: Answer Every Small-Job Request",
+    title: "For Handymen: Answer Every Small-Job Request",
     h1: "Answer every small-job request before you finish the one you're on.",
     lede: "A handyman's day is ten different jobs, and most requests arrive while you are up a ladder. Gus collects what the customer needs from your website, texts you a short summary, and holds the request until you say yes or no.",
     texts: [
@@ -179,11 +179,11 @@ export const trades = {
       softwareQuestion,
     ],
   },
-  hvac: {
-    path: "/hvac",
-    label: "HVAC",
-    eyebrow: "For HVAC",
-    title: "For HVAC Businesses: Handle the Busy Season by Text",
+  heatingAndCooling: {
+    path: "/heating-and-cooling",
+    label: "Heating and cooling",
+    eyebrow: "For heating and cooling contractors",
+    title: "For Heating and Cooling Contractors: Handle the Busy Season by Text",
     h1: "Handle the first hot week of summer without losing your evenings.",
     lede: "Heating and cooling work comes in waves. One heat wave fills your calendar and your phone at the same time. Gus takes requests from your website around the clock, texts you the details, and holds everything until you approve it.",
     texts: [
@@ -198,7 +198,7 @@ export const trades = {
       { item: "Replace air filter", amount: "$30" },
     ],
     total: "$380",
-    differentTitle: "What's different about HVAC",
+    differentTitle: "What's different about heating and cooling (HVAC) work",
     different: [
       "Demand spikes in a few weeks of the year. Seeing every pending request in one text, and approving or declining each one, keeps a busy week from getting away from you.",
       "Many customers are repeat, with a yearly tune-up. Knowing who is paid up and who is not matters before you book their next visit.",
@@ -219,14 +219,14 @@ export const trades = {
   },
 } satisfies Record<string, Trade>;
 
-/** Every trade page as peers (Concord's "Who we help"), landscapers included. */
+/** Every trade page as peers on "Who we help", most likely visitor first. */
 export const whoWeHelp = [
-  { label: trades.handyman.label, href: trades.handyman.path },
+  { label: "Landscaping", href: "/landscaping" },
   { label: trades.houseCleaning.label, href: trades.houseCleaning.path },
-  { label: trades.hvac.label, href: trades.hvac.path },
-  { label: "Landscaping", href: "/landscapers" },
-  { label: trades.painting.label, href: trades.painting.path },
+  { label: trades.handyman.label, href: trades.handyman.path },
   { label: trades.plumbing.label, href: trades.plumbing.path },
+  { label: trades.painting.label, href: trades.painting.path },
+  { label: trades.heatingAndCooling.label, href: trades.heatingAndCooling.path },
 ];
 
 export const larkspurExampleLine =

@@ -8,10 +8,10 @@ import { siteConfig } from "@/lib/site-config";
 import { whoWeHelp } from "@/lib/trades";
 
 export const metadata: Metadata = {
-  title: "Websites and an Office Manager for Concord & Contra Costa Service Businesses",
+  title: "Who We Help: Websites and an Office Manager for Local Service Businesses",
   description:
-    "Güd Vector Consulting Services builds websites, owner-approved quoting and Gus, an office manager you run by text, for service businesses in Concord and across Contra Costa. East Bay, based in Concord, California.",
-  alternates: { canonical: "/concord" },
+    "Güd Vector Consulting Services builds websites, owner-approved quoting and Gus, an office manager you run by text, for owner-run local service businesses. Based in the Bay Area. We work with service businesses anywhere.",
+  alternates: { canonical: "/who-we-help" },
 };
 
 const products = [
@@ -32,17 +32,6 @@ const products = [
   },
 ];
 
-const towns = [
-  "Concord",
-  "Pleasant Hill",
-  "Walnut Creek",
-  "Martinez",
-  "Clayton",
-  "Pacheco",
-  "Pittsburg",
-  "Bay Point",
-];
-
 const guides = [
   {
     title: "Owner-approved quoting",
@@ -56,13 +45,25 @@ const guides = [
   },
 ];
 
-export default function ConcordPage() {
+export default function WhoWeHelpPage() {
   return (
     <>
       <PageHero
-        eyebrow="Concord & Contra Costa"
-        h1="Websites and an office manager for Concord service businesses."
-        lede="Güd Vector Consulting Services builds websites, owner-approved quoting and Gus, an office manager you run by text, for owner-run service businesses in Concord and across Contra Costa. East Bay, based in Concord, California."
+        eyebrow="Who we help"
+        h1="Websites and an office manager for local service businesses."
+        lede="Güd Vector Consulting Services builds websites, owner-approved quoting and Gus, an office manager you run by text, for owner-run local service businesses. Based in the Bay Area."
+        note={
+          <>
+            Customer texts come from our texting line,{" "}
+            <Link
+              href="/sms-opt-in"
+              className="whitespace-nowrap font-medium text-orange-ink underline underline-offset-2"
+            >
+              {siteConfig.textingLine.display}
+            </Link>
+            .
+          </>
+        }
       />
 
       <Section className="border-t border-line">
@@ -71,55 +72,27 @@ export default function ConcordPage() {
       </Section>
 
       <Section tone="muted">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink sm:text-3xl">
-              Where we work
-            </h2>
-            <ul className="mt-6 flex flex-wrap gap-2" aria-label="Towns">
-              {towns.map((town) => (
-                <li
-                  key={town}
-                  className="rounded-full border border-line bg-paper px-4 py-2 text-[15px] text-char"
-                >
-                  {town}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 text-[16px] leading-relaxed text-muted">
-              And the rest of Contra Costa and the San Francisco Bay Area. Customer texts come from our
-              local texting line,{" "}
+        <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink sm:text-3xl">
+          Who we help
+        </h2>
+        <p className="mt-4 max-w-xl text-[16px] leading-relaxed text-muted">
+          Service businesses of all kinds, including:
+        </p>
+        <ul className="mt-6 flex max-w-xl flex-col gap-3 text-[16px] text-char">
+          {whoWeHelp.map((trade) => (
+            <li key={trade.href} className="border-t border-line pt-3">
               <Link
-                href="/sms-opt-in"
-                className="whitespace-nowrap font-medium text-orange-ink underline underline-offset-2"
+                href={trade.href}
+                className="font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-orange"
               >
-                {siteConfig.textingLine.display}
+                {trade.label}
               </Link>
-              .
-            </p>
-          </div>
-          <div>
-            <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink sm:text-3xl">
-              Who we help
-            </h2>
-            <ul className="mt-6 flex flex-col gap-3 text-[16px] text-char">
-              {whoWeHelp.map((trade) => (
-                <li key={trade.href} className="border-t border-line pt-3">
-                  <Link
-                    href={trade.href}
-                    className="font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-orange"
-                  >
-                    {trade.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 text-[16px] leading-relaxed text-muted">
-              And electricians, home inspectors, environmental testing firms and
-              similar owner-run crews, from one truck to a few.
-            </p>
-          </div>
-        </div>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-muted">
+          And electricians, home inspectors and similar owner-run crews, from one truck to a few.
+        </p>
       </Section>
 
       <Section>
@@ -137,7 +110,7 @@ export default function ConcordPage() {
           href={siteConfig.demoUrl}
           className="mt-8 inline-flex min-h-12 items-center rounded-full border border-ink px-6 text-[16px] font-semibold text-ink transition-colors hover:bg-ink hover:text-white"
         >
-          Open the Larkspur demo
+          Open the Demo
         </a>
       </Section>
 
@@ -147,9 +120,8 @@ export default function ConcordPage() {
           <Faq
             items={[
               {
-                question: "Do you only work in Concord?",
-                answer:
-                  "No. We work with service businesses across Contra Costa and the San Francisco Bay Area. This page is for the ones close to home.",
+                question: "Do you only work in the Bay Area?",
+                answer: "No. We're based in the Bay Area and work with service businesses anywhere.",
               },
               {
                 question: "Do I need to switch from the software I use now?",

@@ -21,7 +21,7 @@ type Story = {
 
 const customerThread: Bubble[] = [
   { from: "gus", text: "Hi, I'm Gus with Bay Area Services. What do you need done?" },
-  { from: "me", text: "My water heater is leaking. I'm in Walnut Creek." },
+  { from: "me", text: "My water heater is leaking." },
   { from: "gus", text: "Sorry to hear it. Pick a time for a free estimate:", slots: true },
   { from: "gus", text: "You're booked for Thu 9–11 AM. We'll text you a confirmation." },
 ];
@@ -31,13 +31,13 @@ const ownerThread: Bubble[] = [
   {
     from: "gus",
     text: "New Calendly booking. Estimate added to your calendar.",
-    card: { label: "Calendar", title: "Thu 9–11 AM · Jordan Alvarez", sub: "Water heater leak, Walnut Creek" },
+    card: { label: "Calendar", title: "Thu 9–11 AM · Jordan Alvarez", sub: "Water heater leak" },
   },
   { time: "Thu 11:02 AM" },
   { from: "me", text: "Quote $1,650 for the 50 gal plus $150 haul-away" },
   {
     from: "gus",
-    text: "That's for Jordan's 9 AM estimate in Walnut Creek. Send it?",
+    text: "That's for Jordan's 9 AM water heater estimate. Send it?",
     card: { label: "Quote", title: "Jordan Alvarez · Water heater", sub: "$1,800.00 · 2 items" },
   },
   { from: "me", text: "Send it" },
@@ -70,7 +70,7 @@ const stories = {
     business: "Bay Area Services",
     cta: "Book an estimate",
     headline: "Water heater trouble? We'll be right out.",
-    tagline: "Plumbing across the East Bay. Free estimates.",
+    tagline: "Plumbing and water heaters. Free estimates.",
     slots: ["Thu 9–11 AM", "Thu 1–3 PM", "Fri 9–11 AM"],
     customerThread,
     ownerThread,
@@ -99,7 +99,7 @@ function PhoneFrame({ label, children }: { label: string; children: React.ReactN
   return (
     <div role="img" aria-label={label} className="relative mx-auto aspect-[658/1362] w-full max-w-[300px]">
       <Image
-        src="/brand/iphone-frame-v2.png"
+        src="/brand/iphone-frame.png"
         alt=""
         fill
         sizes="300px"

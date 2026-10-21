@@ -15,10 +15,6 @@ export function OrganizationJsonLd() {
       addressRegion: "CA",
       addressCountry: "US",
     },
-    areaServed: {
-      "@type": "Place",
-      name: siteConfig.areaServed,
-    },
     knowsAbout: [
       "Website building for small businesses",
       "Owner-approved quoting systems",

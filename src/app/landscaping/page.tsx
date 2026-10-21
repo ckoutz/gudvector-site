@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "For Landscapers: Gus Books Estimates, Sends Your Quotes, Runs by Text",
   description:
     "For landscaping crews: Gus answers your website, books estimates, sends the quotes you approve and keeps track of who still owes you. You run it all by text.",
-  alternates: { canonical: "/landscapers" },
+  alternates: { canonical: "/landscaping" },
 };
 
 const points = [
@@ -57,7 +57,7 @@ export default function LandscapersPage() {
           href={siteConfig.demoUrl}
           className="mt-8 inline-flex min-h-12 items-center rounded-full border border-ink px-6 text-[16px] font-semibold text-ink transition-colors hover:bg-ink hover:text-white"
         >
-          Open the Larkspur demo
+          Open the Demo
         </a>
       </Section>
 

@@ -84,7 +84,7 @@ export function TradePage({ trade }: { trade: Trade }) {
           href={siteConfig.demoUrl}
           className="mt-8 inline-flex min-h-12 items-center rounded-full border border-ink px-6 text-[16px] font-semibold text-ink transition-colors hover:bg-ink hover:text-white"
         >
-          Open the Larkspur demo
+          Open the Demo
         </a>
       </Section>
     </>

@@ -6,7 +6,6 @@ export const siteConfig = {
   email: "info@gudvector.com",
   textingLine: { display: "+1 (925) 594-6915", e164: "+19255946915" },
   demoUrl: "https://demo.gudvector.com",
-  areaServed: "San Francisco Bay Area",
   portalUrl: "https://gudvector.com/portal",
   officeName: "Güd Office",
   pricing: {
@@ -46,7 +45,7 @@ export const footerNav: {
     heading: "Company",
     links: [
       { label: "Contact", href: "/contact" },
-      { label: "Concord & Contra Costa", href: "/concord" },
+      { label: "Who we help", href: "/who-we-help" },
       { label: "Customer portal", href: "/portal" },
     ],
   },

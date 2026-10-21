@@ -6,12 +6,14 @@ export function PageHero({
   h1,
   lede,
   price,
+  note,
   cta = true,
 }: {
   eyebrow: string;
   h1: string;
   lede: string;
   price?: string;
+  note?: React.ReactNode;
   cta?: boolean;
 }) {
   return (
@@ -23,6 +25,7 @@ export function PageHero({
       <p className="mt-6 max-w-2xl text-[18px] leading-relaxed text-muted sm:text-[20px]">
         {lede}
       </p>
+      {note && <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">{note}</p>}
       {price && <p className="mt-4 text-[17px] font-semibold text-ink sm:text-[18px]">{price}</p>}
       {cta && (
         <div className="mt-10">
