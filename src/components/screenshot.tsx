@@ -25,7 +25,7 @@ export const screenshots = {
     src: "/screenshots/field-notes-ipad-pro.png",
     width: 2400,
     height: 1740,
-    alt: "Illustrative example on an iPad: a technician's voice note in a #field-notes channel becomes a finished form for Area 1, floor tile and mastic, rooms 104 and 114, two samples, at an invented Example Building",
+    alt: "Illustrative example on an iPad, in a #field-notes channel for an invented Example Building. A technician's voice note says: Area 1, floor tile and mastic, twelve-by-twelve tan tile, rooms 104 and 114, intact, samples 01-1 and 01-2. The assistant asks: Is the tile friable or non-friable? The technician answers: Non-friable. Done. The assistant replies: Area 1 complete. Your finished form is posted to the channel. The finished form lists rooms 104 and 114, floor tile 12 by 12 inches tan, mastic, intact, non-friable, and 2 samples.",
   },
 } as const;
 
