@@ -9,6 +9,7 @@ const routes = [
   { path: "/landscapers", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/owner-approved-quoting", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/dont-want-to-learn-software", priority: 0.7, changeFrequency: "monthly" as const },
+  { path: "/concord", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" as const },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" as const },
   { path: "/terms", priority: 0.3, changeFrequency: "yearly" as const },

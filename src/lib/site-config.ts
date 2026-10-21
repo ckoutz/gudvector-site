@@ -47,6 +47,7 @@ export const footerNav: {
     heading: "Company",
     links: [
       { label: "Contact", href: "/contact" },
+      { label: "Concord & Contra Costa", href: "/concord" },
       { label: "Customer portal", href: "/portal" },
     ],
   },
