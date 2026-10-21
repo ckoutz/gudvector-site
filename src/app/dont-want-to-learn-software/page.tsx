@@ -77,7 +77,7 @@ export default function DontWantToLearnSoftwarePage() {
         <SectionHeading
           eyebrow="Try it"
           title="Text Gus on a demo we built."
-          lede="Larkspur Lawn & Garden is a fictional landscaping company. We made it up to show how this works, so its reviews and details aren't real. Open the owner side and text Gus yourself."
+          lede="Larkspur is a made-up landscaping company. Gus works the same way for any trade. Its reviews and details aren't real. Open the owner side and text Gus yourself."
         />
         <a
           href={siteConfig.demoUrl}

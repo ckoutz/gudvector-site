@@ -51,7 +51,7 @@ export default function LandscapersPage() {
         <SectionHeading
           eyebrow="Try it"
           title="See it on a demo we built."
-          lede="Larkspur Lawn & Garden is a fictional landscaping company. We made it up to show how this works, so its reviews and details aren't real. Ask for an estimate as a customer, then see the owner side and text Gus yourself."
+          lede="Larkspur is a made-up landscaping company. Gus works the same way for any trade. Its reviews and details aren't real. Ask for an estimate as a customer, then see the owner side and text Gus yourself."
         />
         <a
           href={siteConfig.demoUrl}
@@ -69,7 +69,7 @@ export default function LandscapersPage() {
               {
                 question: "Is Larkspur Lawn & Garden a real business?",
                 answer:
-                  "No. It's a demo we built. The reviews, years in business and other details on that site are made up, so you can try everything without bothering a real company.",
+                  "No. Larkspur is a made-up landscaping company. Gus works the same way for any trade. The reviews, years in business and other details on that site are made up, so you can try everything without bothering a real company.",
               },
               {
                 question: "Does Gus book visits or send quotes on his own?",

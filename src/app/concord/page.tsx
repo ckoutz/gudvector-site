@@ -5,11 +5,12 @@ import { FeatureList, Section, SectionHeading } from "@/components/section";
 import { Faq } from "@/components/faq";
 import { CtaBand } from "@/components/cta-band";
 import { siteConfig } from "@/lib/site-config";
+import { whoWeHelp } from "@/lib/trades";
 
 export const metadata: Metadata = {
   title: "Websites and an Office Manager for Concord & Contra Costa Service Businesses",
   description:
-    "Güd Vector Consulting Services is a Bay Area firm based in Concord, California, that builds websites, owner-approved quoting and Gus, an office manager you run by text, for service businesses in Concord and across Contra Costa.",
+    "Güd Vector Consulting Services builds websites, owner-approved quoting and Gus, an office manager you run by text, for service businesses in Concord and across Contra Costa. East Bay, based in Concord, California.",
   alternates: { canonical: "/concord" },
 };
 
@@ -42,16 +43,6 @@ const towns = [
   "Bay Point",
 ];
 
-const trades = [
-  "Landscaping and gardening",
-  "Plumbing",
-  "HVAC",
-  "Electrical",
-  "Cleaning",
-  "Home inspection",
-  "Environmental testing",
-];
-
 const guides = [
   {
     title: "Owner-approved quoting",
@@ -63,11 +54,6 @@ const guides = [
     body: "Don't want to learn software? Text Gus like a person.",
     href: "/dont-want-to-learn-software",
   },
-  {
-    title: "For landscapers",
-    body: "Estimates, quotes and who still owes you, from the truck.",
-    href: "/landscapers",
-  },
 ];
 
 export default function ConcordPage() {
@@ -76,7 +62,7 @@ export default function ConcordPage() {
       <PageHero
         eyebrow="Concord & Contra Costa"
         h1="Websites and an office manager for Concord service businesses."
-        lede="Güd Vector Consulting Services is a Bay Area firm based in Concord, California, that builds websites, owner-approved quoting and Gus, an office manager you run by text, for owner-run service businesses in Concord and across Contra Costa."
+        lede="Güd Vector Consulting Services builds websites, owner-approved quoting and Gus, an office manager you run by text, for owner-run service businesses in Concord and across Contra Costa. East Bay, based in Concord, California."
       />
 
       <Section className="border-t border-line">
@@ -114,17 +100,23 @@ export default function ConcordPage() {
           </div>
           <div>
             <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink sm:text-3xl">
-              Trades we build for
+              Who we help
             </h2>
             <ul className="mt-6 flex flex-col gap-3 text-[16px] text-char">
-              {trades.map((trade) => (
-                <li key={trade} className="border-t border-line pt-3">
-                  {trade}
+              {whoWeHelp.map((trade) => (
+                <li key={trade.href} className="border-t border-line pt-3">
+                  <Link
+                    href={trade.href}
+                    className="font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-orange"
+                  >
+                    {trade.label}
+                  </Link>
                 </li>
               ))}
             </ul>
             <p className="mt-6 text-[16px] leading-relaxed text-muted">
-              And similar owner-run crews, from one truck to a few.
+              And electricians, home inspectors, environmental testing firms and
+              similar owner-run crews, from one truck to a few.
             </p>
           </div>
         </div>
@@ -139,7 +131,7 @@ export default function ConcordPage() {
         <SectionHeading
           eyebrow="Try it"
           title="See it on a demo we built."
-          lede="Larkspur Lawn & Garden is a fictional landscaping company. We made it up to show how this works, so its reviews and details aren't real. Ask for an estimate as a customer, then see the owner side and text Gus yourself."
+          lede="Larkspur is a made-up landscaping company. Gus works the same way for any trade. Its reviews and details aren't real. Ask for an estimate as a customer, then see the owner side and text Gus yourself."
         />
         <a
           href={siteConfig.demoUrl}
