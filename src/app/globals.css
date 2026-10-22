@@ -89,3 +89,51 @@ p {
     scroll-behavior: auto !important;
   }
 }
+
+/* Owner calendar (FullCalendar) in the site's palette. */
+.owner-calendar {
+  --fc-border-color: var(--color-line);
+  --fc-button-bg-color: var(--color-paper);
+  --fc-button-border-color: var(--color-line);
+  --fc-button-text-color: var(--color-ink);
+  --fc-button-hover-bg-color: var(--color-peach);
+  --fc-button-hover-border-color: var(--color-line);
+  --fc-button-active-bg-color: var(--color-ink);
+  --fc-button-active-border-color: var(--color-ink);
+  --fc-today-bg-color: #fff7ed;
+  --fc-now-indicator-color: var(--color-orange);
+  font-size: 13px;
+}
+.owner-calendar .fc .fc-button {
+  min-height: 2.75rem;
+  border-radius: 9999px;
+  padding: 0 0.9rem;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+  box-shadow: none;
+}
+.owner-calendar .fc .fc-button-primary:not(:disabled).fc-button-active,
+.owner-calendar .fc .fc-button-primary:not(:disabled):active {
+  color: var(--color-paper);
+}
+.owner-calendar .fc .fc-button-group > .fc-button:not(:first-child) {
+  margin-left: 2px;
+}
+.owner-calendar .fc .fc-toolbar {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.owner-calendar .fc .fc-toolbar-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+.owner-calendar .fc .fc-col-header-cell-cushion,
+.owner-calendar .fc .fc-daygrid-day-number {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+.owner-calendar .fc-event {
+  cursor: pointer;
+}

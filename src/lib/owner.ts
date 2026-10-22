@@ -155,6 +155,9 @@ export type OwnerCalendarEvent = {
   inviteeName: string | null;
   inviteeEmail: string | null;
   reference: string | null;
+  /** Set on visits from our own scheduling engine, which the owner can change here. */
+  eventId?: string | null;
+  status?: string | null;
 };
 
 export type OwnerCalendar = { events: OwnerCalendarEvent[]; problems: string[] };
@@ -256,6 +259,8 @@ type MockOwnerState = {
   plans: OwnerSubscription[];
   payments: OwnerPayment[];
   invoices: OwnerInvoice[];
+  /** Mock engine visits: added, moved and cancelled from the calendar. */
+  visits: OwnerCalendarEvent[];
 };
 
 /** Mock mode shows invoices only when asked, like a production business without them. */
@@ -280,6 +285,26 @@ function allDayAt(daysFromToday: number): string {
   return `${date}T00:00:00.000Z`;
 }
 
+function mockVisits(): OwnerCalendarEvent[] {
+  const visit = (id: string, day: number, hour: number, minute: number, name: string, title: string, location: string) => ({
+    source: "booking" as const,
+    title,
+    start: at(day, hour, minute),
+    end: at(day, hour + 1, minute),
+    allDay: false,
+    location,
+    inviteeName: name,
+    inviteeEmail: null,
+    reference: null,
+    eventId: id,
+    status: "confirmed",
+  });
+  return [
+    visit("mock-visit-1", 2, 9, 0, "Marcus Hale", "Leak repair estimate", "11 Birch Lane"),
+    visit("mock-visit-2", 3, 10, 30, "Jim Foster", "Water heater check", "5 Cedar Way"),
+  ];
+}
+
 function mockOwnerState(): MockOwnerState {
   const g = globalThis as { __gvasMockOwner?: MockOwnerState };
   if (g.__gvasMockOwner) {
@@ -287,6 +312,7 @@ function mockOwnerState(): MockOwnerState {
     g.__gvasMockOwner.statusBeforePaid ??= new Map();
     g.__gvasMockOwner.plans ??= [];
     g.__gvasMockOwner.payments ??= [];
+    g.__gvasMockOwner.visits ??= mockVisits();
     return g.__gvasMockOwner;
   }
   const quote = (
@@ -324,6 +350,7 @@ function mockOwnerState(): MockOwnerState {
     plans: [],
     payments: [],
     invoices: [],
+    visits: mockVisits(),
     sessions: new Set<string>(),
     quotes: [
       quote(
@@ -461,6 +488,7 @@ function mockCalendar(state: MockOwnerState, start: Date, end: Date): OwnerCalen
     { source: "calendar", title: "Family trip", start: allDayAt(5), end: allDayAt(7), allDay: true, location: null, inviteeName: null, inviteeEmail: null, reference: null },
     { source: "booking", title: "Drain maintenance", start: at(5, 14), end: at(5, 15), allDay: false, location: "7 Pine Court", inviteeName: "Sam Ortiz", inviteeEmail: "sam@example.com", reference: null },
   ];
+  events.push(...state.visits.filter((visit) => visit.status === "confirmed"));
   for (const booking of state.bookings) {
     if (booking.needsDecision && booking.requestedStart) {
       events.push({
@@ -719,6 +747,82 @@ export async function decideOwnerBooking(
     sessionToken,
     { method: "POST", body: JSON.stringify(approve ? {} : { reason: reason || null }) },
   );
+}
+
+export type NewOwnerVisit = {
+  start: string;
+  end: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  notes?: string | null;
+};
+
+function mockVisit(sessionToken: string, eventId: string): OwnerCalendarEvent {
+  const visit = assertMockOwner(sessionToken).visits.find((item) => item.eventId === eventId);
+  if (!visit || visit.status !== "confirmed") throw new GvasError("conflict", "That visit wasn't found.", 409);
+  return visit;
+}
+
+function mockOverlaps(sessionToken: string, start: string, end: string, except?: string): boolean {
+  return assertMockOwner(sessionToken).visits.some(
+    (item) =>
+      item.status === "confirmed" &&
+      item.eventId !== except &&
+      item.start < end &&
+      (item.end ?? item.start) > start,
+  );
+}
+
+const OVERLAP = "That time overlaps another visit or a time someone is booking.";
+
+export async function moveOwnerVisit(sessionToken: string, eventId: string, start: string, end: string): Promise<void> {
+  if (gvasEnv.mock) {
+    const visit = mockVisit(sessionToken, eventId);
+    if (mockOverlaps(sessionToken, start, end, eventId)) throw new GvasError("conflict", OVERLAP, 409);
+    Object.assign(visit, { start, end });
+    return;
+  }
+  await ownerRequest(`/v1/owner/visits/${enc(eventId)}/move`, sessionToken, {
+    method: "POST",
+    body: JSON.stringify({ start, end }),
+  });
+}
+
+export async function cancelOwnerVisit(sessionToken: string, eventId: string): Promise<void> {
+  if (gvasEnv.mock) {
+    mockVisit(sessionToken, eventId).status = "cancelled";
+    return;
+  }
+  await ownerRequest(`/v1/owner/visits/${enc(eventId)}/cancel`, sessionToken, { method: "POST" });
+}
+
+export async function addOwnerVisit(sessionToken: string, visit: NewOwnerVisit): Promise<string> {
+  if (gvasEnv.mock) {
+    const state = assertMockOwner(sessionToken);
+    if (mockOverlaps(sessionToken, visit.start, visit.end)) throw new GvasError("conflict", OVERLAP, 409);
+    const eventId = `mock-visit-${state.visits.length + 1}`;
+    state.visits.push({
+      source: "booking",
+      title: visit.notes?.trim() || "Visit",
+      start: visit.start,
+      end: visit.end,
+      allDay: false,
+      location: visit.address ?? null,
+      inviteeName: visit.name,
+      inviteeEmail: visit.email ?? null,
+      reference: null,
+      eventId,
+      status: "confirmed",
+    });
+    return eventId;
+  }
+  const added = await ownerRequest<{ eventId: string }>("/v1/owner/visits", sessionToken, {
+    method: "POST",
+    body: JSON.stringify(visit),
+  });
+  return added.eventId;
 }
 
 export async function getOwnerRequests(sessionToken: string): Promise<OwnerServiceRequest[]> {

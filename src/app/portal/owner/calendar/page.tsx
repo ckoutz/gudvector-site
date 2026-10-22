@@ -7,21 +7,16 @@ import {
   type OwnerCalendar,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
-import { CalendarLegend, DayAgenda } from "../agenda";
-import { Card, LoadError, buttonSecondary, dayKey, firstParam, onDay, zoneName } from "../ui";
+import { LoadError, dayKey, firstParam, zoneName } from "../ui";
+import { OwnerCalendarView, type CalendarViewName } from "./owner-calendar";
 
 export const dynamic = "force-dynamic";
 
-const DAYS = 7;
-
-function dayLabel(key: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${key}T12:00:00Z`));
-}
+const VIEWS: Record<string, CalendarViewName> = {
+  timeGridDay: "timeGridDay",
+  timeGridWeek: "timeGridWeek",
+  dayGridMonth: "dayGridMonth",
+};
 
 export default async function OwnerCalendarPage({
   searchParams,
@@ -29,23 +24,19 @@ export default async function OwnerCalendarPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const week = Math.max(-8, Math.min(8, Number.parseInt(firstParam(params.week) ?? "0", 10) || 0));
+  const view = VIEWS[firstParam(params.view) ?? ""] ?? "timeGridWeek";
   const token = await requireOwnerSessionToken();
   const zone = await getOwnerTimeZone(token);
 
   const todayKey = dayKey(new Date(), zone);
-  const first = new Date(`${todayKey}T12:00:00Z`);
-  first.setUTCDate(first.getUTCDate() + week * DAYS);
-  const keys = Array.from({ length: DAYS }, (_, index) => {
-    const day = new Date(first);
-    day.setUTCDate(first.getUTCDate() + index);
-    return day.toISOString().slice(0, 10);
-  });
-  // Pad the window by a day each side; events are grouped by local day below.
-  const start = new Date(`${keys[0]}T00:00:00Z`);
-  start.setUTCDate(start.getUTCDate() - 1);
-  const end = new Date(`${keys[DAYS - 1]}T00:00:00Z`);
-  end.setUTCDate(end.getUTCDate() + 2);
+  const asked = firstParam(params.date) ?? "";
+  const dateKey = /^\d{4}-\d{2}-\d{2}$/.test(asked) && !Number.isNaN(Date.parse(asked)) ? asked : todayKey;
+  // Cover the whole visible grid (a month view shows up to 6 weeks), padded a
+  // day each side for time zones; the backend allows up to 62 days.
+  const start = new Date(`${dateKey}T00:00:00Z`);
+  start.setUTCDate(start.getUTCDate() - 8);
+  const end = new Date(`${dateKey}T00:00:00Z`);
+  end.setUTCDate(end.getUTCDate() + (view === "dayGridMonth" ? 50 : 16));
 
   let calendar: OwnerCalendar | null = null;
   let bookings: OwnerBooking[] = [];
@@ -65,31 +56,13 @@ export default async function OwnerCalendarPage({
     console.error("OwnerCalendar: bookings load failed", bookingsResult.reason);
   }
 
-  const rangeLabel = `${dayLabel(keys[0])} – ${dayLabel(keys[DAYS - 1])}`;
-
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-[17px] font-semibold text-ink">{rangeLabel}</h2>
+          <h2 className="text-[17px] font-semibold text-ink">Calendar</h2>
           <p className="mt-0.5 text-[12px] text-muted">Times shown in {zoneName(zone)}.</p>
         </div>
-        <div className="flex gap-2">
-          <Link href={`/portal/owner/calendar?week=${week - 1}`} className={buttonSecondary}>
-            Previous
-          </Link>
-          {week !== 0 && (
-            <Link href="/portal/owner/calendar" className={buttonSecondary}>
-              This week
-            </Link>
-          )}
-          <Link href={`/portal/owner/calendar?week=${week + 1}`} className={buttonSecondary}>
-            Next
-          </Link>
-        </div>
-      </div>
-      <div className="mt-4">
-        <CalendarLegend />
       </div>
 
       {calendar === null ? (
@@ -97,22 +70,20 @@ export default async function OwnerCalendarPage({
           <LoadError label="your calendar" />
         </div>
       ) : (
-        <div className="mt-6 space-y-4">
+        <div className="mt-4 space-y-4">
           {calendar.problems.length > 0 && (
             <div className="rounded-2xl border border-line bg-peach-2 px-5 py-3 text-[13px] text-muted" role="alert">
               {calendar.problems.join(" ")}
             </div>
           )}
-          {keys.map((key) => {
-            const events = calendar.events.filter((event) => onDay(event, key, zone));
-            return (
-              <div key={key} id={`day-${key}`} className="scroll-mt-4">
-                <Card title={`${dayLabel(key)}${key === todayKey ? " · Today" : ""}`}>
-                  <DayAgenda events={events} bookings={bookings} empty="Nothing scheduled." zone={zone} day={key} />
-                </Card>
-              </div>
-            );
-          })}
+          <OwnerCalendarView
+            events={calendar.events}
+            bookings={bookings}
+            zone={zone}
+            initialView={view}
+            initialDate={dateKey}
+            viewChosen={Boolean(VIEWS[firstParam(params.view) ?? ""])}
+          />
           <p className="text-[13px] text-muted">
             Your own calendar shows here once you add its private link in{" "}
             <Link href="/portal/owner/settings" className="font-medium text-orange-ink underline underline-offset-2">

@@ -5,11 +5,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isGvasError } from "@/lib/gvas";
 import {
+  addOwnerVisit,
+  cancelOwnerVisit,
   decideOwnerBooking,
   decideOwnerQuote,
   deleteOwnerSession,
   markOwnerQuotePaid,
   markOwnerQuoteUnpaid,
+  moveOwnerVisit,
+  type NewOwnerVisit,
   recordOwnerPlanPayment,
   sendOwnerInvoice,
   undoOwnerPlanPayment,
@@ -274,4 +278,50 @@ export async function signOutOwner(): Promise<void> {
   }
   store.delete(OWNER_SESSION_COOKIE);
   redirect("/portal/login");
+}
+
+export type VisitResult = { ok: boolean; message?: string };
+
+async function visitChange(change: (token: string) => Promise<unknown>, label: string): Promise<VisitResult> {
+  const token = await requireOwnerSessionToken();
+  try {
+    await change(token);
+  } catch (err) {
+    redirectOwnerOnUnauthorized(err);
+    if (isGvasError(err) && err.kind === "conflict") return { ok: false, message: err.message };
+    console.error(`${label} failed`, err);
+    return { ok: false, message: "That didn't go through. Please try again." };
+  }
+  revalidatePath("/portal/owner", "layout");
+  return { ok: true };
+}
+
+const isoTime = (value: string) => !Number.isNaN(Date.parse(value)) && /[zZ]|[+-]\d\d:\d\d$/.test(value);
+
+export async function moveVisitAction(eventId: string, start: string, end: string): Promise<VisitResult> {
+  if (!isoTime(start) || !isoTime(end)) return { ok: false, message: "That time isn't valid." };
+  return visitChange((token) => moveOwnerVisit(token, eventId, start, end), "moveVisitAction");
+}
+
+export async function cancelVisitAction(eventId: string): Promise<VisitResult> {
+  return visitChange((token) => cancelOwnerVisit(token, eventId), "cancelVisitAction");
+}
+
+export async function addVisitAction(visit: NewOwnerVisit): Promise<VisitResult> {
+  if (!isoTime(visit.start) || !isoTime(visit.end)) return { ok: false, message: "That time isn't valid." };
+  if (!visit.name?.trim()) return { ok: false, message: "Add the customer's name." };
+  const clean = (value?: string | null, max = 500) => value?.trim().slice(0, max) || null;
+  return visitChange(
+    (token) =>
+      addOwnerVisit(token, {
+        start: visit.start,
+        end: visit.end,
+        name: visit.name.trim().slice(0, 200),
+        email: clean(visit.email, 320),
+        phone: clean(visit.phone, 40),
+        address: clean(visit.address),
+        notes: clean(visit.notes, 2000),
+      }),
+    "addVisitAction",
+  );
 }
