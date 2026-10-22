@@ -38,7 +38,7 @@ export const footerNav: {
       { label: siteConfig.officeName, href: "/office" },
       { label: "Custom AI", href: "/custom-ai" },
       { label: "Owner-approved quoting", href: "/owner-approved-quoting" },
-      { label: "Run it by text", href: "/dont-want-to-learn-software" },
+      { label: "No software to learn", href: "/dont-want-to-learn-software" },
     ],
   },
   {

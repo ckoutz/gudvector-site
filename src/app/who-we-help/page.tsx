@@ -39,7 +39,7 @@ const guides = [
     href: "/owner-approved-quoting",
   },
   {
-    title: "Run it by text",
+    title: "No software to learn",
     body: "Don't want to learn software? Text Gus like a person.",
     href: "/dont-want-to-learn-software",
   },
