@@ -8,8 +8,8 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import type { DateSelectArg, DatesSetArg, EventClickArg, EventDropArg, EventInput } from "@fullcalendar/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import type { OwnerBooking, OwnerCalendarEvent } from "@/lib/owner";
-import { addVisitAction, cancelVisitAction, decideBookingAction, moveVisitAction } from "../actions";
+import type { OwnerBooking, OwnerCalendarEvent, OwnerTeamMember } from "@/lib/owner";
+import { addVisitAction, cancelVisitAction, decideBookingAction, moveVisitAction, setOfferingAction } from "../actions";
 import { buttonSecondary, formatDateTime } from "../ui";
 
 export type CalendarViewName = "timeGridDay" | "timeGridWeek" | "dayGridMonth";
@@ -28,6 +28,20 @@ function colorsFor(event: OwnerCalendarEvent) {
   return COLORS.confirmed;
 }
 
+const PALETTE = ["#2f6b45", "#2563eb", "#9333ea", "#c2410c", "#0f766e", "#be185d", "#4d7c0f", "#1e40af"];
+
+/** One colour per person: their own, else a fixed palette by position. */
+function teamColors(team: OwnerTeamMember[]): Map<string, string> {
+  return new Map(team.map((member, index) => [member.employeeId, member.color ?? PALETTE[index % PALETTE.length]]));
+}
+
+function personColors(color: string) {
+  return { backgroundColor: `${color}1f`, borderColor: color, textColor: "#1f1d1a" };
+}
+
+const timeOnly = (iso: string, zone: string) =>
+  new Intl.DateTimeFormat("en-US", { timeZone: zone, hour: "numeric", minute: "2-digit" }).format(new Date(iso));
+
 const mapsLink = (address: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
 type Selected = { event: OwnerCalendarEvent; booking: OwnerBooking | null };
@@ -36,6 +50,7 @@ type Draft = { start: string; end: string };
 export function OwnerCalendarView({
   events,
   bookings,
+  team,
   zone,
   initialView,
   initialDate,
@@ -44,6 +59,8 @@ export function OwnerCalendarView({
 }: {
   events: OwnerCalendarEvent[];
   bookings: OwnerBooking[];
+  /** Everyone with a calendar; the team view shows only with two or more. */
+  team: OwnerTeamMember[];
   zone: string;
   initialView: CalendarViewName;
   initialDate: string;
@@ -67,16 +84,29 @@ export function OwnerCalendarView({
     () => new Map(bookings.map((booking) => [booking.reference.toLowerCase(), booking])),
     [bookings],
   );
-  const inputs: EventInput[] = events.map((event, index) => ({
-    id: event.eventId ?? `${event.source}-${index}`,
-    title: event.inviteeName && event.inviteeName !== event.title ? `${event.inviteeName} · ${event.title}` : event.title,
-    start: event.allDay ? event.start.slice(0, 10) : event.start,
-    end: (event.allDay ? event.end?.slice(0, 10) : event.end) ?? undefined,
-    allDay: event.allDay,
-    editable: canEdit && Boolean(event.eventId) && event.status === "confirmed",
-    extendedProps: { index },
-    ...colorsFor(event),
-  }));
+  const teamOn = team.length > 1;
+  const colorOf = useMemo(() => teamColors(team), [team]);
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const [viewType, setViewType] = useState<string>(initialView);
+  const inputs: EventInput[] = events.flatMap((event, index) => {
+    if (teamOn && event.employeeId && hidden.has(event.employeeId)) return [];
+    const named = event.inviteeName && event.inviteeName !== event.title ? `${event.inviteeName} · ${event.title}` : event.title;
+    const person = teamOn && event.source === "booking" && event.employeeId ? colorOf.get(event.employeeId) : undefined;
+    const unassigned = teamOn && event.source === "booking" && event.assigned === false;
+    return [
+      {
+        id: event.eventId ?? `${event.source}-${index}`,
+        title: unassigned ? `Unassigned · ${named}` : named,
+        start: event.allDay ? event.start.slice(0, 10) : event.start,
+        end: (event.allDay ? event.end?.slice(0, 10) : event.end) ?? undefined,
+        allDay: event.allDay,
+        editable: canEdit && Boolean(event.eventId) && event.status === "confirmed",
+        extendedProps: { index },
+        classNames: unassigned ? ["fc-unassigned"] : [],
+        ...(person ? personColors(person) : colorsFor(event)),
+      },
+    ];
+  });
   const needsYou = events.filter((event) => event.source === "request");
 
   function run(change: () => Promise<{ ok: boolean; message?: string }>, done?: () => void, undo?: () => void) {
@@ -114,6 +144,7 @@ export function OwnerCalendarView({
   }
 
   function onDates(arg: DatesSetArg) {
+    setViewType(arg.view.type);
     const params = new URLSearchParams({ view: arg.view.type, date: arg.view.currentStart.toISOString().slice(0, 10) });
     if (params.get("view") !== initialView || params.get("date") !== initialDate) {
       router.replace(`/portal/owner/calendar?${params.toString()}`, { scroll: false });
@@ -128,6 +159,36 @@ export function OwnerCalendarView({
             {message}
           </p>
         )}
+        {teamOn && (
+          <div className="mb-3 flex flex-wrap items-center gap-2 text-[12px]" role="group" aria-label="Show people">
+            <span className="text-muted">Show:</span>
+            {team.map((member) => {
+              const shown = !hidden.has(member.employeeId);
+              const color = colorOf.get(member.employeeId) as string;
+              return (
+                <button
+                  key={member.employeeId}
+                  type="button"
+                  aria-pressed={shown}
+                  onClick={() =>
+                    setHidden((before) => {
+                      const next = new Set(before);
+                      if (shown) next.add(member.employeeId);
+                      else next.delete(member.employeeId);
+                      return next;
+                    })
+                  }
+                  className="flex min-h-9 items-center gap-1.5 rounded-full border px-3"
+                  style={shown ? { borderColor: color, backgroundColor: `${color}1f` } : { borderColor: "#d8d5cd", opacity: 0.55 }}
+                >
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} aria-hidden />
+                  {member.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {teamOn && viewType === "timeGridDay" && <WhereIsEveryone team={team} events={events} colorOf={colorOf} zone={zone} />}
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, luxonPlugin]}
@@ -164,15 +225,28 @@ export function OwnerCalendarView({
       </div>
 
       <aside className="space-y-4">
-        {draft && <AddVisit draft={draft} zone={zone} pending={pending} onCancel={() => setDraft(null)} onSave={(visit) => run(() => addVisitAction(visit), () => setDraft(null))} />}
+        {draft && (
+          <AddVisit
+            draft={draft}
+            zone={zone}
+            pending={pending}
+            team={teamOn ? team : []}
+            onCancel={() => setDraft(null)}
+            onSave={(visit) => run(() => addVisitAction(visit), () => setDraft(null))}
+          />
+        )}
         {selected && (
           <VisitPanel
             selected={selected}
             zone={zone}
             pending={pending}
             canEdit={canEdit}
+            team={teamOn ? team : []}
             onClose={() => setSelected(null)}
             onCancelVisit={(eventId) => run(() => cancelVisitAction(eventId), () => setSelected(null))}
+            onAssign={(event, employeeId) =>
+              run(() => moveVisitAction(event.eventId as string, event.start, event.end ?? event.start, employeeId), () => setSelected(null))
+            }
           />
         )}
         <section className="rounded-2xl border border-line bg-paper p-4">
@@ -194,6 +268,9 @@ export function OwnerCalendarView({
             ))}
           </ul>
         </section>
+        {teamOn && canEdit && (
+          <Offering team={team} pending={pending} onSave={(ids) => run(() => setOfferingAction(ids))} />
+        )}
         <section className="rounded-2xl border border-line bg-paper p-4 text-[12px] text-muted">
           <h3 className="text-[13px] font-semibold text-ink">Legend</h3>
           <ul className="mt-2 space-y-1.5">
@@ -203,6 +280,7 @@ export function OwnerCalendarView({
                 ["Pending approval", COLORS.pending],
                 ["Completed", COLORS.completed],
                 ["Your own calendar", COLORS.calendar],
+                ...team.filter(() => teamOn).map((member) => [member.name, personColors(colorOf.get(member.employeeId) as string)] as const),
               ] as const
             ).map(([label, colors]) => (
               <li key={label} className="flex items-center gap-2">
@@ -222,16 +300,21 @@ function VisitPanel({
   zone,
   pending,
   canEdit,
+  team,
   onClose,
   onCancelVisit,
+  onAssign,
 }: {
   selected: Selected;
   zone: string;
   pending: boolean;
   canEdit: boolean;
+  team: OwnerTeamMember[];
   onClose: () => void;
   onCancelVisit: (eventId: string) => void;
+  onAssign: (event: OwnerCalendarEvent, employeeId: string) => void;
 }) {
+  const active = team.filter((member) => member.active);
   const { event, booking } = selected;
   const address = event.location ?? booking?.customer.address ?? null;
   return (
@@ -245,6 +328,9 @@ function VisitPanel({
       <p className="mt-1 text-muted">{event.allDay ? "All day" : formatDateTime(event.start, zone)}</p>
       <dl className="mt-3 space-y-1.5">
         {event.title && event.title !== event.inviteeName && <Row label="Service" value={event.title} />}
+        {team.length > 0 && event.source === "booking" && event.employeeId && (
+          <Row label="Who" value={event.assigned === false ? "Unassigned" : (event.employeeName ?? "Unassigned")} />
+        )}
         {address && (
           <div>
             <dt className="text-muted">Address</dt>
@@ -265,6 +351,19 @@ function VisitPanel({
             <input type="hidden" name="reference" value={event.reference} />
             <input type="hidden" name="decision" value="approve" />
             <input type="hidden" name="returnTo" value="/portal/owner/calendar" />
+            {active.length > 0 && (
+              <label className="mb-2 block text-[12px] text-muted">
+                Who does it
+                <select name="employeeId" defaultValue="" className="mt-1 block w-full rounded-lg border border-line bg-paper px-2 py-1.5 text-[13px] text-ink">
+                  <option value="">Decide later</option>
+                  {active.map((member) => (
+                    <option key={member.employeeId} value={member.employeeId}>
+                      {member.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <button type="submit" className="rounded-full bg-ink px-4 py-1.5 text-[13px] font-medium text-paper">
               Approve
             </button>
@@ -282,6 +381,37 @@ function VisitPanel({
       {canEdit && event.eventId && event.status === "confirmed" && (
         <div className="mt-4 space-y-2">
           <p className="text-[12px] text-muted">Drag the visit on the calendar to move it. The customer is told.</p>
+          {active.length > 0 && (
+            <form
+              className="flex flex-wrap items-end gap-2"
+              onSubmit={(submit) => {
+                submit.preventDefault();
+                const employeeId = String(new FormData(submit.currentTarget).get("employeeId") ?? "");
+                if (employeeId) onAssign(event, employeeId);
+              }}
+            >
+              <label className="text-[12px] text-muted">
+                Give to
+                <select
+                  name="employeeId"
+                  defaultValue={event.assigned === false ? "" : (event.employeeId ?? "")}
+                  className="mt-1 block rounded-lg border border-line bg-paper px-2 py-1.5 text-[13px] text-ink"
+                >
+                  <option value="" disabled>
+                    Pick someone
+                  </option>
+                  {active.map((member) => (
+                    <option key={member.employeeId} value={member.employeeId}>
+                      {member.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button type="submit" disabled={pending} className={buttonSecondary}>
+                Assign
+              </button>
+            </form>
+          )}
           <button type="button" disabled={pending} onClick={() => onCancelVisit(event.eventId as string)} className={buttonSecondary}>
             Cancel this visit
           </button>
@@ -304,14 +434,25 @@ function AddVisit({
   draft,
   zone,
   pending,
+  team,
   onCancel,
   onSave,
 }: {
   draft: Draft;
   zone: string;
   pending: boolean;
+  team: OwnerTeamMember[];
   onCancel: () => void;
-  onSave: (visit: { start: string; end: string; name: string; phone: string; email: string; address: string; notes: string }) => void;
+  onSave: (visit: {
+    start: string;
+    end: string;
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+    notes: string;
+    employeeId: string;
+  }) => void;
 }) {
   const field = "mt-1 w-full rounded-lg border border-line bg-paper px-3 py-1.5 text-[13px]";
   return (
@@ -322,7 +463,7 @@ function AddVisit({
         submit.preventDefault();
         const data = new FormData(submit.currentTarget);
         const value = (name: string) => String(data.get(name) ?? "");
-        onSave({ ...draft, name: value("name"), phone: value("phone"), email: value("email"), address: value("address"), notes: value("notes") });
+        onSave({ ...draft, name: value("name"), phone: value("phone"), email: value("email"), address: value("address"), notes: value("notes"), employeeId: value("employeeId") });
       }}
     >
       <h3 className="text-[15px] font-semibold text-ink">Add a visit</h3>
@@ -349,6 +490,21 @@ function AddVisit({
         Service or notes
         <input name="notes" maxLength={2000} className={field} />
       </label>
+      {team.length > 0 && (
+        <label className="mt-2 block">
+          Who does it
+          <select name="employeeId" defaultValue="" className={field}>
+            <option value="">Decide later</option>
+            {team
+              .filter((member) => member.active)
+              .map((member) => (
+                <option key={member.employeeId} value={member.employeeId}>
+                  {member.name}
+                </option>
+              ))}
+          </select>
+        </label>
+      )}
       <div className="mt-3 flex gap-2">
         <button type="submit" disabled={pending} className="rounded-full bg-ink px-4 py-1.5 text-[13px] font-medium text-paper">
           Add visit
@@ -357,6 +513,85 @@ function AddVisit({
           Cancel
         </button>
       </div>
+    </form>
+  );
+}
+
+/** Day view: what each person is doing right now, or their next visit today. */
+function WhereIsEveryone({
+  team,
+  events,
+  colorOf,
+  zone,
+}: {
+  team: OwnerTeamMember[];
+  events: OwnerCalendarEvent[];
+  colorOf: Map<string, string>;
+  zone: string;
+}) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: zone }).format(new Date(now));
+  const dayOf = (iso: string) => new Intl.DateTimeFormat("en-CA", { timeZone: zone }).format(new Date(iso));
+  const visits = events.filter((event) => event.source === "booking" && !event.allDay && event.employeeId && event.status !== "cancelled");
+  return (
+    <section aria-label="Where is everyone now" className="mb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      {team
+        .filter((member) => member.active)
+        .map((member) => {
+          const mine = visits
+            .filter((event) => event.employeeId === member.employeeId && dayOf(event.start) === today)
+            .sort((a, b) => a.start.localeCompare(b.start));
+          const current = mine.find((event) => Date.parse(event.start) <= now && Date.parse(event.end ?? event.start) > now);
+          const next = mine.find((event) => Date.parse(event.start) > now);
+          const color = colorOf.get(member.employeeId) as string;
+          const where = (event: OwnerCalendarEvent) => event.location ?? event.inviteeName ?? event.title;
+          return (
+            <div key={member.employeeId} className="min-w-0 rounded-xl border-l-4 bg-paper-2 px-3 py-2 text-[12px]" style={{ borderLeftColor: color, backgroundColor: `${color}12` }}>
+              <p className="font-semibold text-ink">{member.name}</p>
+              <p className="truncate text-muted">
+                {current
+                  ? `Now: ${where(current)} until ${timeOnly(current.end ?? current.start, zone)}`
+                  : next
+                    ? `Free. Next: ${where(next)} at ${timeOnly(next.start, zone)}`
+                    : "Free for the rest of today"}
+              </p>
+            </div>
+          );
+        })}
+    </section>
+  );
+}
+
+/** Whose open times Gus offers customers. */
+function Offering({ team, pending, onSave }: { team: OwnerTeamMember[]; pending: boolean; onSave: (ids: string[]) => void }) {
+  return (
+    <form
+      className="rounded-2xl border border-line bg-paper p-4 text-[13px]"
+      aria-label="Whose times Gus offers"
+      onSubmit={(submit) => {
+        submit.preventDefault();
+        onSave(new FormData(submit.currentTarget).getAll("employeeId").map(String));
+      }}
+    >
+      <h3 className="text-[15px] font-semibold text-ink">Whose times Gus offers</h3>
+      <p className="mt-1 text-[12px] text-muted">Customers get open times from the people you tick. They never pick a person; you choose who goes when you approve.</p>
+      <div className="mt-2 space-y-1.5">
+        {team
+          .filter((member) => member.active)
+          .map((member) => (
+            <label key={member.employeeId} className="flex min-h-9 items-center gap-2">
+              <input type="checkbox" name="employeeId" value={member.employeeId} defaultChecked={member.offersTimes} />
+              {member.name}
+            </label>
+          ))}
+      </div>
+      <button type="submit" disabled={pending} className={`mt-2 ${buttonSecondary}`}>
+        Save
+      </button>
     </form>
   );
 }

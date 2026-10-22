@@ -5,8 +5,10 @@ import {
   getOwnerGoogleCalendar,
   getOwnerTimeZone,
   type OwnerGoogleCalendar,
+  getOwnerTeam,
   getOwnerVisitEditing,
   type OwnerBooking,
+  type OwnerTeamMember,
   type OwnerCalendar,
 } from "@/lib/owner";
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
@@ -82,11 +84,13 @@ export default async function OwnerCalendarPage({
 
   let calendar: OwnerCalendar | null = null;
   let bookings: OwnerBooking[] = [];
-  const [calendarResult, bookingsResult, googleResult] = await Promise.allSettled([
+  const [calendarResult, bookingsResult, googleResult, teamResult] = await Promise.allSettled([
     getOwnerCalendar(token, start, end),
     getOwnerBookings(token),
     getOwnerGoogleCalendar(token),
+    getOwnerTeam(token),
   ]);
+  const team: OwnerTeamMember[] = teamResult.status === "fulfilled" ? teamResult.value : [];
   if (calendarResult.status === "fulfilled") {
     calendar = calendarResult.value;
   } else {
@@ -125,6 +129,7 @@ export default async function OwnerCalendarPage({
           <OwnerCalendarView
             events={calendar.events}
             bookings={bookings}
+            team={team}
             zone={zone}
             initialView={view}
             initialDate={dateKey}

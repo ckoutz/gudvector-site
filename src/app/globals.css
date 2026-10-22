@@ -137,3 +137,7 @@ p {
 .owner-calendar .fc-event {
   cursor: pointer;
 }
+
+.owner-calendar .fc-unassigned {
+  border-style: dashed;
+}

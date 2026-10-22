@@ -13,6 +13,7 @@ import {
   markOwnerQuotePaid,
   markOwnerQuoteUnpaid,
   moveOwnerVisit,
+  setOwnerOffering,
   type NewOwnerVisit,
   recordOwnerPlanPayment,
   sendOwnerInvoice,
@@ -216,14 +217,19 @@ export async function decideBookingAction(formData: FormData): Promise<void> {
   const reference = String(formData.get("reference") ?? "");
   const approve = formData.get("decision") === "approve";
   const reason = String(formData.get("reason") ?? "").trim().slice(0, 500);
+  const employeeId = String(formData.get("employeeId") ?? "").trim().slice(0, 64);
   let query: Record<string, string>;
   try {
-    const result = await decideOwnerBooking(token, reference, approve, reason || undefined);
+    const result = await decideOwnerBooking(token, reference, approve, reason || undefined, employeeId || undefined);
     query = { message: result.message };
   } catch (err) {
     redirectOwnerOnUnauthorized(err);
-    console.error("decideBookingAction failed", err);
-    query = { notice: "failed" };
+    if (isGvasError(err) && err.kind === "conflict") {
+      query = { message: err.message };
+    } else {
+      console.error("decideBookingAction failed", err);
+      query = { notice: "failed" };
+    }
   }
   back(path, query);
 }
@@ -299,9 +305,21 @@ async function visitChange(change: (token: string) => Promise<unknown>, label: s
 
 const isoTime = (value: string) => !Number.isNaN(Date.parse(value)) && /[zZ]|[+-]\d\d:\d\d$/.test(value);
 
-export async function moveVisitAction(eventId: string, start: string, end: string): Promise<VisitResult> {
+export async function moveVisitAction(
+  eventId: string,
+  start: string,
+  end: string,
+  employeeId?: string,
+): Promise<VisitResult> {
   if (!isoTime(start) || !isoTime(end)) return { ok: false, message: "That time isn't valid." };
-  return visitChange((token) => moveOwnerVisit(token, eventId, start, end), "moveVisitAction");
+  return visitChange((token) => moveOwnerVisit(token, eventId, start, end, employeeId || undefined), "moveVisitAction");
+}
+
+/** Whose open times Gus offers; checkboxes named employeeId. */
+export async function setOfferingAction(employeeIds: string[]): Promise<VisitResult> {
+  const ids = employeeIds.map((id) => id.trim().slice(0, 64)).filter(Boolean);
+  if (!ids.length) return { ok: false, message: "Pick at least one person whose times Gus offers." };
+  return visitChange((token) => setOwnerOffering(token, ids), "setOfferingAction");
 }
 
 export async function cancelVisitAction(eventId: string): Promise<VisitResult> {
@@ -322,6 +340,7 @@ export async function addVisitAction(visit: NewOwnerVisit): Promise<VisitResult>
         phone: clean(visit.phone, 40),
         address: clean(visit.address),
         notes: clean(visit.notes, 2000),
+        employeeId: clean(visit.employeeId, 64),
       }),
     "addVisitAction",
   );

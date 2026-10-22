@@ -158,6 +158,19 @@ export type OwnerCalendarEvent = {
   /** Set on visits from our own scheduling engine, which the owner can change here. */
   eventId?: string | null;
   status?: string | null;
+  /** Whose calendar an engine visit is on, and whether the owner chose them. */
+  employeeId?: string | null;
+  employeeName?: string | null;
+  assigned?: boolean | null;
+};
+
+/** A calendar under the business: the owner's own or an employee's. */
+export type OwnerTeamMember = {
+  employeeId: string;
+  name: string;
+  color: string | null;
+  active: boolean;
+  offersTimes: boolean;
 };
 
 export type OwnerCalendar = { events: OwnerCalendarEvent[]; problems: string[] };
@@ -288,7 +301,17 @@ function allDayAt(daysFromToday: number): string {
 }
 
 function mockVisits(): OwnerCalendarEvent[] {
-  const visit = (id: string, day: number, hour: number, minute: number, name: string, title: string, location: string) => ({
+  const visit = (
+    id: string,
+    day: number,
+    hour: number,
+    minute: number,
+    name: string,
+    title: string,
+    location: string,
+    employeeId: string,
+    assigned = true,
+  ) => ({
     source: "booking" as const,
     title,
     start: at(day, hour, minute),
@@ -300,12 +323,24 @@ function mockVisits(): OwnerCalendarEvent[] {
     reference: null,
     eventId: id,
     status: "confirmed",
+    employeeId,
+    employeeName: MOCK_TEAM.find((member) => member.employeeId === employeeId)?.name ?? null,
+    assigned,
   });
   return [
-    visit("mock-visit-1", 2, 9, 0, "Marcus Hale", "Leak repair estimate", "11 Birch Lane"),
-    visit("mock-visit-2", 3, 10, 30, "Jim Foster", "Water heater check", "5 Cedar Way"),
+    visit("mock-visit-1", 2, 9, 0, "Marcus Hale", "Leak repair estimate", "11 Birch Lane", "mock-owner"),
+    visit("mock-visit-2", 3, 10, 30, "Jim Foster", "Water heater check", "5 Cedar Way", "mock-ana"),
+    visit("mock-visit-3", 0, 8, 30, "Lena Brooks", "Sprinkler repair", "9 Maple Drive", "mock-ana"),
+    visit("mock-visit-4", 0, 13, 0, "Omar Reyes", "Gutter cleaning", "27 Walnut Street", "mock-ben"),
+    visit("mock-visit-5", 0, 15, 0, "Tess Nguyen", "Fence estimate", "3 Willow Court", "mock-ben", false),
   ];
 }
+
+const MOCK_TEAM: OwnerTeamMember[] = [
+  { employeeId: "mock-owner", name: "Owner", color: "#2f6b45", active: true, offersTimes: true },
+  { employeeId: "mock-ana", name: "Ana Ruiz", color: "#2563eb", active: true, offersTimes: false },
+  { employeeId: "mock-ben", name: "Ben Cole", color: "#9333ea", active: true, offersTimes: false },
+];
 
 function mockOwnerState(): MockOwnerState {
   const g = globalThis as { __gvasMockOwner?: MockOwnerState };
@@ -314,7 +349,7 @@ function mockOwnerState(): MockOwnerState {
     g.__gvasMockOwner.statusBeforePaid ??= new Map();
     g.__gvasMockOwner.plans ??= [];
     g.__gvasMockOwner.payments ??= [];
-    g.__gvasMockOwner.visits ??= mockVisits();
+    if (!g.__gvasMockOwner.visits?.some((visit) => visit.employeeId)) g.__gvasMockOwner.visits = mockVisits();
     return g.__gvasMockOwner;
   }
   const quote = (
@@ -733,6 +768,7 @@ export async function decideOwnerBooking(
   reference: string,
   approve: boolean,
   reason?: string,
+  employeeId?: string,
 ): Promise<BookingDecisionResult> {
   if (gvasEnv.mock) {
     const state = assertMockOwner(sessionToken);
@@ -757,7 +793,10 @@ export async function decideOwnerBooking(
   return ownerRequest<BookingDecisionResult>(
     `/v1/owner/bookings/${enc(reference)}/${action}`,
     sessionToken,
-    { method: "POST", body: JSON.stringify(approve ? {} : { reason: reason || null }) },
+    {
+      method: "POST",
+      body: JSON.stringify(approve ? (employeeId ? { employeeId } : {}) : { reason: reason || null }),
+    },
   );
 }
 
@@ -769,7 +808,32 @@ export type NewOwnerVisit = {
   phone?: string | null;
   address?: string | null;
   notes?: string | null;
+  employeeId?: string | null;
 };
+
+const mockTeam = globalThis as { __gvasMockTeam?: OwnerTeamMember[] };
+
+export async function getOwnerTeam(sessionToken: string): Promise<OwnerTeamMember[]> {
+  if (gvasEnv.mock) {
+    assertMockOwner(sessionToken);
+    return (mockTeam.__gvasMockTeam ??= MOCK_TEAM.map((member) => ({ ...member })));
+  }
+  return (await ownerRequest<{ team: OwnerTeamMember[] }>("/v1/owner/team", sessionToken)).team;
+}
+
+/** Whose open times Gus offers customers; at least one. */
+export async function setOwnerOffering(sessionToken: string, employeeIds: string[]): Promise<void> {
+  if (gvasEnv.mock) {
+    const team = await getOwnerTeam(sessionToken);
+    if (!employeeIds.length) throw new GvasError("conflict", "Pick at least one person whose times Gus offers.", 409);
+    for (const member of team) member.offersTimes = employeeIds.includes(member.employeeId);
+    return;
+  }
+  await ownerRequest("/v1/owner/team/offering", sessionToken, {
+    method: "PUT",
+    body: JSON.stringify({ employeeIds }),
+  });
+}
 
 function mockVisit(sessionToken: string, eventId: string): OwnerCalendarEvent {
   const visit = assertMockOwner(sessionToken).visits.find((item) => item.eventId === eventId);
@@ -777,11 +841,18 @@ function mockVisit(sessionToken: string, eventId: string): OwnerCalendarEvent {
   return visit;
 }
 
-function mockOverlaps(sessionToken: string, start: string, end: string, except?: string): boolean {
+function mockOverlaps(
+  sessionToken: string,
+  start: string,
+  end: string,
+  except?: string,
+  employeeId?: string | null,
+): boolean {
   return assertMockOwner(sessionToken).visits.some(
     (item) =>
       item.status === "confirmed" &&
       item.eventId !== except &&
+      (!employeeId || !item.employeeId || item.employeeId === employeeId) &&
       item.start < end &&
       (item.end ?? item.start) > start,
   );
@@ -789,16 +860,28 @@ function mockOverlaps(sessionToken: string, start: string, end: string, except?:
 
 const OVERLAP = "That time overlaps another visit or a time someone is booking.";
 
-export async function moveOwnerVisit(sessionToken: string, eventId: string, start: string, end: string): Promise<void> {
+export async function moveOwnerVisit(
+  sessionToken: string,
+  eventId: string,
+  start: string,
+  end: string,
+  employeeId?: string,
+): Promise<void> {
   if (gvasEnv.mock) {
     const visit = mockVisit(sessionToken, eventId);
-    if (mockOverlaps(sessionToken, start, end, eventId)) throw new GvasError("conflict", OVERLAP, 409);
+    const who = employeeId ?? visit.employeeId ?? null;
+    if (mockOverlaps(sessionToken, start, end, eventId, who)) throw new GvasError("conflict", OVERLAP, 409);
     Object.assign(visit, { start, end });
+    if (employeeId) {
+      const member = (await getOwnerTeam(sessionToken)).find((item) => item.employeeId === employeeId);
+      if (!member) throw new GvasError("conflict", "That person wasn't found.", 409);
+      Object.assign(visit, { employeeId, employeeName: member.name, assigned: true });
+    }
     return;
   }
   await ownerRequest(`/v1/owner/visits/${enc(eventId)}/move`, sessionToken, {
     method: "POST",
-    body: JSON.stringify({ start, end }),
+    body: JSON.stringify(employeeId ? { start, end, employeeId } : { start, end }),
   });
 }
 
@@ -851,7 +934,9 @@ export async function cancelOwnerVisit(sessionToken: string, eventId: string): P
 export async function addOwnerVisit(sessionToken: string, visit: NewOwnerVisit): Promise<string> {
   if (gvasEnv.mock) {
     const state = assertMockOwner(sessionToken);
-    if (mockOverlaps(sessionToken, visit.start, visit.end)) throw new GvasError("conflict", OVERLAP, 409);
+    const who = visit.employeeId ?? "mock-owner";
+    if (mockOverlaps(sessionToken, visit.start, visit.end, undefined, who)) throw new GvasError("conflict", OVERLAP, 409);
+    const member = (await getOwnerTeam(sessionToken)).find((item) => item.employeeId === who);
     const eventId = `mock-visit-${state.visits.length + 1}`;
     state.visits.push({
       source: "booking",
@@ -865,6 +950,9 @@ export async function addOwnerVisit(sessionToken: string, visit: NewOwnerVisit):
       reference: null,
       eventId,
       status: "confirmed",
+      employeeId: who,
+      employeeName: member?.name ?? null,
+      assigned: Boolean(visit.employeeId),
     });
     return eventId;
   }
