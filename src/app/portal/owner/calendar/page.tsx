@@ -2,7 +2,9 @@ import Link from "next/link";
 import {
   getOwnerBookings,
   getOwnerCalendar,
+  getOwnerGoogleCalendar,
   getOwnerTimeZone,
+  type OwnerGoogleCalendar,
   getOwnerVisitEditing,
   type OwnerBooking,
   type OwnerCalendar,
@@ -10,6 +12,45 @@ import {
 import { redirectOwnerOnUnauthorized, requireOwnerSessionToken } from "@/lib/owner-session";
 import { LoadError, dayKey, firstParam, zoneName } from "../ui";
 import { OwnerCalendarView, type CalendarViewName } from "./owner-calendar";
+import { connectGoogleCalendarAction } from "../actions";
+
+const GOOGLE_NOTICES: Record<string, string> = {
+  connected: "Done. Your busy times show up here within a minute.",
+  failed: "Google Calendar didn't connect. Please try again.",
+  cancelled: "Google Calendar wasn't connected.",
+};
+
+function GoogleCalendarStrip({ google, notice }: { google: OwnerGoogleCalendar; notice?: string }) {
+  if (!google.available) return null;
+  const text =
+    google.state === "active"
+      ? "Google Calendar is connected. Your busy times block bookings, and visits are copied to a \"Güd Office visits\" calendar."
+      : google.state === "reconnect"
+        ? "Google Calendar stopped letting us in, so online booking is paused. Reconnect to turn it back on."
+        : "Connect Google Calendar so customers can't book over your own appointments.";
+  return (
+    <div className="rounded-2xl border border-line bg-paper px-5 py-3 text-[13px] text-muted">
+      {notice && GOOGLE_NOTICES[notice] && (
+        <p className="mb-2 font-medium text-ink" role="status">
+          {GOOGLE_NOTICES[notice]}
+        </p>
+      )}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p>{text}</p>
+        {google.state !== "active" && (
+          <form action={connectGoogleCalendarAction}>
+            <button
+              type="submit"
+              className="min-h-11 rounded-full border border-line bg-ink px-4 text-[13px] font-semibold text-paper"
+            >
+              {google.state === "reconnect" ? "Reconnect Google Calendar" : "Connect Google Calendar"}
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +82,10 @@ export default async function OwnerCalendarPage({
 
   let calendar: OwnerCalendar | null = null;
   let bookings: OwnerBooking[] = [];
-  const [calendarResult, bookingsResult] = await Promise.allSettled([
+  const [calendarResult, bookingsResult, googleResult] = await Promise.allSettled([
     getOwnerCalendar(token, start, end),
     getOwnerBookings(token),
+    getOwnerGoogleCalendar(token),
   ]);
   if (calendarResult.status === "fulfilled") {
     calendar = calendarResult.value;
@@ -76,6 +118,9 @@ export default async function OwnerCalendarPage({
             <div className="rounded-2xl border border-line bg-peach-2 px-5 py-3 text-[13px] text-muted" role="alert">
               {calendar.problems.join(" ")}
             </div>
+          )}
+          {googleResult.status === "fulfilled" && (
+            <GoogleCalendarStrip google={googleResult.value} notice={firstParam(params.google)} />
           )}
           <OwnerCalendarView
             events={calendar.events}

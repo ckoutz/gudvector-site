@@ -16,6 +16,7 @@ import {
   type NewOwnerVisit,
   recordOwnerPlanPayment,
   sendOwnerInvoice,
+  startOwnerGoogleConnect,
   undoOwnerPlanPayment,
   type ManualPaymentMethod,
   updateOwnerSettings,
@@ -324,4 +325,18 @@ export async function addVisitAction(visit: NewOwnerVisit): Promise<VisitResult>
       }),
     "addVisitAction",
   );
+}
+
+/** Sends the owner to Google's sign-in; a refusal comes back as ?google=failed. */
+export async function connectGoogleCalendarAction(): Promise<void> {
+  const token = await requireOwnerSessionToken();
+  let url: string;
+  try {
+    url = await startOwnerGoogleConnect(token);
+  } catch (err) {
+    redirectOwnerOnUnauthorized(err);
+    if (!isGvasError(err) || err.kind !== "conflict") console.error("connectGoogleCalendarAction failed", err);
+    redirect("/portal/owner/calendar?google=failed");
+  }
+  redirect(url);
 }

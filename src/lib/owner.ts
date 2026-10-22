@@ -802,6 +802,44 @@ export async function moveOwnerVisit(sessionToken: string, eventId: string, star
   });
 }
 
+/** The business's Google Calendar link: ``none``, ``active`` or ``reconnect``. */
+export type OwnerGoogleCalendar = { available: boolean; state: string; lastSyncAt: string | null };
+
+const mockGoogle = globalThis as { __gvasMockGoogle?: string };
+
+export async function getOwnerGoogleCalendar(sessionToken: string): Promise<OwnerGoogleCalendar> {
+  if (gvasEnv.mock) {
+    assertMockOwner(sessionToken);
+    const state = mockGoogle.__gvasMockGoogle ?? "none";
+    return { available: true, state, lastSyncAt: state === "active" ? new Date().toISOString() : null };
+  }
+  return ownerRequest<OwnerGoogleCalendar>("/v1/owner/calendar/google", sessionToken);
+}
+
+/** The Google sign-in address; Google sends the owner back to /portal/owner/calendar/google. */
+export async function startOwnerGoogleConnect(sessionToken: string): Promise<string> {
+  if (gvasEnv.mock) {
+    assertMockOwner(sessionToken);
+    return "/portal/owner/calendar/google?code=mock-code&state=mock-state";
+  }
+  const started = await ownerRequest<{ url: string }>("/v1/owner/calendar/google/start", sessionToken, {
+    method: "POST",
+  });
+  return started.url;
+}
+
+export async function finishOwnerGoogleConnect(sessionToken: string, code: string, state: string): Promise<void> {
+  if (gvasEnv.mock) {
+    assertMockOwner(sessionToken);
+    mockGoogle.__gvasMockGoogle = "active";
+    return;
+  }
+  await ownerRequest("/v1/owner/calendar/google/finish", sessionToken, {
+    method: "POST",
+    body: JSON.stringify({ code, state }),
+  });
+}
+
 export async function cancelOwnerVisit(sessionToken: string, eventId: string): Promise<void> {
   if (gvasEnv.mock) {
     mockVisit(sessionToken, eventId).status = "cancelled";
