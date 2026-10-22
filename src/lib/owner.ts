@@ -57,7 +57,8 @@ export type OwnerQuotePaidBy = {
 export type ManualPayment = { paidOn: string; method: ManualPaymentMethod; note?: string };
 
 export type OwnerCustomer = {
-  email: string;
+  /** Null for a customer added by text with only a phone: no portal sign-in until one is added. */
+  email: string | null;
   name: string | null;
   phone: string | null;
   smsConsent: boolean | null;

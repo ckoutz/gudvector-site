@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
 import type { OwnerBooking, OwnerCustomer } from "@/lib/owner";
 
-/** A customer's address in the dashboard: a hash, so the e-mail stays out of URLs and logs. */
-export function customerKey(email: string): string {
-  return createHash("sha256").update(email.trim().toLowerCase()).digest("hex").slice(0, 16);
+/** A customer's address in the dashboard: a hash, so the e-mail (or, with none, the phone)
+ * stays out of URLs and logs. */
+export function customerKey(customer: Pick<OwnerCustomer, "email" | "phone">): string {
+  const id = customer.email ? customer.email.trim().toLowerCase() : `phone:${customer.phone ?? ""}`;
+  return createHash("sha256").update(id).digest("hex").slice(0, 16);
 }
 
 export function sameEmail(a: string | null | undefined, b: string | null | undefined): boolean {
