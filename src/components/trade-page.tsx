@@ -2,7 +2,7 @@ import { PageHero } from "@/components/page-hero";
 import { Section, SectionHeading } from "@/components/section";
 import { Faq } from "@/components/faq";
 import { siteConfig } from "@/lib/site-config";
-import type { Trade } from "@/lib/trades";
+import { larkspurExampleLine, type Trade } from "@/lib/trades";
 
 export function TradePage({ trade }: { trade: Trade }) {
   return (
@@ -78,7 +78,7 @@ export function TradePage({ trade }: { trade: Trade }) {
         <SectionHeading
           eyebrow="Try it"
           title="See it on a demo we built."
-          lede="See Gus work for a different business: the Larkspur demo (a made-up landscaping company). Gus works the same way for any trade."
+          lede={larkspurExampleLine}
         />
         <a
           href={siteConfig.demoUrl}
