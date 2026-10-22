@@ -198,6 +198,8 @@ export type OwnerMe = {
     timezone: string | null;
     /** Invoices are switched on for this business (the demo, for now). */
     invoices?: boolean;
+    /** Visits are booked through our own engine, so the dashboard can add, move and cancel them. */
+    visitEditing?: boolean;
   };
 };
 
@@ -616,6 +618,7 @@ export async function getOwnerMe(sessionToken: string): Promise<OwnerMe> {
         calendlyUrl: state.settings.calendlyUrl,
         timezone: state.settings.timezone,
         invoices: mockInvoicesOn(),
+        visitEditing: true,
       },
     };
   }
@@ -631,6 +634,15 @@ export const getOwnerTimeZone = cache(async (sessionToken: string): Promise<stri
     return (await getOwnerMe(sessionToken)).business.timezone || DEFAULT_TIME_ZONE;
   } catch {
     return DEFAULT_TIME_ZONE;
+  }
+});
+
+/** Whether this business's visits can be changed from the dashboard (engine businesses only). */
+export const getOwnerVisitEditing = cache(async (sessionToken: string): Promise<boolean> => {
+  try {
+    return Boolean((await getOwnerMe(sessionToken)).business.visitEditing);
+  } catch {
+    return false;
   }
 });
 

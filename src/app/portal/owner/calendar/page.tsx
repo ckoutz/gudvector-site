@@ -3,6 +3,7 @@ import {
   getOwnerBookings,
   getOwnerCalendar,
   getOwnerTimeZone,
+  getOwnerVisitEditing,
   type OwnerBooking,
   type OwnerCalendar,
 } from "@/lib/owner";
@@ -26,7 +27,7 @@ export default async function OwnerCalendarPage({
   const params = await searchParams;
   const view = VIEWS[firstParam(params.view) ?? ""] ?? "timeGridWeek";
   const token = await requireOwnerSessionToken();
-  const zone = await getOwnerTimeZone(token);
+  const [zone, canEdit] = await Promise.all([getOwnerTimeZone(token), getOwnerVisitEditing(token)]);
 
   const todayKey = dayKey(new Date(), zone);
   const asked = firstParam(params.date) ?? "";
@@ -82,6 +83,7 @@ export default async function OwnerCalendarPage({
             zone={zone}
             initialView={view}
             initialDate={dateKey}
+            canEdit={canEdit}
             viewChosen={Boolean(VIEWS[firstParam(params.view) ?? ""])}
           />
           <p className="text-[13px] text-muted">

@@ -17,12 +17,14 @@ export type CalendarViewName = "timeGridDay" | "timeGridWeek" | "dayGridMonth";
 const COLORS = {
   confirmed: { backgroundColor: "#e3f0e6", borderColor: "#2f6b45", textColor: "#1d3b27" },
   pending: { backgroundColor: "#fdf0dc", borderColor: "#d9922e", textColor: "#6b4410" },
+  completed: { backgroundColor: "#e7eef7", borderColor: "#5b7aa6", textColor: "#24364f" },
   calendar: { backgroundColor: "#eeede9", borderColor: "#9a978f", textColor: "#4a4842" },
 };
 
 function colorsFor(event: OwnerCalendarEvent) {
   if (event.source === "request") return COLORS.pending;
   if (event.source === "calendar") return COLORS.calendar;
+  if (event.status === "completed") return COLORS.completed;
   return COLORS.confirmed;
 }
 
@@ -38,6 +40,7 @@ export function OwnerCalendarView({
   initialView,
   initialDate,
   viewChosen,
+  canEdit,
 }: {
   events: OwnerCalendarEvent[];
   bookings: OwnerBooking[];
@@ -46,6 +49,8 @@ export function OwnerCalendarView({
   initialDate: string;
   /** False when the URL names no view: phones then open on the day view. */
   viewChosen: boolean;
+  /** Engine businesses only; Calendly visits are changed in Calendly. */
+  canEdit: boolean;
 }) {
   const router = useRouter();
   const calendarRef = useRef<FullCalendar>(null);
@@ -68,7 +73,7 @@ export function OwnerCalendarView({
     start: event.allDay ? event.start.slice(0, 10) : event.start,
     end: (event.allDay ? event.end?.slice(0, 10) : event.end) ?? undefined,
     allDay: event.allDay,
-    editable: Boolean(event.eventId) && event.status === "confirmed",
+    editable: canEdit && Boolean(event.eventId) && event.status === "confirmed",
     extendedProps: { index },
     ...colorsFor(event),
   }));
@@ -129,7 +134,7 @@ export function OwnerCalendarView({
           timeZone={zone}
           initialView={initialView}
           initialDate={initialDate}
-          headerToolbar={{ left: "today prev,next title", center: "", right: "timeGridDay,timeGridWeek,dayGridMonth addVisit" }}
+          headerToolbar={{ left: "today prev,next title", center: "", right: canEdit ? "timeGridDay,timeGridWeek,dayGridMonth addVisit" : "timeGridDay,timeGridWeek,dayGridMonth" }}
           buttonText={{ today: "Today", day: "Day", week: "Week", month: "Month" }}
           customButtons={{
             addVisit: {
@@ -144,7 +149,7 @@ export function OwnerCalendarView({
           events={inputs}
           eventStartEditable
           eventDurationEditable
-          selectable
+          selectable={canEdit}
           selectMirror
           nowIndicator
           slotMinTime="07:00:00"
@@ -165,6 +170,7 @@ export function OwnerCalendarView({
             selected={selected}
             zone={zone}
             pending={pending}
+            canEdit={canEdit}
             onClose={() => setSelected(null)}
             onCancelVisit={(eventId) => run(() => cancelVisitAction(eventId), () => setSelected(null))}
           />
@@ -195,6 +201,7 @@ export function OwnerCalendarView({
               [
                 ["Confirmed", COLORS.confirmed],
                 ["Pending approval", COLORS.pending],
+                ["Completed", COLORS.completed],
                 ["Your own calendar", COLORS.calendar],
               ] as const
             ).map(([label, colors]) => (
@@ -214,12 +221,14 @@ function VisitPanel({
   selected,
   zone,
   pending,
+  canEdit,
   onClose,
   onCancelVisit,
 }: {
   selected: Selected;
   zone: string;
   pending: boolean;
+  canEdit: boolean;
   onClose: () => void;
   onCancelVisit: (eventId: string) => void;
 }) {
@@ -270,7 +279,7 @@ function VisitPanel({
           </form>
         </div>
       )}
-      {event.eventId && event.status === "confirmed" && (
+      {canEdit && event.eventId && event.status === "confirmed" && (
         <div className="mt-4 space-y-2">
           <p className="text-[12px] text-muted">Drag the visit on the calendar to move it. The customer is told.</p>
           <button type="button" disabled={pending} onClick={() => onCancelVisit(event.eventId as string)} className={buttonSecondary}>
